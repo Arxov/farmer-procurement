@@ -362,7 +362,7 @@ export default function BookSlot() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                     {availability.map((item) => {
                       const isSelected = date === item.date;
-                      const d = new date(item.date + 'T00:00:00');
+                      const d = new Date(item.date + 'T00:00:00');
                       const todayStr = new Date().toISOString().split('T')[0];
                       const tmrw = new Date();
                       tmrw.setDate(tmrw.getDate() + 1);
