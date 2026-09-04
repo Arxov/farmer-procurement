@@ -363,6 +363,7 @@ export default function FarmerDashboard() {
                   });
                   if (res.ok) {
                     showToast('Booking cancelled successfully', 'info');
+                      queryClient.invalidateQueries({ queryKey: bookingsQueryKeys.farmer(user?.id) });
                   } else {
                     showToast('Failed to cancel booking', 'error');
                   }
@@ -552,6 +553,7 @@ export default function FarmerDashboard() {
     </PullToRefresh>
   );
 }
+
 
 
 
