@@ -43,7 +43,7 @@ export default function FarmerDashboard() {
     if (!session) return;
     const { synced, failed } = await syncOfflineQueue(session.access_token);
     if (synced > 0) {
-      setSyncMessage(`âœ… ${synced} offline booking(s) synced successfully!${failed > 0 ? ` ${failed} failed.` : ''}`);
+      setSyncMessage(`✅ ${synced} offline booking(s) synced successfully!${failed > 0 ? ` ${failed} failed.` : ''}`);
       setTimeout(() => setSyncMessage(''), 5000);
     }
   };
@@ -132,7 +132,7 @@ export default function FarmerDashboard() {
         playQueueChime();
       }
       triggerQueueHaptic();
-      showToast('ðŸš¨ Your turn is near! Please proceed to the procurement bay.', 'info');
+      showToast('🚨 Your turn is near! Please proceed to the procurement bay.', 'info');
     } else if (!hasLeaveNow) {
       alertedRef.current = false;
     }
@@ -190,7 +190,7 @@ export default function FarmerDashboard() {
         {/* Rejection Alert Box */}
         {b.status === 'rejected' && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
-            <p className="font-bold text-red-800 text-sm">âŒ Booking Rejected by Centre</p>
+            <p className="font-bold text-red-800 text-sm">❌ Booking Rejected by Centre</p>
             {b.quality_notes && (
               <p className="text-xs text-red-700 mt-0.5">{b.quality_notes}</p>
             )}
@@ -203,7 +203,7 @@ export default function FarmerDashboard() {
         {/* Leave Now Alert */}
         {isLeaveNow && (
           <div className="bg-orange-50 border border-orange-300 rounded-lg p-3 mb-3 flex items-center gap-2">
-            <span className="text-2xl">ðŸš¨</span>
+            <span className="text-2xl">🚨</span>
             <div>
               <p className="font-bold text-orange-800 text-sm">
                 {queuePos === 1 ? "It's your turn!" : `Your turn is coming! Position: ${queuePos}`}
@@ -219,7 +219,7 @@ export default function FarmerDashboard() {
               <CropBadge name={b.commodities?.name} size="xs" />
               <span className="text-xs font-bold text-gray-800 dark:text-neutral-200">{b.centres?.name}</span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{b.slot_date} â€” {b.slot_window}</p>
+            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{b.slot_date} — {b.slot_window}</p>
             {b.expected_quantity_quintals && (
               <p className="text-xs text-gray-400 mt-0.5">Qty: {b.expected_quantity_quintals} quintals</p>
             )}
@@ -233,7 +233,7 @@ export default function FarmerDashboard() {
           <div className="mt-2 bg-gray-50 dark:bg-neutral-900 rounded-lg p-2">
             <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400">
               {t('queuePosition')}: <strong className="text-lg">{b.queue_entries[0].queue_position ?? '-'}</strong>
-              <span className="mx-2">â€¢</span>
+              <span className="mx-2">•</span>
               {t('estWait')}: <strong>{b.queue_entries[0].estimated_wait_minutes ?? '-'} {t('min')}</strong>
             </p>
           </div>
@@ -259,12 +259,12 @@ export default function FarmerDashboard() {
               })()}
 
               {[
-                { id: 'booked', label: 'Booked', icon: 'ðŸ“' },
-                { id: 'checked_in', label: 'Checked In', icon: 'ðŸ“' },
-                { id: 'weighed', label: 'Weighed', icon: 'âš–ï¸' },
-                { id: 'quality_checked', label: 'Quality', icon: 'ðŸ”' },
-                { id: 'accepted', label: 'Accepted', icon: 'âœ…' },
-                { id: 'paid', label: 'Paid', icon: 'ðŸ’°' },
+                { id: 'booked', label: 'Booked', icon: '📝' },
+                { id: 'checked_in', label: 'Checked In', icon: '📍' },
+                { id: 'weighed', label: 'Weighed', icon: '⚖️' },
+                { id: 'quality_checked', label: 'Quality', icon: '🔍' },
+                { id: 'accepted', label: 'Accepted', icon: '✅' },
+                { id: 'paid', label: 'Paid', icon: '💰' },
               ].map((step, idx) => {
                 const steps = ['booked', 'checked_in', 'weighed', 'quality_checked', 'accepted', 'paid'];
                 const currentIndex = steps.indexOf(b.status);
@@ -282,7 +282,7 @@ export default function FarmerDashboard() {
                           : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 border border-gray-200 dark:border-neutral-700'
                       }`}
                     >
-                      {isCompleted ? 'âœ“' : idx + 1}
+                      {isCompleted ? '✓' : idx + 1}
                     </div>
                     <span
                       className={`text-[10px] mt-1 font-medium text-center whitespace-nowrap ${
@@ -303,16 +303,16 @@ export default function FarmerDashboard() {
         )}
 
         {b.actual_weight_quintals && (
-          <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">âš–ï¸ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
-            {b.quality_grade && <span> â€¢ Grade: <strong>{b.quality_grade}</strong></span>}
+          <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">⚖️ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
+            {b.quality_grade && <span> • Grade: <strong>{b.quality_grade}</strong></span>}
           </p>
         )}
 
         {b.payments?.[0] && (
           <div className="text-sm mt-2 bg-green-50 rounded-lg p-2">
             <p className="text-gray-700 dark:text-neutral-300">
-              ðŸ’° {t('payment')}: <strong className="capitalize">{b.payments[0].status}</strong>
-              {b.payments[0].amount ? ` â€” â‚¹${Number(b.payments[0].amount).toLocaleString()}` : ''}
+              💰 {t('payment')}: <strong className="capitalize">{b.payments[0].status}</strong>
+              {b.payments[0].amount ? ` — ₹${Number(b.payments[0].amount).toLocaleString()}` : ''}
             </p>
             {b.payments[0].utr_reference && (
               <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-1">UTR: {b.payments[0].utr_reference}</p>
@@ -342,12 +342,12 @@ export default function FarmerDashboard() {
         <div className="flex gap-2.5 mt-3 flex-wrap items-center">
           {['booked', 'checked_in'].includes(b.status) && (
             <Link href={`/farmer/token/${b.id}`} className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg hover:bg-emerald-100 transition inline-flex items-center gap-1">
-              ðŸŽ« Appointment Slip &rarr;
+              🎟️ Appointment Slip &rarr;
             </Link>
           )}
           {b.gate_passes?.[0] && (
             <Link href={`/farmer/gate-pass/${b.id}`} className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg hover:bg-green-100 transition inline-flex items-center gap-1">
-              ðŸ“„ Official Gate Pass &rarr;
+              📄 Official Gate Pass &rarr;
             </Link>
           )}
           {b.status === 'booked' && (
@@ -370,10 +370,10 @@ export default function FarmerDashboard() {
                 }}
                 className="text-sm text-red-600 font-medium hover:underline"
               >
-                âœ• Cancel
+                ✖ Cancel
               </button>
               <Link href={`/farmer/book-slot?reschedule=${b.id}`} className="text-sm text-blue-600 font-medium hover:underline">
-                ðŸ”„ Reschedule
+                🔄 Reschedule
               </Link>
             </>
           )}
@@ -398,12 +398,12 @@ export default function FarmerDashboard() {
                 title={audioAlerts ? 'Audio alert enabled for your queue turn' : 'Audio alert muted'}
                 aria-label={audioAlerts ? 'Mute queue audio alerts' : 'Enable queue audio alerts'}
               >
-                <span>{audioAlerts ? 'ðŸ””' : 'ðŸ”•'}</span>
+                <span>{audioAlerts ? '🔔' : '🔕'}</span>
                 <span className="hidden sm:inline">{audioAlerts ? 'Alerts On' : 'Alerts Muted'}</span>
               </button>
               <VoiceAssistance profile={profile} bookings={bookings} commodities={commodities} />
               <NotificationBell bookings={bookings} />
-              <Link href="/ivr-demo" className="bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-amber-700">ðŸŽ™ï¸ IVR</Link>
+              <Link href="/ivr-demo" className="bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-amber-700">🎙️ IVR</Link>
               <Link href="/farmer/book-slot" className="bg-green-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-green-800">{t('bookSlot')}</Link>
               <Link href="/farmer/grievances" className="bg-yellow-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-yellow-700">{t('viewGrievances')}</Link>
               <button onClick={handleLogout} className="bg-gray-200 text-gray-700 dark:text-neutral-300 px-3 py-1.5 rounded-xl text-xs font-medium hover:bg-gray-300">{t('logout')}</button>
@@ -420,12 +420,12 @@ export default function FarmerDashboard() {
                 </span>
                 <h2 className="text-lg font-bold mt-1">{profile.full_name || 'Kisan Mitra'}</h2>
                 <p className="text-xs text-emerald-200">
-                  ðŸ“± {profile.phone || '-'} â€¢ ðŸ“ {profile.village || 'APMC Region'}
-                  {profile.land_holding_acres ? ` â€¢ ðŸŒ¾ ${profile.land_holding_acres} Acres` : ''}
+                  📱 {profile.phone || '-'} • 📍 {profile.village || 'APMC Region'}
+                  {profile.land_holding_acres ? ` • 🌾 ${profile.land_holding_acres} Acres` : ''}
                 </p>
               </div>
               <div className="bg-emerald-700/60 border border-emerald-500/40 rounded-full px-3 py-1 flex items-center gap-1.5 text-xs text-emerald-100">
-                <span>ðŸ›¡ï¸</span>
+                <span>🛡️</span>
                 <span className="font-semibold">Aadhaar eKYC Verified</span>
               </div>
             </div>
@@ -435,7 +435,7 @@ export default function FarmerDashboard() {
               <div>
                 <p className="text-[11px] text-emerald-200 font-medium">Total DBT Earned</p>
                 <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
-                  â‚¹{totalEarnings.toLocaleString()}
+                  ₹{totalEarnings.toLocaleString()}
                 </p>
               </div>
               <div className="border-x border-emerald-700/60">
@@ -459,7 +459,7 @@ export default function FarmerDashboard() {
           <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-4 mb-6">
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-base">ðŸŒ¾</span>
+                <span className="text-base">🌾</span>
                 <h3 className="text-xs font-bold text-gray-800 dark:text-neutral-200 uppercase tracking-wider">
                   Live Govt. MSP Rates (2026 Season)
                 </h3>
@@ -480,7 +480,7 @@ export default function FarmerDashboard() {
                       )}
                     </div>
                     <p className="text-sm font-extrabold text-green-700 mt-1">
-                      â‚¹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400 dark:text-neutral-400">/q</span>
+                      ₹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400 dark:text-neutral-400">/q</span>
                     </p>
                   </div>
                   <Link
@@ -513,13 +513,13 @@ export default function FarmerDashboard() {
 
         {!loading && getOfflineQueue().length > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 text-sm">
-            ðŸ“¡ {getOfflineQueue().length} booking(s) queued offline â€” will sync when you reconnect.
+            📡 {getOfflineQueue().length} booking(s) queued offline — will sync when you reconnect.
           </div>
         )}
 
         {!loading && bookings.length === 0 && (
           <EmptyState
-            icon="ðŸŒ¾"
+            icon="🌾"
             title="No Bookings Yet"
             description="You haven't booked any procurement slots. Choose a centre and book your first slot easily."
             actionText="Book a Slot Now"
@@ -530,7 +530,7 @@ export default function FarmerDashboard() {
         {/* Upcoming Bookings */}
         {upcoming.length.toLocaleString() > 0 && (
           <>
-            <h2 className="text-md font-semibold text-gray-700 dark:text-neutral-300 mb-3">ðŸ“… Upcoming</h2>
+            <h2 className="text-md font-semibold text-gray-700 dark:text-neutral-300 mb-3">📅 Upcoming</h2>
             <div className="space-y-4 mb-8">
               {upcoming.map(renderBookingCard)}
             </div>
@@ -540,7 +540,7 @@ export default function FarmerDashboard() {
         {/* Past Bookings */}
         {past.length > 0 && (
           <>
-            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-3">ðŸ“‹ Past / Completed</h2>
+            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-3">📋 Past / Completed</h2>
             <div className="space-y-3 opacity-80">
               {past.map(renderBookingCard)}
             </div>

@@ -197,14 +197,14 @@ export default function BookSlot() {
         {suggestion && (
           <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-5 shadow-xs">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">ðŸ’¡</span>
+              <span className="text-base">💡</span>
               <p className="text-sm font-bold text-emerald-900">{t('suggestedSlot')}</p>
             </div>
             <p className="text-xs text-emerald-800">
               Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>
             </p>
             <p className="text-[11px] text-emerald-600 mt-1 font-medium">
-              âš¡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
+              ⚡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
             </p>
             <button
               onClick={applySuggestion}
@@ -219,15 +219,15 @@ export default function BookSlot() {
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
           <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5">
             <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment â€¢ Transparent 3-Step Booking</p>
+            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
           </div>
 
           {/* Stepper Header Pills */}
           <div className="flex items-center justify-between mb-6 px-1">
             {[
-              { num: 1, title: 'Mandi & Crop', icon: 'ðŸŒ¾' },
-              { num: 2, title: 'date & Slot', icon: 'ðŸ“…' },
-              { num: 3, title: 'Review & Book', icon: 'ðŸ“‹' },
+              { num: 1, title: 'Mandi & Crop', icon: '🌾' },
+              { num: 2, title: 'date & Slot', icon: '📅' },
+              { num: 3, title: 'Review & Book', icon: '📋' },
             ].map((s, idx) => (
               <div key={s.num} className="flex items-center flex-1 last:flex-none">
                 <button
@@ -244,7 +244,7 @@ export default function BookSlot() {
                       : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  <span>{step > s.num ? 'âœ“' : s.icon}</span>
+                  <span>{step > s.num ? '✓' : s.icon}</span>
                   <span className="hidden sm:inline">{s.title}</span>
                   <span className="sm:hidden">{s.num}</span>
                 </button>
@@ -262,7 +262,7 @@ export default function BookSlot() {
           {/* Error Message Box */}
           {error && (
             <div className="mb-4 text-red-600 text-xs bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
-              <span>âš ï¸</span>
+              <span>⚠️</span>
               <span>{error}</span>
             </div>
           )}
@@ -282,7 +282,7 @@ export default function BookSlot() {
                   <option value="">Select centre</option>
                   {centres.map(c => (
                     <option key={c.id} value={c.id}>
-                      {c.name} â€” {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
+                      {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
                     </option>
                   ))}
                 </select>
@@ -303,7 +303,7 @@ export default function BookSlot() {
                     const crop = getCropConfig(c.name);
                     return (
                       <option key={c.id} value={c.id}>
-                        {crop.icon} {c.name} â€” Govt MSP: â‚¹{Number(c.msp_rate_per_quintal).toLocaleString()}/quintal
+                        {crop.icon} {c.name} — Govt MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}/quintal
                       </option>
                     );
                   })}
@@ -316,7 +316,7 @@ export default function BookSlot() {
                     </div>
                     <div className="text-right">
                       <span className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 block">MSP Rate</span>
-                      <span className="text-xs font-bold text-green-800">â‚¹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
+                      <span className="text-xs font-bold text-green-800">₹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
                     </div>
                   </div>
                 )}
@@ -353,7 +353,7 @@ export default function BookSlot() {
                       onClick={() => setshowCustomDate(!showCustomDate)}
                       className="text-[11px] text-green-700 hover:text-green-800 font-semibold"
                     >
-                      {showCustomDate ? 'âš¡ Show Capacity Cards' : 'ðŸ“… Or pick specific calendar date'}
+                      {showCustomDate ? '⚡ Show Capacity Cards' : '📅 Or pick specific calendar date'}
                     </button>
                   )}
                 </div>
@@ -489,13 +489,13 @@ export default function BookSlot() {
               {estPayout > 0 && (
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs flex justify-between items-center">
                   <div>
-                    <p className="text-emerald-800 font-semibold">ðŸ’° Estimated Direct Benefit (DBT)</p>
+                    <p className="text-emerald-800 font-semibold">💰 Estimated Direct Benefit (DBT)</p>
                     <p className="text-emerald-600 text-[11px]">
-                      {quantity} quintals Ã— â‚¹{Number(selectedComm?.msp_rate_per_quintal || 0).toLocaleString()}/q
+                      {quantity} quintals × ₹{Number(selectedComm?.msp_rate_per_quintal || 0).toLocaleString()}/q
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-base font-bold text-emerald-900">â‚¹{Number(estPayout).toLocaleString()}</p>
+                    <p className="text-base font-bold text-emerald-900">₹{Number(estPayout).toLocaleString()}</p>
                     <p className="text-[10px] text-emerald-700">Directly deposited to bank account</p>
                   </div>
                 </div>
@@ -504,7 +504,7 @@ export default function BookSlot() {
               {/* Booking Summary Card */}
               <div className="bg-slate-50 dark:bg-neutral-950 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
                 <p className="font-bold text-gray-800 dark:text-neutral-200 text-sm border-b border-slate-200 pb-1.5">
-                  ðŸ“‹ Appointment Summary
+                  📋 Appointment Summary
                 </p>
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Mandi Centre:</span>
@@ -548,7 +548,7 @@ export default function BookSlot() {
                       <span>{t('bookingInProgress')}</span>
                     </>
                   ) : (
-                    <span>Confirm Booking â†’</span>
+                    <span>Confirm Booking →</span>
                   )}
                 </button>
               </div>
