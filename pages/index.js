@@ -153,12 +153,11 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-green-800 bg-green-100 px-2 py-0.5 rounded">
-                  Govt. of India
+                  Farmer Portal
                 </span>
-                <span className="text-xs text-gray-400 hidden sm:inline">Ministry of Consumer Affairs & Food</span>
               </div>
               <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-neutral-100 leading-tight">
-                National Farmer Procurement Platform (CFPP)
+                Kisan Setu
               </h2>
             </div>
           </div>
@@ -180,69 +179,6 @@ export default function Home() {
 
       {/* Main Landing & Login Section */}
       <main className="max-w-6xl mx-auto px-4 py-8 sm:py-12 flex-1 flex flex-col lg:flex-row items-center gap-10 justify-center">
-        {/* Left Hero Content */}
-        <div className="flex-1 space-y-6 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
-            ✨ Smart Slot Booking & Live Queue Token Engine
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-neutral-100 tracking-tight leading-tight">
-            Fair MSP, <span className="text-green-700">Zero Wait Time</span> at Mandis.
-          </h1>
-
-          <p className="text-base sm:text-lg text-gray-600 dark:text-neutral-400 dark:text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-            Eliminate long mandi lines with real-time token scheduling, direct bank transfers with milestone tracking, and seamless quality grading for all farmers.
-          </p>
-
-          {/* Feature Highlights Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left max-w-lg mx-auto lg:mx-0">
-            <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl notranslate">⚖️</span>
-              <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Direct MSP Assurance</p>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Verified weights and transparent grade-based pricing.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl notranslate">⏱️</span>
-              <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Smart Token Scheduling</p>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Real-time queue tracker with "Leave Now" alerts.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl notranslate">💳</span>
-              <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Direct Bank Milestones</p>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Bank transfer tracking with automated UTR generation.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl notranslate">📡</span>
-              <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Offline-Ready Sync</p>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Book even without internet; auto-syncs on reconnect.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Live Trust Metrics */}
-          <div className="pt-4 border-t border-gray-200 dark:border-neutral-700 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0">
-            <div>
-              <p className="text-2xl font-bold text-green-700">100%</p>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">MSP Direct Payout</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-green-700">&lt; 30m</p>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Avg. Mandi Wait</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-green-700">Multi-State</p>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">All Major APMCs</p>
-            </div>
-          </div>
-        </div>
-
         {/* Right Authentication Box */}
         <div className="w-full max-w-md">
           <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 relative">
