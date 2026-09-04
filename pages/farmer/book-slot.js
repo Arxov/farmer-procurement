@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -17,24 +17,24 @@ export default function BookSlot() {
   const { data: centres = [] } = useCentres();
   const { data: commodities = [] } = useCommodities();
   const [centreId, setCentreId] = useState('');
-  const [commodityId, setCommodityId] = useState('');
-  const [date, setDate] = useState('');
+  const [{t('commodity').toUpperCase()}Id, set{t('commodity').toUpperCase()}Id] = useState('');
+  const [{t('date').toUpperCase()}, set{t('date').toUpperCase()}] = useState('');
   const [slotWindow, setSlotWindow] = useState(SLOT_WINDOWS[0]);
   const [quantity, setQuantity] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [suggestion, setSuggestion] = useState(null);
   const [availability, setAvailability] = useState([]);
-  const [showCustomDate, setShowCustomDate] = useState(false);
+  const [showCustom{t('date').toUpperCase()}, setShowCustom{t('date').toUpperCase()}] = useState(false);
   const [step, setStep] = useState(1);
   const router = useRouter();
   const { t } = useLanguage();
 
   useEffect(() => {
-    if (router.query.commodityId) {
-      setCommodityId(router.query.commodityId);
+    if (router.query.{t('commodity').toUpperCase()}Id) {
+      set{t('commodity').toUpperCase()}Id(router.query.{t('commodity').toUpperCase()}Id);
     }
-  }, [router.query.commodityId]);
+  }, [router.query.{t('commodity').toUpperCase()}Id]);
 
   useEffect(() => {
     // Fetch auto-suggestion
@@ -57,7 +57,7 @@ export default function BookSlot() {
   const applySuggestion = () => {
     if (!suggestion) return;
     setCentreId(suggestion.centreId);
-    setDate(suggestion.date);
+    set{t('date').toUpperCase()}(suggestion.{t('date').toUpperCase()});
     setSlotWindow(suggestion.slotWindow);
   };
 
@@ -72,31 +72,31 @@ export default function BookSlot() {
       const selectedCentre = centres.find(c => c.id === centreId);
       const capacity = selectedCentre?.daily_capacity || 100;
 
-      const dates = [];
+      const {t('date').toUpperCase()}s = [];
       for (let i = 0; i < 4; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        dates.push(d.toISOString().split('T')[0]);
+        const d = new {t('date').toUpperCase()}();
+        d.set{t('date').toUpperCase()}(d.get{t('date').toUpperCase()}() + i);
+        {t('date').toUpperCase()}s.push(d.toISOString().split('T')[0]);
       }
 
       const { data: bookingsData } = await supabase
         .from('bookings')
-        .select('slot_date')
+        .select('slot_{t('date').toUpperCase()}')
         .eq('centre_id', centreId)
-        .in('slot_date', dates)
+        .in('slot_{t('date').toUpperCase()}', {t('date').toUpperCase()}s)
         .neq('status', 'cancelled');
 
       const countMap = {};
       (bookingsData || []).forEach(b => {
-        countMap[b.slot_date] = (countMap[b.slot_date] || 0) + 1;
+        countMap[b.slot_{t('date').toUpperCase()}] = (countMap[b.slot_{t('date').toUpperCase()}] || 0) + 1;
       });
 
-      const list = dates.map(dStr => {
+      const list = {t('date').toUpperCase()}s.map(dStr => {
         const booked = countMap[dStr] || 0;
         const available = Math.max(0, capacity - booked);
         const percent = Math.min(100, Math.round((booked / capacity) * 100));
         return {
-          date: dStr,
+          {t('date').toUpperCase()}: dStr,
           booked,
           capacity,
           available,
@@ -111,18 +111,18 @@ export default function BookSlot() {
   }, [centreId, centres]);
 
   const submit = async () => {
-    if (!centreId || !commodityId || !date) {
-      setError('Please fill in all required fields (Centre, Commodity, Date).');
+    if (!centreId || !{t('commodity').toUpperCase()}Id || !{t('date').toUpperCase()}) {
+      setError('Please fill in all required fields (Centre, {t('commodity').toUpperCase()}, {t('date').toUpperCase()}).');
       return;
     }
     if (quantity && (Number.isNaN(parseFloat(quantity)) || parseFloat(quantity) <= 0)) {
-      setError('Expected quantity must be a positive number.');
+      setError('{t('expectedQuantity').toUpperCase()} must be a positive number.');
       return;
     }
     setLoading(true);
     setError('');
 
-    const bookingPayload = { centreId, commodityId, date, slotWindow, quantity };
+    const bookingPayload = { centreId, {t('commodity').toUpperCase()}Id, {t('date').toUpperCase()}, slotWindow, quantity };
 
     // Offline fallback: queue locally
     if (!navigator.onLine) {
@@ -177,7 +177,7 @@ export default function BookSlot() {
     }
   };
 
-  const selectedComm = commodities.find(c => c.id === commodityId);
+  const selectedComm = commodities.find(c => c.id === {t('commodity').toUpperCase()}Id);
   const selectedCentre = centres.find(c => c.id === centreId);
   const estPayout = selectedComm && quantity && !Number.isNaN(parseFloat(quantity))
     ? parseFloat(quantity) * parseFloat(selectedComm.msp_rate_per_quintal)
@@ -189,7 +189,7 @@ export default function BookSlot() {
         {/* Navigation Breadcrumb */}
         <div className="mb-4">
           <Link href="/farmer/dashboard" className="text-green-800 text-sm font-medium hover:underline inline-flex items-center gap-1">
-            &larr; {t('back')} to Dashboard
+            &larr; {t('back')} 
           </Link>
         </div>
 
@@ -197,14 +197,14 @@ export default function BookSlot() {
         {suggestion && (
           <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-5 shadow-xs">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">💡</span>
+              <span className="text-base">ðŸ’¡</span>
               <p className="text-sm font-bold text-emerald-900">{t('suggestedSlot')}</p>
             </div>
             <p className="text-xs text-emerald-800">
-              Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>
+              Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.{t('date').toUpperCase()}}</strong> at <strong>{suggestion.slotWindow}</strong>
             </p>
             <p className="text-[11px] text-emerald-600 mt-1 font-medium">
-              ⚡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
+              âš¡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
             </p>
             <button
               onClick={applySuggestion}
@@ -219,15 +219,15 @@ export default function BookSlot() {
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
           <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5">
             <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">{t('bookProcurementSlot')}</h1>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
+            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment â€¢ Transparent 3-Step Booking</p>
           </div>
 
           {/* Stepper Header Pills */}
           <div className="flex items-center justify-between mb-6 px-1">
             {[
-              { num: 1, title: 'Mandi & Crop', icon: '🌾' },
-              { num: 2, title: 'Date & Slot', icon: '📅' },
-              { num: 3, title: 'Review & Book', icon: '📋' },
+              { num: 1, title: 'Mandi & Crop', icon: 'ðŸŒ¾' },
+              { num: 2, title: '{t('date').toUpperCase()} & Slot', icon: 'ðŸ“…' },
+              { num: 3, title: 'Review & Book', icon: 'ðŸ“‹' },
             ].map((s, idx) => (
               <div key={s.num} className="flex items-center flex-1 last:flex-none">
                 <button
@@ -244,7 +244,7 @@ export default function BookSlot() {
                       : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  <span>{step > s.num ? '✓' : s.icon}</span>
+                  <span>{step > s.num ? 'âœ“' : s.icon}</span>
                   <span className="hidden sm:inline">{s.title}</span>
                   <span className="sm:hidden">{s.num}</span>
                 </button>
@@ -262,12 +262,12 @@ export default function BookSlot() {
           {/* Error Message Box */}
           {error && (
             <div className="mb-4 text-red-600 text-xs bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
-              <span>⚠️</span>
+              <span>âš ï¸</span>
               <span>{error}</span>
             </div>
           )}
 
-          {/* STEP 1: Mandi & Commodity */}
+          {/* STEP 1: Mandi & {t('commodity').toUpperCase()} */}
           {step === 1 && (
             <div className="space-y-4 animate-fadeIn">
               <div>
@@ -282,7 +282,7 @@ export default function BookSlot() {
                   <option value="">{t('selectCentre')}</option>
                   {centres.map(c => (
                     <option key={c.id} value={c.id}>
-                      {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
+                      {c.name} â€” {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
                     </option>
                   ))}
                 </select>
@@ -291,19 +291,19 @@ export default function BookSlot() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
-                  2. {t('commodity')} *
+                  2. {t('{t('commodity').toUpperCase()}')} *
                 </label>
                 <select
                   className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={commodityId}
-                  onChange={e => { setCommodityId(e.target.value); setError(''); }}
+                  value={{t('commodity').toUpperCase()}Id}
+                  onChange={e => { set{t('commodity').toUpperCase()}Id(e.target.value); setError(''); }}
                 >
-                  <option value="">{t('selectCommodity')}</option>
+                  <option value="">{t('select{t('commodity').toUpperCase()}')}</option>
                   {commodities.map(c => {
                     const crop = getCropConfig(c.name);
                     return (
                       <option key={c.id} value={c.id}>
-                        {crop.icon} {c.name} — Govt MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}/quintal
+                        {crop.icon} {c.name} â€” Govt MSP: â‚¹{Number(c.msp_rate_per_quintal).toLocaleString()}/quintal
                       </option>
                     );
                   })}
@@ -316,7 +316,7 @@ export default function BookSlot() {
                     </div>
                     <div className="text-right">
                       <span className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 block">MSP Rate</span>
-                      <span className="text-xs font-bold text-green-800">₹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
+                      <span className="text-xs font-bold text-green-800">â‚¹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
                     </div>
                   </div>
                 )}
@@ -325,8 +325,8 @@ export default function BookSlot() {
               <button
                 type="button"
                 onClick={() => {
-                  if (!centreId || !commodityId) {
-                    setError('Please select both a Mandi centre and a commodity to proceed.');
+                  if (!centreId || !{t('commodity').toUpperCase()}Id) {
+                    setError('Please select both a Mandi centre and a {t('commodity').toUpperCase()} to proceed.');
                     return;
                   }
                   setError('');
@@ -334,53 +334,53 @@ export default function BookSlot() {
                 }}
                 className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
               >
-                Next: Choose Date & Time Slot &rarr;
+                Next: Choose {t('date').toUpperCase()} & Time Slot &rarr;
               </button>
             </div>
           )}
 
-          {/* STEP 2: Date & Time Window */}
+          {/* STEP 2: {t('date').toUpperCase()} & Time Window */}
           {step === 2 && (
             <div className="space-y-4 animate-fadeIn">
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 uppercase tracking-wider">
-                    {t('date')} & Mandi Capacity *
+                    {t('{t('date').toUpperCase()}')} & Mandi Capacity *
                   </label>
                   {availability.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => setShowCustomDate(!showCustomDate)}
+                      onClick={() => setShowCustom{t('date').toUpperCase()}(!showCustom{t('date').toUpperCase()})}
                       className="text-[11px] text-green-700 hover:text-green-800 font-semibold"
                     >
-                      {showCustomDate ? '⚡ Show Capacity Cards' : '📅 Or pick specific calendar date'}
+                      {showCustom{t('date').toUpperCase()} ? 'âš¡ Show Capacity Cards' : 'ðŸ“… Or pick specific calendar {t('date').toUpperCase()}'}
                     </button>
                   )}
                 </div>
 
-                {!showCustomDate && availability.length > 0 ? (
+                {!showCustom{t('date').toUpperCase()} && availability.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                     {availability.map((item) => {
-                      const isSelected = date === item.date;
-                      const d = new Date(item.date + 'T00:00:00');
-                      const todayStr = new Date().toISOString().split('T')[0];
-                      const tmrw = new Date();
-                      tmrw.setDate(tmrw.getDate() + 1);
+                      const isSelected = {t('date').toUpperCase()} === item.{t('date').toUpperCase()};
+                      const d = new {t('date').toUpperCase()}(item.{t('date').toUpperCase()} + 'T00:00:00');
+                      const todayStr = new {t('date').toUpperCase()}().toISOString().split('T')[0];
+                      const tmrw = new {t('date').toUpperCase()}();
+                      tmrw.set{t('date').toUpperCase()}(tmrw.get{t('date').toUpperCase()}() + 1);
                       const tmrwStr = tmrw.toISOString().split('T')[0];
 
-                      let dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
-                      if (item.date === todayStr) dayName = 'Today';
-                      else if (item.date === tmrwStr) dayName = 'Tomorrow';
+                      let dayName = d.toLocale{t('date').toUpperCase()}String('en-IN', { weekday: 'short' });
+                      if (item.{t('date').toUpperCase()} === todayStr) dayName = 'Today';
+                      else if (item.{t('date').toUpperCase()} === tmrwStr) dayName = 'Tomorrow';
 
-                      const dayMonth = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                      const dayMonth = d.toLocale{t('date').toUpperCase()}String('en-IN', { day: 'numeric', month: 'short' });
                       const isLow = item.percent < 50;
                       const isMed = item.percent >= 50 && item.percent < 85;
 
                       return (
                         <button
                           type="button"
-                          key={item.date}
-                          onClick={() => { setDate(item.date); setError(''); }}
+                          key={item.{t('date').toUpperCase()}}
+                          onClick={() => { set{t('date').toUpperCase()}(item.{t('date').toUpperCase()}); setError(''); }}
                           className={`p-2.5 rounded-xl border text-left transition relative flex flex-col justify-between ${
                             isSelected
                               ? 'border-green-600 bg-green-50/70 ring-2 ring-green-600/20 shadow-xs'
@@ -418,10 +418,10 @@ export default function BookSlot() {
                   </div>
                 ) : (
                   <input
-                    type="date"
+                    type="{t('date').toUpperCase()}"
                     className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none mb-2"
-                    value={date}
-                    onChange={e => { setDate(e.target.value); setError(''); }}
+                    value={{t('date').toUpperCase()}}
+                    onChange={e => { set{t('date').toUpperCase()}(e.target.value); setError(''); }}
                   />
                 )}
               </div>
@@ -451,8 +451,8 @@ export default function BookSlot() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!date || !slotWindow) {
-                      setError('Please select a date and time window.');
+                    if (!{t('date').toUpperCase()} || !slotWindow) {
+                      setError('Please select a {t('date').toUpperCase()} and time window.');
                       return;
                     }
                     setError('');
@@ -489,13 +489,13 @@ export default function BookSlot() {
               {estPayout > 0 && (
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs flex justify-between items-center">
                   <div>
-                    <p className="text-emerald-800 font-semibold">💰 Estimated Direct Benefit (DBT)</p>
+                    <p className="text-emerald-800 font-semibold">ðŸ’° Estimated Direct Benefit (DBT)</p>
                     <p className="text-emerald-600 text-[11px]">
-                      {quantity} quintals × ₹{Number(selectedComm?.msp_rate_per_quintal || 0).toLocaleString()}/q
+                      {quantity} quintals Ã— â‚¹{Number(selectedComm?.msp_rate_per_quintal || 0).toLocaleString()}/q
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-base font-bold text-emerald-900">₹{Number(estPayout).toLocaleString()}</p>
+                    <p className="text-base font-bold text-emerald-900">â‚¹{Number(estPayout).toLocaleString()}</p>
                     <p className="text-[10px] text-emerald-700">Directly deposited to bank account</p>
                   </div>
                 </div>
@@ -504,19 +504,19 @@ export default function BookSlot() {
               {/* Booking Summary Card */}
               <div className="bg-slate-50 dark:bg-neutral-950 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
                 <p className="font-bold text-gray-800 dark:text-neutral-200 text-sm border-b border-slate-200 pb-1.5">
-                  📋 Appointment Summary
+                  ðŸ“‹ Appointment Summary
                 </p>
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Mandi Centre:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{selectedCentre?.name || '-'} ({selectedCentre?.district})</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Commodity:</span>
+                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{t('commodity').toUpperCase()}:</span>
                   <CropBadge name={selectedComm?.name} size="xs" />
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Inspection Date:</span>
-                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{date}</span>
+                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Inspection {t('date').toUpperCase()}:</span>
+                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{{t('date').toUpperCase()}}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Time Window:</span>
@@ -548,7 +548,7 @@ export default function BookSlot() {
                       <span>{t('bookingInProgress')}</span>
                     </>
                   ) : (
-                    <span>{t('confirmBooking')} →</span>
+                    <span>{t('confirmBooking')} â†’</span>
                   )}
                 </button>
               </div>
@@ -561,3 +561,4 @@ export default function BookSlot() {
     </div>
   );
 }
+
