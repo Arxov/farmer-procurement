@@ -38,7 +38,7 @@ export default function NotificationBell({ bookings = [] }) {
           message: `â‚¹${Number(p.amount || 0).toLocaleString()} credited for ${b.commodities?.name || 'crop'}. UTR: ${p.utr_reference || 'N/A'}`,
           time: 'Payment Confirmed',
           type: 'success',
-          link: /farmer/dashboard#booking-,
+          link: `/farmer/dashboard#booking-${b.id}`,
         });
       } else if (p.status === 'initiated') {
         notifications.push({
@@ -47,7 +47,7 @@ export default function NotificationBell({ bookings = [] }) {
           message: `â‚¹${Number(p.amount || 0).toLocaleString()} DBT transfer initiated to your linked bank account.`,
           time: 'Transfer in progress',
           type: 'info',
-          link: /farmer/dashboard#booking-,
+          link: `/farmer/dashboard#booking-${b.id}`,
         });
       }
     }
@@ -73,7 +73,7 @@ export default function NotificationBell({ bookings = [] }) {
         message: queuePos === 1 ? "It's your turn at the weighbridge!" : `Your turn is coming up soon! Position: #${queuePos}`,
         time: 'Active Queue',
         type: 'warning',
-        link: /farmer/dashboard#booking-,
+        link: `/farmer/dashboard#booking-${b.id}`,
       });
     }
 
@@ -85,7 +85,7 @@ export default function NotificationBell({ bookings = [] }) {
         message: `Appointment for ${b.commodities?.name} at ${b.centres?.name} on ${b.slot_date} (${b.slot_window}).`,
         time: b.slot_date,
         type: 'info',
-        link: /farmer/dashboard#booking-,
+        link: `/farmer/dashboard#booking-${b.id}`,
       });
     }
 
@@ -203,8 +203,7 @@ export default function NotificationBell({ bookings = [] }) {
                       }`}
                     >
                       <div className="flex justify-between items-start mb-0.5">
-                        <Link
-                          href={n.link}
+                        <a href={n.link}
                           onClick={() => {
                             markSingleRead(n.id);
                             setIsOpen(false);
@@ -212,14 +211,13 @@ export default function NotificationBell({ bookings = [] }) {
                           className="text-xs font-bold text-gray-900 dark:text-neutral-100 hover:underline flex-1"
                         >
                           {n.title}
-                        </Link>
+                        </a>
                         <span className="text-[9px] text-gray-400 font-medium ml-2">{n.time}</span>
                       </div>
                       <p className="text-[11px] text-gray-600 dark:text-neutral-400 dark:text-neutral-400 leading-snug">{n.message}</p>
 
                       <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700 flex justify-between items-center text-[10px]">
-                        <Link
-                          href={n.link}
+                        <a href={n.link}
                           onClick={() => {
                             markSingleRead(n.id);
                             setIsOpen(false);
@@ -227,7 +225,7 @@ export default function NotificationBell({ bookings = [] }) {
                           className="text-green-700 font-semibold hover:underline inline-flex items-center gap-0.5"
                         >
                           View details &rarr;
-                        </Link>
+                        </a>
 
                         {!isRead ? (
                           <button
@@ -257,4 +255,5 @@ export default function NotificationBell({ bookings = [] }) {
     </>
   );
 }
+
 

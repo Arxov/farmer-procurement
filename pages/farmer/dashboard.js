@@ -186,7 +186,7 @@ export default function FarmerDashboard() {
     const isLeaveNow = queuePos && queuePos <= 3 && ['booked', 'checked_in'].includes(b.status);
 
     return (
-      <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={b.id} className={`bg-white dark:bg-neutral-800 rounded-xl shadow p-4 ${getBorderColor(b.status)} ${isLeaveNow ? 'ring-2 ring-orange-400' : ''}`}>
+      <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={b.id} id={`booking-${b.id}`} className={`bg-white dark:bg-neutral-800 rounded-xl shadow p-4 ${getBorderColor(b.status)} ${isLeaveNow ? 'ring-2 ring-orange-400' : ''}`}>
         {/* Rejection Alert Box */}
         {b.status === 'rejected' && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
@@ -553,6 +553,7 @@ export default function FarmerDashboard() {
     </PullToRefresh>
   );
 }
+
 
 
 
