@@ -148,7 +148,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl font-bold text-amber-700">
-              ðŸ›ï¸
+              <span className="notranslate">🏛️</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -167,12 +167,12 @@ export default function Home() {
               href="/ivr-demo"
               className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1.5 shadow-2xs"
             >
-              <span>ðŸŽ™ï¸</span>
+              <span><span className="notranslate">🎙️</span></span>
               <span>IVR Voice Demo</span>
             </Link>
             <div className="text-right hidden sm:block">
               <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Toll-Free Kisan Helpline</p>
-              <p className="text-xs font-bold text-green-800">ðŸ“ž 1800-180-1551</p>
+              <p className="text-xs font-bold text-green-800">📞 1800-180-1551</p>
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function Home() {
         {/* Left Hero Content */}
         <div className="flex-1 space-y-6 text-center lg:text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
-            âœ¨ Smart Slot Booking & Live Queue Token Engine
+            ✨ Smart Slot Booking & Live Queue Token Engine
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-neutral-100 tracking-tight leading-tight">
@@ -197,28 +197,28 @@ export default function Home() {
           {/* Feature Highlights Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left max-w-lg mx-auto lg:mx-0">
             <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl">âš–ï¸</span>
+              <span className="text-xl notranslate">⚖️</span>
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Direct MSP Assurance</p>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Verified weights and transparent grade-based pricing.</p>
               </div>
             </div>
             <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl">â±ï¸</span>
+              <span className="text-xl notranslate">⏱️</span>
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Smart Token Scheduling</p>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Real-time queue tracker with "Leave Now" alerts.</p>
               </div>
             </div>
             <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl">ðŸ’³</span>
+              <span className="text-xl notranslate">💳</span>
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Direct Bank Milestones</p>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Bank transfer tracking with automated UTR generation.</p>
               </div>
             </div>
             <div className="flex items-start gap-2.5 bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-xs">
-              <span className="text-xl">ðŸ“¡</span>
+              <span className="text-xl notranslate">📡</span>
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-neutral-100">Offline-Ready Sync</p>
                 <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Book even without internet; auto-syncs on reconnect.</p>
@@ -259,13 +259,13 @@ export default function Home() {
                 onClick={() => { setLoginMode('phone'); setError(''); setOtpSent(false); setAadhaarStep(0); }}
                 className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${loginMode === 'phone' ? 'bg-white dark:bg-neutral-800 shadow-sm text-green-800' : 'text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200'}`}
               >
-                ðŸ“± {t('mobileNumber')}
+                <span className="notranslate">📱</span> {t('mobileNumber')}
               </button>
               <button
                 onClick={() => { setLoginMode('aadhaar'); setError(''); setOtpSent(false); setAadhaarStep(0); }}
                 className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${loginMode === 'aadhaar' ? 'bg-white dark:bg-neutral-800 shadow-sm text-green-800' : 'text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200'}`}
               >
-                ðŸªª Aadhaar eKYC
+                <span className="notranslate">🪪</span> Aadhaar eKYC
               </button>
             </div>
 
@@ -283,7 +283,7 @@ export default function Home() {
                       className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-4 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
                     />
                     <button onClick={sendOtp} disabled={loading} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50">
-                      {loading ? t('sending') : `${t('sendOtp')} â†’`}
+                      {loading ? t('sending') : `${t('sendOtp')} →`}
                     </button>
                   </>
                 ) : (
@@ -326,7 +326,7 @@ export default function Home() {
                     />
                     <p className="text-[11px] text-gray-400 mb-4">Verified securely via UIDAI eKYC protocol</p>
                     <button onClick={handleAadhaarNext} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition">
-                      Verify Aadhaar â†’
+                      Verify Aadhaar →
                     </button>
                   </>
                 )}
@@ -334,7 +334,7 @@ export default function Home() {
                 {aadhaarStep === 1 && (
                   <>
                     <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-xs">
-                      <p className="text-green-800 font-medium">âœ… Aadhaar Validated: {aadhaar}</p>
+                      <p className="text-green-800 font-medium">✅ Aadhaar Validated: {aadhaar}</p>
                     </div>
                     <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">Aadhaar-Linked Mobile</label>
                     <input
@@ -345,7 +345,7 @@ export default function Home() {
                       className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-4 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
                     />
                     <button onClick={handleAadhaarNext} disabled={loading} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50">
-                      {loading ? t('sending') : 'Send Aadhaar OTP â†’'}
+                      {loading ? t('sending') : 'Send Aadhaar OTP →'}
                     </button>
                   </>
                 )}
@@ -353,8 +353,8 @@ export default function Home() {
                 {aadhaarStep === 2 && (
                   <>
                     <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-xs">
-                      <p className="text-green-800 font-medium">âœ… Aadhaar: {aadhaar}</p>
-                      <p className="text-green-700 mt-0.5">ðŸ“± OTP sent to {phone}</p>
+                      <p className="text-green-800 font-medium">✅ Aadhaar: {aadhaar}</p>
+                      <p className="text-green-700 mt-0.5"><span className="notranslate">📱</span> OTP sent to {phone}</p>
                     </div>
                     <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">{t('enterOtp')}</label>
                     <input
@@ -384,7 +384,7 @@ export default function Home() {
 
                 {/* Emblem / Aadhaar Graphic */}
                 <div className="w-16 h-16 mx-auto mb-4 bg-orange-50 border-2 border-orange-200 rounded-full flex items-center justify-center text-3xl shadow-inner relative">
-                  <span>ðŸ†”</span>
+                  <span>🆔</span>
                   <div className="absolute inset-0 rounded-full border-2 border-orange-500 animate-ping opacity-25" />
                 </div>
 
@@ -394,15 +394,15 @@ export default function Home() {
                 {/* Progress Scanner Animation */}
                 <div className="my-5 p-3 bg-slate-50 dark:bg-neutral-950 border border-gray-200 dark:border-neutral-700 rounded-xl text-left font-mono text-[11px] space-y-1.5 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">
                   <div className="flex items-center justify-between text-green-700 font-semibold">
-                    <span>â–¶ Encrypting 256-bit Token...</span>
-                    <span>âœ“ OK</span>
+                    <span>▶ Encrypting 256-bit Token...</span>
+                    <span>✓ OK</span>
                   </div>
                   <div className="flex items-center justify-between text-green-700 font-semibold">
-                    <span>â–¶ Validating Demographic Hash...</span>
-                    <span>âœ“ OK</span>
+                    <span>▶ Validating Demographic Hash...</span>
+                    <span>✓ OK</span>
                   </div>
                   <div className="flex items-center justify-between text-amber-700 font-semibold animate-pulse">
-                    <span>â–¶ Fetching Linked OTP Gateway...</span>
+                    <span>▶ Fetching Linked OTP Gateway...</span>
                     <span>99.2%</span>
                   </div>
                 </div>
@@ -421,14 +421,14 @@ export default function Home() {
       <footer className="bg-gray-900 text-gray-400 text-xs py-6 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <div>
-            <p className="text-gray-300 font-semibold">Central Farmer Procurement Platform (CFPP) â€¢ SIH26032</p>
+            <p className="text-gray-300 font-semibold">Central Farmer Procurement Platform (CFPP) • SIH26032</p>
             <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 text-[11px] mt-0.5">Developed for Ministry of Consumer Affairs, Food & Public Distribution</p>
           </div>
           <div className="flex gap-4 text-[11px] text-gray-400">
             <span>Direct Benefit Transfer (DBT)</span>
-            <span>â€¢</span>
+            <span>•</span>
             <span>UIDAI Aadhaar Verified</span>
-            <span>â€¢</span>
+            <span>•</span>
             <span>e-NAM Interoperable</span>
           </div>
         </div>
