@@ -1,7 +1,9 @@
 ﻿import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function NotificationBell({ bookings = [] }) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [readIds, setReadIds] = useState([]);
 
@@ -203,29 +205,55 @@ export default function NotificationBell({ bookings = [] }) {
                       }`}
                     >
                       <div className="flex justify-between items-start mb-0.5">
-                        <a href={n.link}
-                          onClick={() => {
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
                             markSingleRead(n.id);
                             setIsOpen(false);
+                            if (n.link.includes('#')) {
+                              const targetId = n.link.split('#')[1];
+                              const el = document.getElementById(targetId);
+                              if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                el.classList.add('ring-4', 'ring-green-400', 'transition-all');
+                                setTimeout(() => el.classList.remove('ring-4', 'ring-green-400'), 2000);
+                              }
+                            } else {
+                              router.push(n.link);
+                            }
                           }}
-                          className="text-xs font-bold text-gray-900 dark:text-neutral-100 hover:underline flex-1"
+                          className="text-xs font-bold text-gray-900 dark:text-neutral-100 hover:underline flex-1 text-left"
                         >
                           {n.title}
-                        </a>
+                        </button>
                         <span className="text-[9px] text-gray-400 font-medium ml-2">{n.time}</span>
                       </div>
                       <p className="text-[11px] text-gray-600 dark:text-neutral-400 dark:text-neutral-400 leading-snug">{n.message}</p>
 
                       <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700 flex justify-between items-center text-[10px]">
-                        <a href={n.link}
-                          onClick={() => {
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
                             markSingleRead(n.id);
                             setIsOpen(false);
+                            if (n.link.includes('#')) {
+                              const targetId = n.link.split('#')[1];
+                              const el = document.getElementById(targetId);
+                              if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                el.classList.add('ring-4', 'ring-green-400', 'transition-all');
+                                setTimeout(() => el.classList.remove('ring-4', 'ring-green-400'), 2000);
+                              }
+                            } else {
+                              router.push(n.link);
+                            }
                           }}
                           className="text-green-700 font-semibold hover:underline inline-flex items-center gap-0.5"
                         >
                           View details &rarr;
-                        </a>
+                        </button>
 
                         {!isRead ? (
                           <button
@@ -255,5 +283,6 @@ export default function NotificationBell({ bookings = [] }) {
     </>
   );
 }
+
 
 

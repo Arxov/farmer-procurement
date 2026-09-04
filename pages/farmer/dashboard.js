@@ -99,7 +99,7 @@ export default function FarmerDashboard() {
       window.removeEventListener('online', handleOnline);
       if (channelRef.current) { supabase.removeChannel(channelRef.current); channelRef.current = null; }
     };
-  }, [router, queryClient, refetchBookings]);
+  }, [queryClient, refetchBookings]); // Removed router to prevent re-running init on hash changes
 
   const handleRefresh = async () => {
     try {
@@ -553,6 +553,7 @@ export default function FarmerDashboard() {
     </PullToRefresh>
   );
 }
+
 
 
 
