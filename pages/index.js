@@ -11,7 +11,8 @@ export default function Home() {
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [loginMode, setLoginMode] = useState('phone'); // 'phone' or 'aadhaar'
+  const [loginMode, setLoginMode] = useState('phone');
+  const [portalRole, setPortalRole] = useState('farmer'); // 'phone' or 'aadhaar'
   const router = useRouter();
   const { t } = useLanguage();
 
@@ -183,11 +184,34 @@ export default function Home() {
         <div className="w-full max-w-md">
           <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 relative">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-700 text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-              Secure Citizen & Staff Login
+              {portalRole === 'farmer' ? 'Citizen Login' : 'Secure Staff Login'}
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mt-2 mb-1">{t('appName')}</h2>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-5">{t('appTagline')}</p>
+            
+            {/* Role Toggle */}
+            <div className="flex gap-2 mb-6">
+              <button
+                onClick={() => setPortalRole('farmer')}
+                className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition border ${portalRole === 'farmer' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+              >
+                🌾 Farmer
+              </button>
+              <button
+                onClick={() => setPortalRole('officer')}
+                className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition border ${portalRole === 'officer' ? 'bg-blue-50 border-blue-200 text-blue-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+              >
+                📋 Officer
+              </button>
+              <button
+                onClick={() => setPortalRole('admin')}
+                className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition border ${portalRole === 'admin' ? 'bg-purple-50 border-purple-200 text-purple-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+              >
+                🛡️ Admin
+              </button>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mb-1">{portalRole === 'farmer' ? t('appName') : portalRole === 'officer' ? 'Officer Portal' : 'Admin Portal'}</h2>
+            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-5">{portalRole === 'farmer' ? t('appTagline') : 'Secure authorized staff access'}</p>
 
             {/* Login Mode Toggle */}
             <div className="flex bg-gray-100 dark:bg-neutral-800 rounded-xl p-1 mb-5">
