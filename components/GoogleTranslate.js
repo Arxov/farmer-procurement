@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 
 const GoogleTranslate = () => {
   useEffect(() => {
@@ -22,7 +22,7 @@ const GoogleTranslate = () => {
   return (
     <>
       <div id="google_translate_element" className="fixed bottom-20 sm:bottom-6 right-4 z-50 bg-white dark:bg-neutral-800 p-1.5 rounded-xl shadow-2xl border border-green-200 dark:border-green-900 overflow-hidden"></div>
-      <style jsx global>{\
+      <style jsx global>{`
         /* Hide the ugly Google Translate top banner */
         .skiptranslate > iframe.skiptranslate {
           display: none !important;
@@ -48,7 +48,7 @@ const GoogleTranslate = () => {
         .goog-te-gadget-icon {
           display: none !important;
         }
-      \}</style>
+      `}</style>
     </>
   );
 };

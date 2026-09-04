@@ -72,7 +72,7 @@ export default function FarmerDashboard() {
         if (!channelRef.current) {
           channelRef.current = supabase
             .channel('farmer-bookings')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings', filter: \armer_id=eq.\\ }, () => {
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings', filter: `farmer_id=eq.${currentUser.id}` }, () => {
               queryClient.invalidateQueries({ queryKey: bookingsQueryKeys.farmer(currentUser.id) });
             })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'queue_entries' }, () => {

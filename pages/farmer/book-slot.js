@@ -17,24 +17,24 @@ export default function BookSlot() {
   const { data: centres = [] } = useCentres();
   const { data: commodities = [] } = useCommodities();
   const [centreId, setCentreId] = useState('');
-  const [{t('commodity').toUpperCase()}Id, set{t('commodity').toUpperCase()}Id] = useState('');
-  const [{t('date').toUpperCase()}, set{t('date').toUpperCase()}] = useState('');
+  const [commodityId, setcommodityId] = useState('');
+  const [date, setDate] = useState('');
   const [slotWindow, setSlotWindow] = useState(SLOT_WINDOWS[0]);
   const [quantity, setQuantity] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [suggestion, setSuggestion] = useState(null);
   const [availability, setAvailability] = useState([]);
-  const [showCustom{t('date').toUpperCase()}, setShowCustom{t('date').toUpperCase()}] = useState(false);
+  const [showCustomDate, setshowCustomDate] = useState(false);
   const [step, setStep] = useState(1);
   const router = useRouter();
   const { t } = useLanguage();
 
   useEffect(() => {
-    if (router.query.{t('commodity').toUpperCase()}Id) {
-      set{t('commodity').toUpperCase()}Id(router.query.{t('commodity').toUpperCase()}Id);
+    if (router.query.commodityId) {
+      setcommodityId(router.query.commodityId);
     }
-  }, [router.query.{t('commodity').toUpperCase()}Id]);
+  }, [router.query.commodityId]);
 
   useEffect(() => {
     // Fetch auto-suggestion
@@ -57,7 +57,7 @@ export default function BookSlot() {
   const applySuggestion = () => {
     if (!suggestion) return;
     setCentreId(suggestion.centreId);
-    set{t('date').toUpperCase()}(suggestion.{t('date').toUpperCase()});
+    setDate(suggestion.date);
     setSlotWindow(suggestion.slotWindow);
   };
 
@@ -72,31 +72,31 @@ export default function BookSlot() {
       const selectedCentre = centres.find(c => c.id === centreId);
       const capacity = selectedCentre?.daily_capacity || 100;
 
-      const {t('date').toUpperCase()}s = [];
+      const dates = [];
       for (let i = 0; i < 4; i++) {
-        const d = new {t('date').toUpperCase()}();
-        d.set{t('date').toUpperCase()}(d.get{t('date').toUpperCase()}() + i);
-        {t('date').toUpperCase()}s.push(d.toISOString().split('T')[0]);
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        dates.push(d.toISOString().split('T')[0]);
       }
 
       const { data: bookingsData } = await supabase
         .from('bookings')
-        .select('slot_{t('date').toUpperCase()}')
+        .select('slot_date')
         .eq('centre_id', centreId)
-        .in('slot_{t('date').toUpperCase()}', {t('date').toUpperCase()}s)
+        .in('slot_date', dates)
         .neq('status', 'cancelled');
 
       const countMap = {};
       (bookingsData || []).forEach(b => {
-        countMap[b.slot_{t('date').toUpperCase()}] = (countMap[b.slot_{t('date').toUpperCase()}] || 0) + 1;
+        countMap[b.slot_date] = (countMap[b.slot_date] || 0) + 1;
       });
 
-      const list = {t('date').toUpperCase()}s.map(dStr => {
+      const list = dates.map(dStr => {
         const booked = countMap[dStr] || 0;
         const available = Math.max(0, capacity - booked);
         const percent = Math.min(100, Math.round((booked / capacity) * 100));
         return {
-          {t('date').toUpperCase()}: dStr,
+          date: dStr,
           booked,
           capacity,
           available,
@@ -111,18 +111,18 @@ export default function BookSlot() {
   }, [centreId, centres]);
 
   const submit = async () => {
-    if (!centreId || !{t('commodity').toUpperCase()}Id || !{t('date').toUpperCase()}) {
-      setError('Please fill in all required fields (Centre, {t('commodity').toUpperCase()}, {t('date').toUpperCase()}).');
+    if (!centreId || !commodityId || !date) {
+      setError('Please fill in all required fields (Centre, Commodity, Date).');
       return;
     }
     if (quantity && (Number.isNaN(parseFloat(quantity)) || parseFloat(quantity) <= 0)) {
-      setError('{t('expectedQuantity').toUpperCase()} must be a positive number.');
+      setError('Expected Quantity must be a positive number.');
       return;
     }
     setLoading(true);
     setError('');
 
-    const bookingPayload = { centreId, {t('commodity').toUpperCase()}Id, {t('date').toUpperCase()}, slotWindow, quantity };
+    const bookingPayload = { centreId, commodityId, date, slotWindow, quantity };
 
     // Offline fallback: queue locally
     if (!navigator.onLine) {
@@ -177,7 +177,7 @@ export default function BookSlot() {
     }
   };
 
-  const selectedComm = commodities.find(c => c.id === {t('commodity').toUpperCase()}Id);
+  const selectedComm = commodities.find(c => c.id === commodityId);
   const selectedCentre = centres.find(c => c.id === centreId);
   const estPayout = selectedComm && quantity && !Number.isNaN(parseFloat(quantity))
     ? parseFloat(quantity) * parseFloat(selectedComm.msp_rate_per_quintal)
@@ -201,7 +201,7 @@ export default function BookSlot() {
               <p className="text-sm font-bold text-emerald-900">{t('suggestedSlot')}</p>
             </div>
             <p className="text-xs text-emerald-800">
-              Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.{t('date').toUpperCase()}}</strong> at <strong>{suggestion.slotWindow}</strong>
+              Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>
             </p>
             <p className="text-[11px] text-emerald-600 mt-1 font-medium">
               âš¡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
@@ -218,7 +218,7 @@ export default function BookSlot() {
         {/* Main Booking Wizard Card */}
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
           <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">{t('bookProcurementSlot')}</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
             <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment â€¢ Transparent 3-Step Booking</p>
           </div>
 
@@ -226,7 +226,7 @@ export default function BookSlot() {
           <div className="flex items-center justify-between mb-6 px-1">
             {[
               { num: 1, title: 'Mandi & Crop', icon: 'ðŸŒ¾' },
-              { num: 2, title: '{t('date').toUpperCase()} & Slot', icon: 'ðŸ“…' },
+              { num: 2, title: 'date & Slot', icon: 'ðŸ“…' },
               { num: 3, title: 'Review & Book', icon: 'ðŸ“‹' },
             ].map((s, idx) => (
               <div key={s.num} className="flex items-center flex-1 last:flex-none">
@@ -267,7 +267,7 @@ export default function BookSlot() {
             </div>
           )}
 
-          {/* STEP 1: Mandi & {t('commodity').toUpperCase()} */}
+          {/* STEP 1: Mandi & Commodity */}
           {step === 1 && (
             <div className="space-y-4 animate-fadeIn">
               <div>
@@ -279,7 +279,7 @@ export default function BookSlot() {
                   value={centreId}
                   onChange={e => { setCentreId(e.target.value); setError(''); }}
                 >
-                  <option value="">{t('selectCentre')}</option>
+                  <option value="">Select centre</option>
                   {centres.map(c => (
                     <option key={c.id} value={c.id}>
                       {c.name} â€” {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
@@ -291,14 +291,14 @@ export default function BookSlot() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
-                  2. {t('{t('commodity').toUpperCase()}')} *
+                  2. {t('Commodity')} *
                 </label>
                 <select
                   className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={{t('commodity').toUpperCase()}Id}
-                  onChange={e => { set{t('commodity').toUpperCase()}Id(e.target.value); setError(''); }}
+                  value={commodityId}
+                  onChange={e => { setcommodityId(e.target.value); setError(''); }}
                 >
-                  <option value="">{t('select{t('commodity').toUpperCase()}')}</option>
+                  <option value="">Select commodity</option>
                   {commodities.map(c => {
                     const crop = getCropConfig(c.name);
                     return (
@@ -325,8 +325,8 @@ export default function BookSlot() {
               <button
                 type="button"
                 onClick={() => {
-                  if (!centreId || !{t('commodity').toUpperCase()}Id) {
-                    setError('Please select both a Mandi centre and a {t('commodity').toUpperCase()} to proceed.');
+                  if (!centreId || !commodityId) {
+                    setError('Please select both a Mandi centre and a Commodity to proceed.');
                     return;
                   }
                   setError('');
@@ -334,53 +334,53 @@ export default function BookSlot() {
                 }}
                 className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
               >
-                Next: Choose {t('date').toUpperCase()} & Time Slot &rarr;
+                Next: Choose date & Time Slot &rarr;
               </button>
             </div>
           )}
 
-          {/* STEP 2: {t('date').toUpperCase()} & Time Window */}
+          {/* STEP 2: date & Time Window */}
           {step === 2 && (
             <div className="space-y-4 animate-fadeIn">
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 uppercase tracking-wider">
-                    {t('{t('date').toUpperCase()}')} & Mandi Capacity *
+                    Date & Mandi Capacity *
                   </label>
                   {availability.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => setShowCustom{t('date').toUpperCase()}(!showCustom{t('date').toUpperCase()})}
+                      onClick={() => setshowCustomDate(!showCustomDate)}
                       className="text-[11px] text-green-700 hover:text-green-800 font-semibold"
                     >
-                      {showCustom{t('date').toUpperCase()} ? 'âš¡ Show Capacity Cards' : 'ðŸ“… Or pick specific calendar {t('date').toUpperCase()}'}
+                      {showCustomDate ? 'âš¡ Show Capacity Cards' : 'ðŸ“… Or pick specific calendar date'}
                     </button>
                   )}
                 </div>
 
-                {!showCustom{t('date').toUpperCase()} && availability.length > 0 ? (
+                {!showCustomDate && availability.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                     {availability.map((item) => {
-                      const isSelected = {t('date').toUpperCase()} === item.{t('date').toUpperCase()};
-                      const d = new {t('date').toUpperCase()}(item.{t('date').toUpperCase()} + 'T00:00:00');
-                      const todayStr = new {t('date').toUpperCase()}().toISOString().split('T')[0];
-                      const tmrw = new {t('date').toUpperCase()}();
-                      tmrw.set{t('date').toUpperCase()}(tmrw.get{t('date').toUpperCase()}() + 1);
+                      const isSelected = date === item.date;
+                      const d = new date(item.date + 'T00:00:00');
+                      const todayStr = new Date().toISOString().split('T')[0];
+                      const tmrw = new Date();
+                      tmrw.setDate(tmrw.getDate() + 1);
                       const tmrwStr = tmrw.toISOString().split('T')[0];
 
-                      let dayName = d.toLocale{t('date').toUpperCase()}String('en-IN', { weekday: 'short' });
-                      if (item.{t('date').toUpperCase()} === todayStr) dayName = 'Today';
-                      else if (item.{t('date').toUpperCase()} === tmrwStr) dayName = 'Tomorrow';
+                      let dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
+                      if (item.date === todayStr) dayName = 'Today';
+                      else if (item.date === tmrwStr) dayName = 'Tomorrow';
 
-                      const dayMonth = d.toLocale{t('date').toUpperCase()}String('en-IN', { day: 'numeric', month: 'short' });
+                      const dayMonth = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
                       const isLow = item.percent < 50;
                       const isMed = item.percent >= 50 && item.percent < 85;
 
                       return (
                         <button
                           type="button"
-                          key={item.{t('date').toUpperCase()}}
-                          onClick={() => { set{t('date').toUpperCase()}(item.{t('date').toUpperCase()}); setError(''); }}
+                          key={item.date}
+                          onClick={() => { setDate(item.date); setError(''); }}
                           className={`p-2.5 rounded-xl border text-left transition relative flex flex-col justify-between ${
                             isSelected
                               ? 'border-green-600 bg-green-50/70 ring-2 ring-green-600/20 shadow-xs'
@@ -418,10 +418,10 @@ export default function BookSlot() {
                   </div>
                 ) : (
                   <input
-                    type="{t('date').toUpperCase()}"
+                    type="date"
                     className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none mb-2"
-                    value={{t('date').toUpperCase()}}
-                    onChange={e => { set{t('date').toUpperCase()}(e.target.value); setError(''); }}
+                    value={date}
+                    onChange={e => { setDate(e.target.value); setError(''); }}
                   />
                 )}
               </div>
@@ -451,8 +451,8 @@ export default function BookSlot() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!{t('date').toUpperCase()} || !slotWindow) {
-                      setError('Please select a {t('date').toUpperCase()} and time window.');
+                    if (!date || !slotWindow) {
+                      setError('Please select a date and time window.');
                       return;
                     }
                     setError('');
@@ -511,12 +511,12 @@ export default function BookSlot() {
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{selectedCentre?.name || '-'} ({selectedCentre?.district})</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{t('commodity').toUpperCase()}:</span>
+                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Commodity:</span>
                   <CropBadge name={selectedComm?.name} size="xs" />
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Inspection {t('date').toUpperCase()}:</span>
-                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{{t('date').toUpperCase()}}</span>
+                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Inspection date:</span>
+                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{date}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Time Window:</span>
@@ -548,7 +548,7 @@ export default function BookSlot() {
                       <span>{t('bookingInProgress')}</span>
                     </>
                   ) : (
-                    <span>{t('confirmBooking')} â†’</span>
+                    <span>Confirm Booking â†’</span>
                   )}
                 </button>
               </div>
@@ -561,4 +561,5 @@ export default function BookSlot() {
     </div>
   );
 }
+
 
