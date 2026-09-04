@@ -441,7 +441,7 @@ export default function FarmerDashboard() {
               <div className="border-x border-emerald-700/60">
                 <p className="text-[11px] text-emerald-200 font-medium">Procured Qty</p>
                 <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
-                  {totalQuintals} <span className="text-xs font-normal">q</span>
+                  {totalQuintals.toLocaleString()} <span className="text-xs font-normal">q</span>
                 </p>
               </div>
               <div>
@@ -528,7 +528,7 @@ export default function FarmerDashboard() {
         )}
 
         {/* Upcoming Bookings */}
-        {upcoming.length > 0 && (
+        {upcoming.length.toLocaleString() > 0 && (
           <>
             <h2 className="text-md font-semibold text-gray-700 dark:text-neutral-300 mb-3">ðŸ“… Upcoming</h2>
             <div className="space-y-4 mb-8">
@@ -553,6 +553,7 @@ export default function FarmerDashboard() {
     </PullToRefresh>
   );
 }
+
 
 
 
