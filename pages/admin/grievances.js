@@ -36,6 +36,7 @@ export default function AdminGrievances() {
 
   const updateStatus = async (id, newStatus) => {
     const notes = newStatus === 'resolved' ? prompt('Resolution notes (optional):') : null;
+    if (newStatus === 'resolved' && notes === null) return; // User clicked Cancel
     setUpdating(id);
     const { data: { session } } = await supabase.auth.getSession();
     await fetch('/api/admin/grievances', {

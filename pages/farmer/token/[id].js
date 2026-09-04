@@ -10,7 +10,7 @@ export default function AppointmentTokenPage() {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const router = useRouter();
   const { id } = router.query;
-  const { t, lang } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     if (!id) return;
@@ -53,7 +53,7 @@ export default function AppointmentTokenPage() {
     let speechText = '';
     let speechLang = 'hi-IN';
 
-    if (lang === 'hi') {
+    if (language === 'hi') {
       speechText = `नमस्ते ${farmerName} जी। आपका मंडी स्लॉट ${crop} के लिए ${centreName} में दिनांक ${date} को समय ${windowTime} बजे बुक है। कृपया अपना आधार कार्ड साथ लाएं।`;
       speechLang = 'hi-IN';
     } else {

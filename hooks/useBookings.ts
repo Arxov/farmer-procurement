@@ -12,7 +12,7 @@ export async function fetchFarmerBookings(farmerId?: string) {
   if (!farmerId) return [];
   const { data, error } = await supabase
     .from('bookings')
-    .select('*, centres(name), commodities(name), queue_entries(queue_position, estimated_wait_minutes), payments(amount, status), gate_passes(id)')
+    .select('*, centres(name), commodities(name), queue_entries(queue_position, estimated_wait_minutes), payments(amount, status, utr_reference), gate_passes(id)')
     .eq('farmer_id', farmerId)
     .order('created_at', { ascending: false });
 

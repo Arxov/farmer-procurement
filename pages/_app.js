@@ -49,9 +49,9 @@ export default function App({ Component, pageProps }) {
             >
               <ErrorBoundary>
                 <Component {...pageProps} />
-            <GoogleTranslate />
               </ErrorBoundary>
             </motion.main>
+            <GoogleTranslate />
           </AnimatePresence>
         </div>
       </ToastProvider>

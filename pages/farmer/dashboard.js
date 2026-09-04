@@ -511,9 +511,9 @@ export default function FarmerDashboard() {
           </div>
         )}
 
-        {!loading && getOfflineQueue().length > 0 && (
+        {!loading && (typeof window !== "undefined" && window.localStorage.getItem("offline_bookings_queue") ? JSON.parse(window.localStorage.getItem("offline_bookings_queue")).length : 0) > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 text-sm">
-            📡 {getOfflineQueue().length} booking(s) queued offline — will sync when you reconnect.
+            📡 {typeof window !== "undefined" && window.localStorage.getItem("offline_bookings_queue") ? JSON.parse(window.localStorage.getItem("offline_bookings_queue")).length : 0} booking(s) queued offline — will sync when you reconnect.
           </div>
         )}
 
@@ -528,7 +528,7 @@ export default function FarmerDashboard() {
         )}
 
         {/* Upcoming Bookings */}
-        {upcoming.length.toLocaleString() > 0 && (
+        {upcoming.length > 0 && (
           <>
             <h2 className="text-md font-semibold text-gray-700 dark:text-neutral-300 mb-3">📅 Upcoming</h2>
             <div className="space-y-4 mb-8">

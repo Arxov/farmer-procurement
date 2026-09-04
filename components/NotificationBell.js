@@ -211,7 +211,7 @@ export default function NotificationBell({ bookings = [] }) {
                             e.preventDefault();
                             markSingleRead(n.id);
                             setIsOpen(false);
-                            if (n.link.includes('#')) {
+                            if (n.link.includes('#') && router.pathname === n.link.split('#')[0]) {
                               const targetId = n.link.split('#')[1];
                               const el = document.getElementById(targetId);
                               if (el) {
@@ -238,7 +238,7 @@ export default function NotificationBell({ bookings = [] }) {
                             e.preventDefault();
                             markSingleRead(n.id);
                             setIsOpen(false);
-                            if (n.link.includes('#')) {
+                            if (n.link.includes('#') && router.pathname === n.link.split('#')[0]) {
                               const targetId = n.link.split('#')[1];
                               const el = document.getElementById(targetId);
                               if (el) {

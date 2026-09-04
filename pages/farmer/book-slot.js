@@ -226,7 +226,7 @@ export default function BookSlot() {
           <div className="flex items-center justify-between mb-6 px-1">
             {[
               { num: 1, title: 'Mandi & Crop', icon: '🌾' },
-              { num: 2, title: 'date & Slot', icon: '📅' },
+              { num: 2, title: 'Date & Slot', icon: '📅' },
               { num: 3, title: 'Review & Book', icon: '📋' },
             ].map((s, idx) => (
               <div key={s.num} className="flex items-center flex-1 last:flex-none">
@@ -291,7 +291,7 @@ export default function BookSlot() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
-                  2. {t('Commodity')} *
+                  2. {t('commodity')} *
                 </label>
                 <select
                   className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"

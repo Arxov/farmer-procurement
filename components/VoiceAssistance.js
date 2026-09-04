@@ -35,10 +35,12 @@ export default function VoiceAssistance({ profile, bookings = [], commodities = 
 
     if (language === 'hi') {
       voiceLang = 'hi-IN';
-      text = `à¤¨à¤®à¤¸à¥à¤¤à¥‡ ${name} à¤œà¥€à¥¤ à¤•à¤¿à¤¸à¤¾à¤¨ à¤–à¤°à¥€à¤¦ à¤®à¤‚à¤š à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆà¥¤ `;
+      text = `नमस्ते ${name} जी। किसान खरीद मंच में आपका स्वागत है। `;
+
 
       if (activeBookings.length > 0) {
-        text += `à¤†à¤ªà¤•à¥‡ à¤ªà¤¾à¤¸ ${activeBookings.length} à¤¸à¤•à¥à¤°à¤¿à¤¯ à¤¸à¥à¤²à¥‰à¤Ÿ à¤¹à¥ˆà¤‚à¥¤ `;
+        text += `आपके पास ${activeBookings.length} सक्रिय स्लॉट हैं। `;
+
       } else {
         text += `à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤•à¥‹à¤ˆ à¤¸à¤•à¥à¤°à¤¿à¤¯ à¤¸à¥à¤²à¥‰à¤Ÿ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ `;
       }
@@ -103,7 +105,7 @@ export default function VoiceAssistance({ profile, bookings = [], commodities = 
       }`}
       title="Listen to dashboard overview in your language"
     >
-      <span>{isPlaying ? 'â¹ï¸' : 'ðŸ”Š'}</span>
+      <span>{isPlaying ? '⏸️' : '🔊'}</span>
       <span>{isPlaying ? (language === 'hi' ? 'à¤°à¥‹à¤•à¥‡à¤‚' : 'Stop Audio') : (language === 'hi' ? 'à¤¬à¥‹à¤²à¤•à¤° à¤¸à¥à¤¨à¥‡à¤‚' : 'Listen')}</span>
     </button>
   );

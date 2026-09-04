@@ -27,7 +27,7 @@ export default function AdminPayments() {
     });
     if (res.status === 403) { router.push('/'); return; }
     if (res.ok) {
-      const { payments: p } = await res.json();
+      const result = await res.json(); const p = result.data || result.payments;
       setPayments(p || []);
     }
     setLoading(false);

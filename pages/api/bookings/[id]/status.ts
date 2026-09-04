@@ -48,7 +48,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
 
   // On acceptance: create payment record + gate pass
   if (status === 'accepted') {
-    const acceptedQty = parseFloat(accepted_quantity_quintals as string) || parseFloat(actual_weight_quintals as string) || 0;
+    const acceptedQty = parseFloat(accepted_quantity_quintals as string) || parseFloat(actual_weight_quintals as string) || parseFloat(data.actual_weight_quintals as string) || 0;
 
     const { data: commodity } = await supabaseAdmin
       .from('commodities')

@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 
 export default function FarmerBottomNav() {
   const router = useRouter();
-  const { t, lang, toggleLanguage } = useLanguage();
+  const { t, language, toggleLanguage } = useLanguage();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -52,7 +52,7 @@ export default function FarmerBottomNav() {
           className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-green-600"
         >
           <span className="text-xl" aria-hidden="true">🌐</span>
-          <span className="text-[10px] mt-0.5 font-medium">{lang === 'hi' ? 'English' : 'हिंदी'}</span>
+          <span className="text-[10px] mt-0.5 font-medium">{language === 'hi' ? 'English' : 'हिंदी'}</span>
         </motion.button>
 
         {/* Quick Logout */}
