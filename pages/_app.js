@@ -1,6 +1,7 @@
-import { AnimatePresence, motion } from 'framer-motion';
+﻿import { AnimatePresence, motion } from 'framer-motion';
 import Providers from '../components/Providers';
 import { ThemeProvider } from 'next-themes';
+import GoogleTranslate from '../components/GoogleTranslate';
 import ThemeToggle from '../components/ThemeToggle';
 import ErrorBoundary from '../components/ErrorBoundary';
 import '../styles/globals.css';
@@ -48,6 +49,7 @@ export default function App({ Component, pageProps }) {
             >
               <ErrorBoundary>
                 <Component {...pageProps} />
+            <GoogleTranslate />
               </ErrorBoundary>
             </motion.main>
           </AnimatePresence>
@@ -70,3 +72,4 @@ export function reportWebVitals(metric) {
     }
   }
 }
+
