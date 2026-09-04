@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function NotificationBell({ bookings = [] }) {
@@ -34,20 +34,20 @@ export default function NotificationBell({ bookings = [] }) {
       if (p.status === 'paid') {
         notifications.push({
           id: `pay-paid-${b.id}`,
-          title: '💰 DBT Payment Credited',
-          message: `₹${Number(p.amount || 0).toLocaleString()} credited for ${b.commodities?.name || 'crop'}. UTR: ${p.utr_reference || 'N/A'}`,
+          title: 'ðŸ’° DBT Payment Credited',
+          message: `â‚¹${Number(p.amount || 0).toLocaleString()} credited for ${b.commodities?.name || 'crop'}. UTR: ${p.utr_reference || 'N/A'}`,
           time: 'Payment Confirmed',
           type: 'success',
-          link: '/farmer/dashboard',
+          link: /farmer/dashboard#booking-,
         });
       } else if (p.status === 'initiated') {
         notifications.push({
           id: `pay-init-${b.id}`,
-          title: '⏳ Payment Initiated',
-          message: `₹${Number(p.amount || 0).toLocaleString()} DBT transfer initiated to your linked bank account.`,
+          title: 'â³ Payment Initiated',
+          message: `â‚¹${Number(p.amount || 0).toLocaleString()} DBT transfer initiated to your linked bank account.`,
           time: 'Transfer in progress',
           type: 'info',
-          link: '/farmer/dashboard',
+          link: /farmer/dashboard#booking-,
         });
       }
     }
@@ -56,7 +56,7 @@ export default function NotificationBell({ bookings = [] }) {
     if (b.gate_passes?.[0]) {
       notifications.push({
         id: `gate-${b.id}`,
-        title: '🎫 Gate Pass Ready',
+        title: 'ðŸŽ« Gate Pass Ready',
         message: `Mandi clearance pass issued for ${b.commodities?.name}. Scan at entrance/exit gate.`,
         time: 'Inspection Complete',
         type: 'success',
@@ -69,11 +69,11 @@ export default function NotificationBell({ bookings = [] }) {
     if (queuePos && queuePos <= 3 && ['booked', 'checked_in'].includes(b.status)) {
       notifications.push({
         id: `queue-${b.id}`,
-        title: '🚨 Mandi Queue Alert',
+        title: 'ðŸš¨ Mandi Queue Alert',
         message: queuePos === 1 ? "It's your turn at the weighbridge!" : `Your turn is coming up soon! Position: #${queuePos}`,
         time: 'Active Queue',
         type: 'warning',
-        link: '/farmer/dashboard',
+        link: /farmer/dashboard#booking-,
       });
     }
 
@@ -81,11 +81,11 @@ export default function NotificationBell({ bookings = [] }) {
     if (b.status === 'booked') {
       notifications.push({
         id: `book-${b.id}`,
-        title: '📝 Slot Booking Confirmed',
+        title: 'ðŸ“ Slot Booking Confirmed',
         message: `Appointment for ${b.commodities?.name} at ${b.centres?.name} on ${b.slot_date} (${b.slot_window}).`,
         time: b.slot_date,
         type: 'info',
-        link: '/farmer/dashboard',
+        link: /farmer/dashboard#booking-,
       });
     }
 
@@ -93,7 +93,7 @@ export default function NotificationBell({ bookings = [] }) {
     if (b.status === 'rejected') {
       notifications.push({
         id: `reject-${b.id}`,
-        title: '❌ Consignment Rejected',
+        title: 'âŒ Consignment Rejected',
         message: `Booking for ${b.commodities?.name} was rejected. ${b.quality_notes || ''}`,
         time: 'Action Required',
         type: 'error',
@@ -128,7 +128,7 @@ export default function NotificationBell({ bookings = [] }) {
         className="relative p-2 rounded-xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:bg-neutral-900 shadow-2xs transition"
         title="Notifications"
       >
-        <span className="text-base">🔔</span>
+        <span className="text-base">ðŸ””</span>
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -149,7 +149,7 @@ export default function NotificationBell({ bookings = [] }) {
             {/* Header */}
             <div className="p-4 border-b border-gray-200 dark:border-neutral-700 flex justify-between items-center bg-slate-50 dark:bg-neutral-950">
               <div className="flex items-center gap-2">
-                <span className="text-lg">🔔</span>
+                <span className="text-lg">ðŸ””</span>
                 <div>
                   <h3 className="text-sm font-bold text-gray-900 dark:text-neutral-100">Notifications & Alerts</h3>
                   <p className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{unreadCount} unread update(s)</p>
@@ -168,7 +168,7 @@ export default function NotificationBell({ bookings = [] }) {
                   onClick={() => setIsOpen(false)}
                   className="w-7 h-7 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 flex items-center justify-center text-xs font-bold"
                 >
-                  ✕
+                  âœ•
                 </button>
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function NotificationBell({ bookings = [] }) {
             <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
               {notifications.length === 0 ? (
                 <div className="py-12 text-center text-gray-400 text-xs">
-                  <span className="text-3xl block mb-2">🔕</span>
+                  <span className="text-3xl block mb-2">ðŸ”•</span>
                   No alerts right now. Your appointment and payment updates will appear here.
                 </div>
               ) : (
@@ -235,7 +235,7 @@ export default function NotificationBell({ bookings = [] }) {
                             onClick={(e) => markSingleRead(n.id, e)}
                             className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200 bg-white dark:bg-neutral-800/90 border border-gray-200 dark:border-neutral-700 px-2 py-0.5 rounded font-medium transition hover:bg-gray-50 dark:bg-neutral-900"
                           >
-                            ✓ Mark as read
+                            âœ“ Mark as read
                           </button>
                         ) : (
                           <span className="text-gray-400">Read</span>
@@ -257,3 +257,4 @@ export default function NotificationBell({ bookings = [] }) {
     </>
   );
 }
+
