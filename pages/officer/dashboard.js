@@ -190,7 +190,7 @@ export default function OfficerDashboard() {
                   onChange={e => setActionData({ ...actionData, rejection_reason: e.target.value, quality_grade: 'Rejected' })}
                 >
                   <option value="">Select Reason</option>
-                  <option value="High Moisture">High Moisture (> 14%)</option>
+                  <option value="High Moisture">High Moisture (&gt; 14%)</option>
                   <option value="High Admixture">High Admixture / Chaff</option>
                   <option value="Fungus / Discolored">Fungus / Discolored Grains</option>
                   <option value="Other">Other</option>
