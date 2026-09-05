@@ -12,6 +12,9 @@ export const UpdateBookingStatusSchema = z.object({
   status: z.enum(['booked', 'checked_in', 'weighed', 'quality_checked', 'accepted', 'rejected', 'paid', 'cancelled']),
   actual_weight_quintals: z.union([z.number().positive(), z.string()]).optional().nullable(),
   quality_grade: z.string().optional().nullable(),
+  moisture_percent: z.union([z.number(), z.string()]).optional().nullable(),
+  admixture_percent: z.union([z.number(), z.string()]).optional().nullable(),
+  rejection_reason: z.string().optional().nullable(),
   quality_notes: z.string().optional().nullable(),
   accepted_quantity_quintals: z.union([z.number().positive(), z.string()]).optional().nullable(),
 });

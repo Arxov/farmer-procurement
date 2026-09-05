@@ -9,6 +9,7 @@ import CropBadge from '../../components/CropBadge';
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ total: 0, byStatus: {} });
   const [byCentre, setByCentre] = useState([]);
+  const [centreQC, setCentreQC] = useState([]);
   const [byDate, setByDate] = useState([]);
   const [revenue, setRevenue] = useState({ pending: 0, paid: 0, total: 0 });
   const [capacity, setCapacity] = useState([]);
@@ -42,7 +43,7 @@ export default function AdminDashboard() {
         // 1. Total bookings by status (Limit to recent to avoid massive payloads)
         const { data: allBookings } = await supabase
           .from('bookings')
-          .select('status, centre_id, slot_date, slot_window, expected_quantity_quintals, centres(name, state), profiles(full_name), commodities(name)')
+          .select('status, centre_id, slot_date, slot_window, expected_quantity_quintals, rejection_reason, centres(name, state), profiles(full_name), commodities(name)')
           .order('created_at', { ascending: false })
           .limit(5000);
           
@@ -63,6 +64,21 @@ export default function AdminDashboard() {
           centreMap[name] = (centreMap[name] || 0) + 1;
         });
         setByCentre(Object.entries(centreMap).sort((a, b) => b[1] - a[1]));
+
+        const centreMapQC = {};
+        (allBookings || []).forEach(b => {
+          const name = b.centres?.name || 'Unknown';
+          if (!centreMapQC[name]) centreMapQC[name] = { total: 0, accepted: 0, rejected: 0, reasons: {} };
+          centreMapQC[name].total++;
+          if (['accepted', 'paid'].includes(b.status)) centreMapQC[name].accepted++;
+          if (b.status === 'rejected') {
+             centreMapQC[name].rejected++;
+             if (b.rejection_reason) {
+                centreMapQC[name].reasons[b.rejection_reason] = (centreMapQC[name].reasons[b.rejection_reason] || 0) + 1;
+             }
+          }
+        });
+        setCentreQC(Object.entries(centreMapQC).sort((a,b) => b[1].total - a[1].total));
 
         // 3. Bookings by date (last 7 days)
         const dateMap = {};

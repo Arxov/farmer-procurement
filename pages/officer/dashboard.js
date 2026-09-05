@@ -133,32 +133,85 @@ export default function OfficerDashboard() {
       );
     }
 
-    if (nextStatus === 'quality_checked') {
+        if (nextStatus === 'quality_checked') {
+      const isRejected = actionData.quality_grade === 'Rejected' || parseFloat(actionData.moisture_percent || 0) > 14;
+      
       return (
-        <div className="mt-3 p-3 bg-gray-50 dark:bg-neutral-900 rounded-lg space-y-2">
-          <label className="block text-sm font-medium">{t('qualityGrade')}</label>
-          <select
-            className="w-full border rounded-lg px-3 py-2"
-            value={actionData.quality_grade || ''}
-            onChange={e => setActionData({ ...actionData, quality_grade: e.target.value })}
-          >
-            <option value="">Select grade</option>
-            <option value="A">Grade A - Premium</option>
-            <option value="B">Grade B - Standard</option>
-            <option value="C">Grade C - Below Average</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-          <label className="block text-sm font-medium">{t('qualityNotes')}</label>
-          <input
-            type="text"
-            className="w-full border rounded-lg px-3 py-2"
-            placeholder="Optional notes"
-            value={actionData.quality_notes || ''}
-            onChange={e => setActionData({ ...actionData, quality_notes: e.target.value })}
-          />
-          <div className="flex gap-2">
-            <button onClick={() => advance(booking)} disabled={actionLoading || !actionData.quality_grade} className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50">
-              {actionLoading ? t('loading') : t('confirm')}
+        <div className="mt-3 p-3 bg-gray-50 dark:bg-neutral-900 rounded-lg space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">Moisture (%)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${parseFloat(actionData.moisture_percent || 0) > 14 ? 'border-red-500 bg-red-50 text-red-900' : ''}`}
+                placeholder="e.g. 12.5"
+                value={actionData.moisture_percent || ''}
+                onChange={e => setActionData({ ...actionData, moisture_percent: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">Admixture (%)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="e.g. 1.2"
+                value={actionData.admixture_percent || ''}
+                onChange={e => setActionData({ ...actionData, admixture_percent: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">{t('qualityGrade')}</label>
+            <select
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+              value={isRejected ? 'Rejected' : (actionData.quality_grade || '')}
+              onChange={e => setActionData({ ...actionData, quality_grade: e.target.value })}
+              disabled={isRejected && actionData.quality_grade !== 'Rejected'}
+            >
+              <option value="">Select grade</option>
+              <option value="A">FAQ Grade A - Premium</option>
+              <option value="B">FAQ Grade B - Standard</option>
+              <option value="C">URS - Under Rejection Standard</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+          {isRejected && (
+            <div className="bg-red-50 border border-red-200 p-2 rounded-lg">
+               <label className="block text-xs font-bold text-red-800 uppercase tracking-wider mb-1">Rejection Reason</label>
+               <select
+                  className="w-full border border-red-300 rounded-lg px-3 py-2 text-sm bg-white"
+                  value={actionData.rejection_reason || ''}
+                  onChange={e => setActionData({ ...actionData, rejection_reason: e.target.value, quality_grade: 'Rejected' })}
+                >
+                  <option value="">Select Reason</option>
+                  <option value="High Moisture">High Moisture (> 14%)</option>
+                  <option value="High Admixture">High Admixture / Chaff</option>
+                  <option value="Fungus / Discolored">Fungus / Discolored Grains</option>
+                  <option value="Other">Other</option>
+                </select>
+            </div>
+          )}
+
+          <div>
+             <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">{t('qualityNotes')}</label>
+             <input
+               type="text"
+               className="w-full border rounded-lg px-3 py-2 text-sm"
+               placeholder="Optional notes or photo reference ID"
+               value={actionData.quality_notes || ''}
+               onChange={e => setActionData({ ...actionData, quality_notes: e.target.value })}
+             />
+          </div>
+
+          <div className="flex gap-2 pt-2 border-t">
+            <button onClick={() => advance(booking)} disabled={actionLoading || (!isRejected && !actionData.quality_grade) || (isRejected && !actionData.rejection_reason)} className={`px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 text-white ${isRejected ? 'bg-red-600 hover:bg-red-700' : 'bg-green-700 hover:bg-green-800'}`}>
+              {actionLoading ? t('loading') : (isRejected ? 'Confirm Rejection' : t('confirm'))}
             </button>
             <button onClick={cancelAction} className="bg-gray-200 text-gray-700 dark:text-neutral-300 px-4 py-2 rounded-lg text-sm font-medium">{t('cancel')}</button>
           </div>

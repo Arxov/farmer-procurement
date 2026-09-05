@@ -15,7 +15,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: (validation as any).error });
   }
 
-  const { status, actual_weight_quintals, quality_grade, quality_notes, accepted_quantity_quintals } = (validation as any).data;
+  const { status, actual_weight_quintals, quality_grade, quality_notes, accepted_quantity_quintals, moisture_percent, admixture_percent, rejection_reason } = (validation as any).data;
   const isStaff = ['officer', 'admin'].includes(req.user.role);
 
   // Farmers can cancel their own bookings
@@ -34,6 +34,9 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (status === 'quality_checked') {
     if (quality_grade) updateObj.quality_grade = quality_grade;
     if (quality_notes) updateObj.quality_notes = quality_notes;
+    if (moisture_percent) updateObj.moisture_percent = parseFloat(moisture_percent as string);
+    if (admixture_percent) updateObj.admixture_percent = parseFloat(admixture_percent as string);
+    if (rejection_reason) updateObj.rejection_reason = rejection_reason;
   }
   if (status === 'accepted' && accepted_quantity_quintals) {
     updateObj.accepted_quantity_quintals = parseFloat(accepted_quantity_quintals as string);

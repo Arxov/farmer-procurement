@@ -285,7 +285,28 @@ export default function BookSlot() {
                       {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
                     </option>
                   ))}
-                </select>
+                                </select>
+                
+                {selectedComm && (
+                  <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 animate-fadeIn">
+                    <div className="flex gap-2">
+                      <span className="text-amber-600 dark:text-amber-400 mt-0.5">⚠️</span>
+                      <div>
+                        <p className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5">
+                          Mandi QC Precaution
+                        </p>
+                        <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                          {selectedComm.name.toLowerCase().includes('wheat') || selectedComm.name.toLowerCase().includes('paddy') 
+                            ? 'Sun-dry for at least 48 hours. Max allowed moisture is 14%. Higher moisture will result in rejection or MSP deductions.' 
+                            : selectedComm.name.toLowerCase().includes('soya') || selectedComm.name.toLowerCase().includes('cotton')
+                            ? 'Ensure pods/bolls are completely dry and free from foreign matter. Max allowed moisture is 12%.'
+                            : 'Ensure your crop is clean, sorted, and free from excessive moisture or foreign matter to avoid rejection.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-[11px] text-gray-400 mt-1">Select the APMC yard closest to your farmland.</p>
               </div>
 
