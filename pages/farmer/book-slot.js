@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -10,6 +10,7 @@ import { getCropConfig } from '../../lib/cropIcons';
 import { useCentres } from '../../hooks/useCentres';
 import { useCommodities } from '../../hooks/useCommodities';
 import confetti from 'canvas-confetti';
+import LanguageToggle from '../../components/LanguageToggle';
 
 const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
@@ -276,9 +277,12 @@ export default function BookSlot() {
 
         {/* Main Booking Wizard Card */}
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
-          <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
+          <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5 flex justify-between items-start">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
+              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
+            </div>
+            <LanguageToggle />
           </div>
 
           {/* Stepper Header Pills */}
@@ -349,27 +353,55 @@ export default function BookSlot() {
                                 </select>
                 
                 {selectedComm && (
-                  <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 animate-fadeIn">
-                    <div className="flex gap-2">
-                      <span className="text-amber-600 dark:text-amber-400 mt-0.5">⚠️</span>
-                      <div>
-                        <p className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5">
-                          Mandi QC Precaution
-                        </p>
-                        <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                          {selectedComm.name.toLowerCase().includes('wheat') || selectedComm.name.toLowerCase().includes('paddy') 
-                            ? 'Sun-dry for at least 48 hours. Max allowed moisture is 14%. Higher moisture will result in rejection or MSP deductions.' 
-                            : selectedComm.name.toLowerCase().includes('soya') || selectedComm.name.toLowerCase().includes('cotton')
-                            ? 'Ensure pods/bolls are completely dry and free from foreign matter. Max allowed moisture is 12%.'
-                            : 'Ensure your crop is clean, sorted, and free from excessive moisture or foreign matter to avoid rejection.'}
-                        </p>
+                  <div className="mt-3 space-y-2 animate-fadeIn">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+                      <div className="flex gap-2">
+                        <span className="text-amber-600 dark:text-amber-400 mt-0.5">⚠️</span>
+                        <div>
+                          <p className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5">
+                            Mandi QC Precaution
+                          </p>
+                          <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                            {selectedComm.harvest_guidelines || (
+                              selectedComm.name.toLowerCase().includes('wheat') || selectedComm.name.toLowerCase().includes('paddy') 
+                              ? 'Sun-dry for at least 48 hours. Max allowed moisture is 14%. Higher moisture will result in rejection or MSP deductions.' 
+                              : selectedComm.name.toLowerCase().includes('soya') || selectedComm.name.toLowerCase().includes('cotton')
+                              ? 'Ensure pods/bolls are completely dry and free from foreign matter. Max allowed moisture is 12%.'
+                              : 'Ensure your crop is clean, sorted, and free from excessive moisture or foreign matter to avoid rejection.'
+                            )}
+                          </p>
+                        </div>
                       </div>
                     </div>
+
+                    {selectedComm.market_advisory && (
+                      <div className={`border rounded-xl p-3 ${selectedComm.demand_status === 'oversupply' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
+                        <div className="flex gap-2">
+                          <span className="mt-0.5">{selectedComm.demand_status === 'oversupply' ? '📉' : '💡'}</span>
+                          <div>
+                            <p className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${selectedComm.demand_status === 'oversupply' ? 'text-red-800' : 'text-blue-800'}`}>
+                              Market Advisory: {selectedComm.demand_status === 'oversupply' ? 'Oversupply' : 'Information'}
+                            </p>
+                            <p className={`text-xs leading-relaxed ${selectedComm.demand_status === 'oversupply' ? 'text-red-700' : 'text-blue-700'}`}>
+                              {selectedComm.market_advisory}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
                 <p className="text-[11px] text-gray-400 mt-1">Select the APMC yard closest to your farmland.</p>
-                {centreId && centreCommodities.length > 0 && commodities.filter(c => centreCommodities.some(cc => cc.commodity_id === c.id)).length === 0 && (
+                {centreId && centreCommodities.length > 0 && commodities.filter(c => {
+                  const cc = centreCommodities.find(cc => cc.commodity_id === c.id);
+                  if (!cc) return false;
+                  const month = new Date().getMonth() + 1;
+                  if (cc.procurement_start_month <= cc.procurement_end_month) {
+                    return month >= cc.procurement_start_month && month <= cc.procurement_end_month;
+                  }
+                  return month >= cc.procurement_start_month || month <= cc.procurement_end_month;
+                }).length === 0 && (
                   <div className="mt-2 bg-orange-50 border border-orange-200 rounded-xl p-3">
                     <p className="text-xs text-orange-700 font-semibold">⚠️ No crops are currently being procured at this mandi for the current season.</p>
                   </div>

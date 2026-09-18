@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { supabase } from '../../lib/supabaseClient';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
+import LanguageToggle from '../../components/LanguageToggle';
 import { useLanguage } from '../../lib/i18n';
 import { getCropConfig } from '../../lib/cropIcons';
 
@@ -53,9 +54,14 @@ export default function NetCalculator() {
         <title>Net Realization Calculator | Kisan Setu</title>
       </Head>
 
-      <div className="bg-green-700 text-white px-4 py-6 rounded-b-3xl shadow-sm">
-        <h1 className="text-2xl font-bold mb-1">{language === 'hi' ? 'शुद्ध आय कैलकुलेटर' : 'Net Realization Calculator'}</h1>
-        <p className="text-green-100 text-sm">{language === 'hi' ? 'मंडी शुल्क और परिवहन के बाद अपनी वास्तविक कमाई जानें' : 'Know your true take-home after transport & mandi fees'}</p>
+      <div className="bg-green-700 text-white px-4 py-6 rounded-b-3xl shadow-sm relative">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">{language === 'hi' ? 'शुद्ध आय कैलकुलेटर' : 'Net Realization Calculator'}</h1>
+            <p className="text-green-100 text-sm">{language === 'hi' ? 'मंडी शुल्क और परिवहन के बाद अपनी वास्तविक कमाई जानें' : 'Know your true take-home after transport & mandi fees'}</p>
+          </div>
+          <LanguageToggle />
+        </div>
       </div>
 
       <div className="px-4 mt-6 max-w-lg mx-auto space-y-4">

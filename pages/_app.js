@@ -1,4 +1,4 @@
-﻿import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Providers from '../components/Providers';
 import { ThemeProvider } from 'next-themes';
 import GoogleTranslate from '../components/GoogleTranslate';
@@ -37,7 +37,6 @@ export default function App({ Component, pageProps }) {
             <title>Kisan Procurement Portal</title>
           </Head>
           <ThemeToggle />
-          <LanguageToggle />
           <OfflineBanner />
           <AnimatePresence mode="wait">
             <motion.main
@@ -51,8 +50,8 @@ export default function App({ Component, pageProps }) {
                 <Component {...pageProps} />
               </ErrorBoundary>
             </motion.main>
-            <GoogleTranslate />
           </AnimatePresence>
+          <GoogleTranslate />
         </div>
       </ToastProvider>
     </LanguageProvider>

@@ -8,8 +8,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 2, // 2 minutes
-            gcTime: 1000 * 60 * 10,   // 10 minutes
+            // Scalability: Increase staleTime to 5 minutes to reduce redundant DB calls
+            staleTime: 1000 * 60 * 5, 
+            // Scalability: Increase gcTime to 30 minutes to keep data in memory longer for offline/fast navigation
+            gcTime: 1000 * 60 * 30,
             refetchOnWindowFocus: false,
             retry: 1,
           },

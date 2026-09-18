@@ -5,6 +5,10 @@ import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
+  // Tech Scalability: Cache the suggestion for 5 minutes at the edge (Vercel CDN)
+  // and revalidate in background up to 10 minutes (stale-while-revalidate).
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'Not authenticated' });
 

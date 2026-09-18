@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * 3-Day Mandi Weather Forecast & Grain Quality Advisory Widget
  */
 export default function WeatherAdvisory({ district = 'Mandi Region' }) {
   const [expanded, setExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Generate real dynamic dates
   const today = new Date();
@@ -43,6 +48,10 @@ export default function WeatherAdvisory({ district = 'Mandi Region' }) {
       riskColor: 'text-amber-800 bg-amber-50 border-amber-200',
     },
   ];
+
+  if (!mounted) {
+    return <div className="bg-gradient-to-br from-sky-50 to-blue-50/60 border border-sky-200/80 rounded-2xl p-4 mb-6 shadow-xs h-[160px] animate-pulse"></div>;
+  }
 
   return (
     <div className="bg-gradient-to-br from-sky-50 to-blue-50/60 border border-sky-200/80 rounded-2xl p-4 mb-6 shadow-xs">

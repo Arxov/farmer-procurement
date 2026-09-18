@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { supabase } from '../../lib/supabaseClient';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
+import LanguageToggle from '../../components/LanguageToggle';
 import { useLanguage } from '../../lib/i18n';
 import { getCropConfig } from '../../lib/cropIcons';
 
@@ -87,9 +88,14 @@ export default function PriceOutlook() {
         <title>Price Outlook | Kisan Setu</title>
       </Head>
 
-      <div className="bg-green-700 text-white px-4 py-6 rounded-b-3xl shadow-sm">
-        <h1 className="text-2xl font-bold mb-1">{language === 'hi' ? 'मूल्य पूर्वानुमान' : 'Price Outlook'}</h1>
-        <p className="text-green-100 text-sm">{language === 'hi' ? 'एआई-आधारित 14-दिवसीय मंडी मूल्य प्रवृत्तियां' : 'AI-driven 14-day mandi price trends'}</p>
+      <div className="bg-green-700 text-white px-4 py-6 rounded-b-3xl shadow-sm relative">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">{language === 'hi' ? 'मूल्य पूर्वानुमान' : 'Price Outlook'}</h1>
+            <p className="text-green-100 text-sm">{language === 'hi' ? 'एआई-आधारित 14-दिवसीय मंडी मूल्य प्रवृत्तियां' : 'AI-driven 14-day mandi price trends'}</p>
+          </div>
+          <LanguageToggle />
+        </div>
       </div>
 
       <div className="px-4 mt-6 max-w-lg mx-auto space-y-4">

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
+import LanguageToggle from '../../components/LanguageToggle';
 
 const ISSUE_TYPES = [
   { value: 'quality_dispute', labelKey: 'qualityDispute' },
@@ -72,7 +73,7 @@ export default function GrievancesPage() {
       setPageLoading(false);
     };
     load();
-  }, [router]);
+  }, []);
 
   const submitGrievance = async () => {
     if (!bookingId || !issueType || !description.trim()) {
@@ -120,7 +121,10 @@ export default function GrievancesPage() {
 
         {/* File Grievance Form */}
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-6 mb-6">
-          <h1 className="text-xl font-bold mb-4">{t('fileGrievance')}</h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-xl font-bold">{t('fileGrievance')}</h1>
+            <LanguageToggle />
+          </div>
 
           <label className="block text-sm font-medium mb-1">{t('selectBooking')}</label>
           <select className="w-full border rounded-lg px-3 py-2 mb-3" value={bookingId} onChange={e => setBookingId(e.target.value)}>

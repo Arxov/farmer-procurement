@@ -52,7 +52,7 @@ export default function OfficerDashboard() {
       setAuthorized(true);
     };
     checkAuth();
-  }, [router]);
+  }, []);
 
   const startAction = (booking) => {
     setActiveId(booking.id);

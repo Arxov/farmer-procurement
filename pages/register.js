@@ -44,7 +44,7 @@ export default function Register() {
     };
 
     loadProfile();
-  }, [router]);
+  }, []);
 
   const submit = async () => {
     setLoading(true);

@@ -22,7 +22,7 @@ export default function DemoLogin() {
           });
       }
     });
-  }, [router]);
+  }, []);
 
   const handleDemoLogin = async (role, email) => {
     setLoadingRole(role);

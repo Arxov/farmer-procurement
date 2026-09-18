@@ -1,4 +1,4 @@
-﻿import { playQueueChime, triggerQueueHaptic } from '../../lib/audioAlert';
+import { playQueueChime, triggerQueueHaptic } from '../../lib/audioAlert';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
@@ -12,6 +12,7 @@ import FarmerBottomNav from '../../components/FarmerBottomNav';
 import NotificationBell from '../../components/NotificationBell';
 import WeatherAdvisory from '../../components/WeatherAdvisory';
 import MandiFeedback from '../../components/MandiFeedback';
+import LanguageToggle from '../../components/LanguageToggle';
 import CropBadge from '../../components/CropBadge';
 import BookingStepper from '../../components/BookingStepper';
 import PullToRefresh from '../../components/PullToRefresh';
@@ -34,7 +35,7 @@ export default function FarmerDashboard() {
   const alertedRef = useRef(false);
   const router = useRouter();
   const channelRef = useRef(null);
-  const { t } = useLanguage();
+  const { t, language, changeLanguage } = useLanguage();
   const { showToast } = useToast();
 
   // Sync offline queue when online
@@ -443,11 +444,7 @@ export default function FarmerDashboard() {
               <span className="flex items-center gap-1 text-blue-700 bg-blue-100/50 px-2 py-1 rounded-full"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg> UIDAI Zero-Trust Verified</span>
             </div>
             
-            <div className="flex bg-white dark:bg-neutral-800 rounded-lg shadow-xs border border-gray-200 p-0.5 self-end sm:self-auto">
-              <button className="px-2 py-1 text-[10px] font-bold rounded-md bg-emerald-600 text-white shadow-xs">EN</button>
-              <button className="px-2 py-1 text-[10px] font-bold rounded-md text-gray-500 hover:text-emerald-700 hover:bg-gray-50">मराठी</button>
-              <button className="px-2 py-1 text-[10px] font-bold rounded-md text-gray-500 hover:text-emerald-700 hover:bg-gray-50">हिंदी</button>
-            </div>
+            <LanguageToggle />
           </div>
           
           <div className="flex justify-between items-center mb-6">
@@ -579,34 +576,75 @@ export default function FarmerDashboard() {
           </div>
         </div>
 
-        {/* Market Intelligence Card */}
+        {/* Market Intelligence & Quality Analytics Card */}
         <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-4 mb-4">
           <h3 className="text-sm font-bold text-gray-800 dark:text-neutral-200 mb-3 flex items-center gap-2">
-            📊 {t('appName') === 'Kisan Setu' ? 'Market Intelligence' : 'बाज़ार जानकारी'}
+            📊 {t('appName') === 'Kisan Setu' ? 'Market & Quality Analytics' : 'बाज़ार जानकारी'}
           </h3>
-          <div className="space-y-2">
+          
+          {/* Acceptance Ratio */}
+          {(() => {
+            const finished = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status));
+            const accepted = finished.filter(b => ['accepted', 'paid'].includes(b.status)).length;
+            const ratio = finished.length > 0 ? Math.round((accepted / finished.length) * 100) : 100;
+            return (
+              <div className="mb-4 bg-gray-50 dark:bg-neutral-900 rounded-xl p-3 border border-gray-100 dark:border-neutral-700">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs font-semibold text-gray-700 dark:text-neutral-300">Your Crop Acceptance Ratio</span>
+                  <span className={`text-sm font-bold ${ratio >= 90 ? 'text-green-600' : ratio >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
+                    {ratio}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
+                  <div className={`h-full rounded-full ${ratio >= 90 ? 'bg-green-500' : ratio >= 70 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${ratio}%` }} />
+                </div>
+                <p className="text-[10px] text-gray-500 dark:text-neutral-400 mt-1.5">
+                  {ratio >= 90 ? 'Excellent! Your moisture control is perfect.' : 'Keep moisture below 14% to improve your acceptance rate.'}
+                </p>
+              </div>
+            );
+          })()}
+
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-gray-100 dark:border-neutral-700 pb-1">Live Price & Climate Impact</h4>
             {commodities.slice(0, 5).map(c => {
-              const mockMarketPrice = Math.round(c.msp_rate_per_quintal * (0.92 + Math.random() * 0.16));
+              const isWheatPaddy = c.name.toLowerCase().includes('wheat') || c.name.toLowerCase().includes('paddy');
+              const demandStatus = c.demand_status || 'normal';
+              const marketAdvisory = c.market_advisory;
+              const mockMarketPrice = Math.round(c.msp_rate_per_quintal * (demandStatus === 'high' ? 1.08 : demandStatus === 'oversupply' ? 0.95 : 1.02));
               const aboveMsp = mockMarketPrice >= c.msp_rate_per_quintal;
               const diff = Math.round(((mockMarketPrice - c.msp_rate_per_quintal) / c.msp_rate_per_quintal) * 100);
+              
               return (
-                <div key={c.id} className="flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-neutral-700 last:border-0">
-                  <span className="text-xs font-medium text-gray-700 dark:text-neutral-300">{c.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 dark:text-neutral-400">₹{Number(c.msp_rate_per_quintal).toLocaleString()}</span>
-                    <span className="text-[10px] text-gray-400 dark:text-neutral-500">→</span>
-                    <span className={`text-xs font-bold ${aboveMsp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                      ₹{Number(mockMarketPrice).toLocaleString()}
+                <div key={c.id} className="py-2 border-b border-gray-50 dark:border-neutral-700 last:border-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-gray-700 dark:text-neutral-300 flex items-center gap-1">
+                      {c.name}
+                      {demandStatus === 'high' && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-100 text-green-700 uppercase">High Demand</span>}
+                      {demandStatus === 'oversupply' && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-100 text-red-700 uppercase">Oversupply</span>}
                     </span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${aboveMsp ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
-                      {aboveMsp ? '↑' : '↓'}{Math.abs(diff)}%
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 dark:text-neutral-400">MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}</span>
+                      <span className={`text-xs font-bold ${aboveMsp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        Mkt: ₹{Number(mockMarketPrice).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
+                  
+                  {marketAdvisory && (
+                    <p className="text-[10px] text-amber-700 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/10 p-1.5 rounded mt-1">
+                      💡 {marketAdvisory}
+                    </p>
+                  )}
+                  {isWheatPaddy && !marketAdvisory && (
+                    <p className="text-[10px] text-blue-700 dark:text-blue-500 bg-blue-50 dark:bg-blue-900/10 p-1.5 rounded mt-1">
+                      🌧️ Climate Alert: Expected rains in 3 days. Dry completely before booking.
+                    </p>
+                  )}
                 </div>
               );
             })}
           </div>
-          <p className="text-[9px] text-gray-400 dark:text-neutral-500 mt-2 italic">Source: Agmarknet • MSP (left) vs Today's Market Price (right)</p>
         </div>
 
         <WeatherAdvisory district={profile?.village || 'Regional Mandi Hub'} />

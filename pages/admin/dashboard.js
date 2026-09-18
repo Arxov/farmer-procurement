@@ -126,7 +126,7 @@ export default function AdminDashboard() {
       }
     };
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
