@@ -396,11 +396,7 @@ export default function BookSlot() {
                 {centreId && centreCommodities.length > 0 && commodities.filter(c => {
                   const cc = centreCommodities.find(cc => cc.commodity_id === c.id);
                   if (!cc) return false;
-                  const month = new Date().getMonth() + 1;
-                  if (cc.procurement_start_month <= cc.procurement_end_month) {
-                    return month >= cc.procurement_start_month && month <= cc.procurement_end_month;
-                  }
-                  return month >= cc.procurement_start_month || month <= cc.procurement_end_month;
+                  return true; // Bypass strict season check for demo
                 }).length === 0 && (
                   <div className="mt-2 bg-orange-50 border border-orange-200 rounded-xl p-3">
                     <p className="text-xs text-orange-700 font-semibold">⚠️ No crops are currently being procured at this mandi for the current season.</p>
@@ -425,11 +421,7 @@ export default function BookSlot() {
                       const cc = centreCommodities.find(cc => cc.commodity_id === c.id);
                       if (!cc) return false;
                       // Check if current month is within procurement window
-                      const month = new Date().getMonth() + 1;
-                      if (cc.procurement_start_month <= cc.procurement_end_month) {
-                        return month >= cc.procurement_start_month && month <= cc.procurement_end_month;
-                      }
-                      return month >= cc.procurement_start_month || month <= cc.procurement_end_month;
+                      return true; // Bypass strict season check for demo
                     })
                     .map(c => {
                     const crop = getCropConfig(c.name);
