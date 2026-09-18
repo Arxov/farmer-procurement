@@ -517,6 +517,7 @@ export default function BookSlot() {
                     })}
                   </div>
                 ) : (
+                  <>
                   <input
                     type="date"
                     className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none mb-2"
@@ -535,6 +536,7 @@ export default function BookSlot() {
                     </div>
                   </div>
                 )}
+                  </>
 
                 )}
               </div>
