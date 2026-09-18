@@ -721,6 +721,7 @@ export default function FarmerDashboard() {
         <InstallPwaBanner />
         <FarmerBottomNav />
       </div>
+      <KisanMitraWidget />
     </PullToRefresh>
   );
 }
