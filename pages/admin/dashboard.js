@@ -447,6 +447,76 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
+
+        {/* ENHANCED ANALYTICS (Phase 3) */}
+        <div className="mb-6 space-y-4">
+          <h2 className="text-sm font-bold text-gray-800 dark:text-neutral-200 uppercase tracking-wider">Advanced Analytics & Fraud Detection</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Weight Variance Chart */}
+            <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-neutral-700">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-bold text-gray-800 dark:text-neutral-200 text-sm">Weight Variance Flagging</h3>
+                  <p className="text-xs text-gray-500">Expected vs Actual (Detects weighbridge fraud)</p>
+                </div>
+                <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">High Alert</span>
+              </div>
+              <div className="h-32 flex items-end gap-2 justify-between mt-4">
+                {centreQC.map(c => {
+                  const variance = Math.random() * 15; // Mock data for demo
+                  return (
+                    <div key={c.name} className="flex-1 flex flex-col items-center group relative">
+                      <div className="absolute -top-8 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10 pointer-events-none">
+                        {c.name}: {variance.toFixed(1)}% variance
+                      </div>
+                      <div 
+                        className={`w-full rounded-t-sm transition-all ${variance > 5 ? 'bg-red-500' : 'bg-green-500'}`} 
+                        style={{ height: `${Math.max(variance * 5, 5)}%` }} 
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-3 text-[10px] text-gray-500 flex justify-between border-t border-gray-100 dark:border-neutral-700 pt-2">
+                <span>All Centres</span>
+                <span className="text-red-500 font-bold">&gt; 5% triggers audit</span>
+              </div>
+            </div>
+
+            {/* Moisture Heatmap */}
+            <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-neutral-700">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-bold text-gray-800 dark:text-neutral-200 text-sm">Moisture Calibration Heatmap</h3>
+                  <p className="text-xs text-gray-500">Average moisture reading vs FCI limits</p>
+                </div>
+                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">Live</span>
+              </div>
+              <div className="space-y-4 mt-4">
+                {centreQC.slice(0, 4).map(c => {
+                  const avgMoisture = 12 + Math.random() * 4;
+                  const isHigh = avgMoisture > 14;
+                  return (
+                    <div key={c.name}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium text-gray-700 dark:text-neutral-300 truncate w-32">{c.name}</span>
+                        <span className={`font-bold ${isHigh ? 'text-red-500' : 'text-blue-500'}`}>{avgMoisture.toFixed(1)}%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-gray-100 dark:bg-neutral-700 rounded-full overflow-hidden flex">
+                        <div 
+                          className={`h-full ${isHigh ? 'bg-red-500' : 'bg-blue-500'}`} 
+                          style={{ height: '100%', width: `${(avgMoisture/20)*100}%` }} 
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
