@@ -1,10 +1,10 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '../lib/i18n';
 
 export default function VoiceAssistance({ profile, bookings = [], commodities = [] }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -26,7 +26,7 @@ export default function VoiceAssistance({ profile, bookings = [], commodities = 
 
     window.speechSynthesis.cancel();
 
-    const name = profile?.full_name || (language === 'hi' ? 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤­à¤¾à¤ˆ' : 'Farmer');
+    const name = profile?.full_name || (language === 'hi' ? 'किसान भाई' : 'Farmer');
     const activeBookings = bookings.filter(b => ['booked', 'checked_in'].includes(b.status));
     const activeQueue = bookings.find(b => b.queue_entries?.[0]);
 
@@ -42,21 +42,21 @@ export default function VoiceAssistance({ profile, bookings = [], commodities = 
         text += `आपके पास ${activeBookings.length} सक्रिय स्लॉट हैं। `;
 
       } else {
-        text += `à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤•à¥‹à¤ˆ à¤¸à¤•à¥à¤°à¤¿à¤¯ à¤¸à¥à¤²à¥‰à¤Ÿ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤ `;
+        text += `वर्तमान में आपका कोई सक्रिय स्लॉट नहीं है। `;
       }
 
       if (activeQueue && activeQueue.queue_entries?.[0]) {
         const pos = activeQueue.queue_entries[0].queue_position;
         const wait = activeQueue.queue_entries[0].estimated_wait_minutes;
-        text += `à¤®à¤‚à¤¡à¥€ à¤•à¤¤à¤¾à¤° à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¨à¤‚à¤¬à¤° ${pos} à¤¹à¥ˆà¥¤ à¤…à¤¨à¥à¤®à¤¾à¤¨à¤¿à¤¤ à¤¸à¤®à¤¯ ${wait} à¤®à¤¿à¤¨à¤Ÿ à¤¹à¥ˆà¥¤ `;
+        text += `मंडी कतार में आपका नंबर ${pos} है। अनुमानित समय ${wait} मिनट है। `;
       }
 
       if (commodities.length > 0) {
         const top = commodities[0];
-        text += `à¤†à¤œ à¤•à¤¾ à¤¶à¥€à¤°à¥à¤· à¤à¤®à¤à¤¸à¤ªà¥€ à¤­à¤¾à¤µ: ${top.name} à¤•à¤¾ ${top.msp_rate_per_quintal} à¤°à¥à¤ªà¤¯à¥‡ à¤ªà¥à¤°à¤¤à¤¿ à¤•à¥à¤µà¤¿à¤‚à¤Ÿà¤² à¤¹à¥ˆà¥¤ `;
+        text += `आज का शीर्ष एमएसपी भाव: ${top.name} का ${top.msp_rate_per_quintal} रुपये प्रति क्विंटल है। `;
       }
 
-      text += 'à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦ à¤”à¤° à¤¶à¥à¤­ à¤¦à¤¿à¤¨à¥¤';
+      text += 'धन्यवाद और शुभ दिन।';
     } else {
       voiceLang = 'en-IN';
       text = `Hello ${name}. Welcome to Central Farmer Procurement Platform. `;
@@ -106,8 +106,7 @@ export default function VoiceAssistance({ profile, bookings = [], commodities = 
       title="Listen to dashboard overview in your language"
     >
       <span>{isPlaying ? '⏸️' : '🔊'}</span>
-      <span>{isPlaying ? (language === 'hi' ? 'à¤°à¥‹à¤•à¥‡à¤‚' : 'Stop Audio') : (language === 'hi' ? 'à¤¬à¥‹à¤²à¤•à¤° à¤¸à¥à¤¨à¥‡à¤‚' : 'Listen')}</span>
+      <span>{isPlaying ? t('stopAudio') : t('listen')}</span>
     </button>
   );
 }
-
