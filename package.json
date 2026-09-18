@@ -12,10 +12,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/supabase-js": "^2.116.0",
     "@tanstack/react-query": "^5.102.8",
     "@tanstack/react-query-devtools": "^5.102.8",
     "canvas-confetti": "^1.9.4",
+    "dotenv": "^18.0.0",
     "framer-motion": "^13.2.0",
     "idb-keyval": "^6.3.0",
     "next": "^14.2.5",

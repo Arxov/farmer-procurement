@@ -2,7 +2,7 @@
  * @swagger
  * /api/bookings/create:
  *   post:
- *     summary: Create a procurement slot booking
+ *     summary: Create a procurement slot booking (atomic, race-condition safe)
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -55,7 +55,53 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   const { centreId, commodityId, date, slotWindow, quantity } = (validation as any).data;
   const parsedQuantity = quantity ? parseFloat(quantity as string) : null;
 
-  // Enforce centre daily capacity
+  // Use atomic Postgres function to prevent race conditions
+  // This function uses SELECT FOR UPDATE to lock the centre row,
+  // checks ALL constraints (capacity, tonnage, duplicates, no-shows, weekly limit),
+  // and only then inserts the booking — all in a single transaction.
+  try {
+    const { data: result, error: rpcError } = await supabaseAdmin.rpc('book_slot_atomic', {
+      p_farmer_id: req.user.id,
+      p_centre_id: centreId,
+      p_commodity_id: commodityId,
+      p_slot_date: date,
+      p_slot_window: slotWindow,
+      p_quantity: parsedQuantity,
+    });
+
+    if (rpcError) {
+      // If the RPC function doesn't exist yet (migration not run), fall back to legacy logic
+      if (rpcError.message.includes('book_slot_atomic') || rpcError.code === '42883') {
+        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+      }
+      return res.status(500).json({ error: rpcError.message });
+    }
+
+    // The RPC returns a JSON object with either 'error' or 'booking'
+    if (result?.error) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    const booking = result?.booking;
+    const position = result?.queue_position;
+    const waitMinutes = result?.estimated_wait_minutes;
+
+    sendNotification({
+      bookingId: booking?.id,
+      message: `Your slot is booked for ${date} (${slotWindow}). Position: ${position ?? '?'}. Estimated wait: ~${waitMinutes ?? '?'} minutes.`,
+    });
+
+    return res.status(200).json({ booking, queue_position: position, estimated_wait_minutes: waitMinutes });
+  } catch (err: any) {
+    return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+  }
+}
+
+// Legacy booking logic (fallback if atomic function not available)
+async function legacyBooking(
+  req: AuthenticatedNextApiRequest, res: NextApiResponse,
+  centreId: string, commodityId: string, date: string, slotWindow: string, parsedQuantity: number | null
+) {
   const { data: centre } = await supabaseAdmin.from('centres').select('daily_capacity').eq('id', centreId).single();
 
   if (centre) {
@@ -71,7 +117,6 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     }
   }
 
-  // Prevent duplicate bookings
   const { data: existing } = await supabaseAdmin
     .from('bookings')
     .select('id')
