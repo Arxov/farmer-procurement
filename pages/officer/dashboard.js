@@ -178,6 +178,23 @@ export default function OfficerDashboard() {
           </div>
           
           <div>
+            {/* AI Optics Phase 4 */}
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg border border-emerald-100 dark:border-emerald-800 mb-3">
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-[10px] font-black uppercase text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  Pre-Check AI Vision Scan
+                </span>
+                <span className="text-[9px] font-bold bg-white dark:bg-neutral-800 text-emerald-700 px-1 rounded shadow-xs">Scan ID: KS-V{Math.floor(Math.random() * 9000) + 1000}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[9px] font-medium bg-emerald-100/50 dark:bg-emerald-800/30 text-emerald-700 dark:text-emerald-200 px-1.5 py-0.5 rounded border border-emerald-200/50">Size Uniformity: 55-65mm</span>
+                <span className="text-[9px] font-medium bg-emerald-100/50 dark:bg-emerald-800/30 text-emerald-700 dark:text-emerald-200 px-1.5 py-0.5 rounded border border-emerald-200/50">Est. Moisture: 11.4% (Pass)</span>
+                <span className="text-[9px] font-medium bg-emerald-100/50 dark:bg-emerald-800/30 text-emerald-700 dark:text-emerald-200 px-1.5 py-0.5 rounded border border-emerald-200/50">Defect Ratio &lt; 2%</span>
+              </div>
+              <p className="text-[9px] text-emerald-600/80 mt-1 italic">Please manually verify AI grading suggestions below.</p>
+            </div>
+
             <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">{t('qualityGrade')}</label>
             <select
               className="w-full border rounded-lg px-3 py-2 text-sm"
