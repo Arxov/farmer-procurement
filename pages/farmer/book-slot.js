@@ -313,6 +313,18 @@ export default function BookSlot() {
                       step > s.num ? 'bg-green-600' : 'bg-gray-200'
                     }`}
                   />
+
+          {/* Weather Aware Warning */}
+          {date && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex gap-3 mt-4">
+              <span className="text-2xl mt-0.5">🌦️</span>
+              <div>
+                <p className="text-xs font-bold text-blue-800 dark:text-blue-300">Weather Forecast for {date}</p>
+                <p className="text-[11px] text-blue-700 dark:text-blue-400 mt-1">Light rain is expected near your selected mandi. High moisture can lead to crop rejection. Please ensure your produce is properly covered.</p>
+              </div>
+            </div>
+          )}
+
                 )}
               </div>
             ))}
@@ -520,17 +532,6 @@ export default function BookSlot() {
                     className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none mb-2"
                     value={date}
                     onChange={e =>
-
-          {/* Weather Aware Warning */}
-          {date && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex gap-3 mt-4">
-              <span className="text-2xl mt-0.5">🌦️</span>
-              <div>
-                <p className="text-xs font-bold text-blue-800 dark:text-blue-300">Weather Forecast for {date}</p>
-                <p className="text-[11px] text-blue-700 dark:text-blue-400 mt-1">Light rain is expected near your selected mandi. High moisture can lead to crop rejection. Please ensure your produce is properly covered.</p>
-              </div>
-            </div>
-          )}
  { setDate(e.target.value); setError(''); }}
                   />
                 )}
