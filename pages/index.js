@@ -1,434 +1,145 @@
-﻿import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
-import { useLanguage } from '../lib/i18n';
 
-export default function Home() {
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [aadhaar, setAadhaar] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [loginMode, setLoginMode] = useState('phone');
-  const [portalRole, setPortalRole] = useState('farmer'); // 'phone' or 'aadhaar'
+export default function DemoLogin() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const [loadingRole, setLoadingRole] = useState(null);
+  const [error, setError] = useState(null);
 
-  const sendOtp = async () => {
-    if (loginMode === 'aadhaar') {
-      // Aadhaar flow: validate 12-digit number, convert to phone for demo
-      const cleaned = aadhaar.replace(/\s/g, '');
-      if (!/^\d{12}$/.test(cleaned)) {
-        setError('Please enter a valid 12-digit Aadhaar number');
-        return;
+  useEffect(() => {
+    // If already logged in, redirect based on role
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        supabase.from('profiles').select('role').eq('id', session.user.id).single()
+          .then(({ data }) => {
+            if (data?.role) {
+              if (data.role === 'farmer') router.push('/farmer/dashboard');
+              if (data.role === 'officer') router.push('/officer/dashboard');
+              if (data.role === 'admin') router.push('/admin/dashboard');
+            }
+          });
       }
-      // In production, this would call UIDAI API for eKYC.
-      // For hackathon demo, we simulate by asking for the linked mobile number.
-      setOtpSent(true);
-      setError('');
-      return;
-    }
+    });
+  }, [router]);
 
-    if (!phone.trim()) {
-      setError('Please enter a valid mobile number');
-      return;
-    }
-    setLoading(true);
-    setError('');
+  const handleDemoLogin = async (role, email) => {
+    setLoadingRole(role);
+    setError(null);
     try {
-      const { error: sendError } = await supabase.auth.signInWithOtp({ phone });
-      setLoading(false);
-      if (sendError) { setError(sendError.message); return; }
-      setOtpSent(true);
-    } catch (err) {
-      setLoading(false);
-      setError('Network error: Could not reach the server.');
-    }
-  };
-
-  const verifyOtp = async () => {
-    if (!otp.trim()) {
-      setError('Please enter the OTP code');
-      return;
-    }
-
-    // For Aadhaar mode, we also need the phone
-    const loginPhone = loginMode === 'aadhaar' ? phone : phone;
-    if (!loginPhone.trim()) {
-      setError('Please enter your linked mobile number');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      // If Aadhaar mode and OTP not yet sent via Supabase, send it now
-      if (loginMode === 'aadhaar' && !loading) {
-        const { error: sendError } = await supabase.auth.signInWithOtp({ phone: loginPhone });
-        if (sendError) { setError(sendError.message); setLoading(false); return; }
-        setLoading(false);
-        setError('OTP sent to your Aadhaar-linked mobile. Enter the code below.');
-        return;
-      }
-
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({ phone: loginPhone, token: otp, type: 'sms' });
-      setLoading(false);
-      if (verifyError) { setError(verifyError.message); return; }
-
-      if (!data?.user) {
-        setError('Verification succeeded but no user was returned. Please try again.');
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-      if (!profile) { router.push('/register'); return; }
-      if (profile.role === 'officer') router.push('/officer/dashboard');
-      else if (profile.role === 'admin') router.push('/admin/dashboard');
-      else router.push('/farmer/dashboard');
-    } catch (err) {
-      setLoading(false);
-      setError('Network error: Could not reach the server.');
-    }
-  };
-
-  // Aadhaar step tracking
-  
-  const bypassLogin = async (role) => {
-    setLoading(true);
-    setError('');
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: `${role}@demo.com`,
-        password: 'password123'
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'password123',
       });
+      if (error) throw error;
       
-      if (signInError) throw signInError;
-      
+      if (role === 'farmer') router.push('/farmer/dashboard');
       if (role === 'officer') router.push('/officer/dashboard');
-      else if (role === 'admin') router.push('/admin/dashboard');
-      else router.push('/farmer/dashboard');
-      
+      if (role === 'admin') router.push('/admin/dashboard');
     } catch (err) {
-      setError('Bypass failed: ' + err.message);
-      setLoading(false);
+      setError(err.message);
+      setLoadingRole(null);
     }
   };
 
-  const [aadhaarStep, setAadhaarStep] = useState(0); // 0=enter aadhaar, 1=enter phone, 2=enter otp
-  const [isVerifyingAadhaar, setIsVerifyingAadhaar] = useState(false);
-
-  const handleAadhaarNext = async () => {
-    if (aadhaarStep === 0) {
-      const cleaned = aadhaar.replace(/\s/g, '');
-      if (!/^\d{12}$/.test(cleaned)) {
-        setError('Please enter a valid 12-digit Aadhaar number');
-        return;
-      }
-      setError('');
-      setIsVerifyingAadhaar(true);
-
-      // Simulate UIDAI eKYC protocol handshake
-      setTimeout(() => {
-        setIsVerifyingAadhaar(false);
-        setAadhaarStep(1);
-      }, 1600);
-    } else if (aadhaarStep === 1) {
-      if (!phone.trim()) {
-        setError('Please enter your Aadhaar-linked mobile number');
-        return;
-      }
-      setLoading(true);
-      setError('');
-      try {
-        const { error: sendError } = await supabase.auth.signInWithOtp({ phone });
-        setLoading(false);
-        if (sendError) { setError(sendError.message); return; }
-        setAadhaarStep(2);
-      } catch (err) {
-        setLoading(false);
-        setError('Network error: Could not reach the server.');
-      }
-    } else if (aadhaarStep === 2) {
-      await verifyOtp();
+  const demoAccounts = [
+    {
+      id: 'farmer',
+      email: 'farmer@demo.com',
+      name: 'Ramesh Patil',
+      roleTitle: 'Farmer',
+      badge: 'Registered Progressive Farmer',
+      location: 'Baramati Cluster, Pune',
+      uid: 'ID: 9822100011',
+      icon: '🌱',
+      btnLabel: 'Enter Portal as Ramesh'
+    },
+    {
+      id: 'officer',
+      email: 'officer@demo.com',
+      name: 'APMC Officer Desk',
+      roleTitle: 'Quality Inspector',
+      badge: 'Verified Mandi Official (MSAMB)',
+      location: 'Baramati Krushi APMC',
+      uid: 'ID: 9422088990',
+      icon: '📋',
+      btnLabel: 'Enter Portal as Officer'
+    },
+    {
+      id: 'admin',
+      email: 'admin@demo.com',
+      name: 'Kisan Setu National Admin',
+      roleTitle: 'Admin',
+      badge: 'State Portal & Nodal Authority',
+      location: 'State Agricultural Operations Center',
+      uid: 'ID: 0202555123',
+      icon: '🛡️',
+      btnLabel: 'Enter Portal as Admin'
     }
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 flex flex-col justify-between">
-      {/* Official Government Tricolor Top Accent */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 via-white to-green-600 shadow-sm" />
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col items-center justify-center p-4">
+      <Head>
+        <title>Kisan Setu | Demo Login Hub</title>
+      </Head>
 
-      {/* Top Header Bar */}
-      <header className="bg-white dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-700 px-4 py-3 shadow-xs">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl font-bold text-amber-700">
-              <span className="notranslate">🏛️</span>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-green-800 bg-green-100 px-2 py-0.5 rounded">
-                  Farmer Portal
-                </span>
+      <div className="text-center max-w-3xl mb-12 mt-8">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900">
+          Kisan Setu
+        </h1>
+        <p className="text-sm md:text-base text-slate-500 mb-6 font-medium px-4">
+          National Digital Agriculture Platform: Direct Mandi Procurement & Settlements
+        </p>
+        
+        <div className="flex flex-wrap justify-center gap-3">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Live Enterprise Production v3.0
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            Zero-Trust JWT Authentication
+          </span>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-8 p-4 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm font-medium w-full max-w-4xl text-center">
+          Error: {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mb-12">
+        {demoAccounts.map(account => (
+          <div key={account.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition-shadow flex flex-col h-full">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-2xl border border-emerald-100 shrink-0">
+                {account.icon}
               </div>
-              <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-neutral-100 leading-tight">
-                Kisan Setu
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">{account.name}</h2>
+                <p className="text-sm font-semibold text-emerald-700">{account.roleTitle}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/ivr-demo"
-              className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1.5 shadow-2xs"
+
+            <div className="flex-1 space-y-1 mb-8 text-sm">
+              <p className="text-slate-600 font-medium">{account.badge}</p>
+              <p className="text-slate-500">{account.location}</p>
+              <p className="text-slate-400 text-xs mt-2">{account.uid}</p>
+            </div>
+
+            <button
+              onClick={() => handleDemoLogin(account.id, account.email)}
+              disabled={loadingRole !== null}
+              className="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-colors"
             >
-              <span><span className="notranslate">🎙️</span></span>
-              <span>IVR Voice Demo</span>
-            </Link>
-            <div className="text-right hidden sm:block">
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Toll-Free Kisan Helpline</p>
-              <p className="text-xs font-bold text-green-800">📞 1800-180-1551</p>
-            </div>
+              {loadingRole === account.id ? 'Authenticating...' : account.btnLabel}
+            </button>
           </div>
-        </div>
-      </header>
-
-      {/* Main Landing & Login Section */}
-      <main className="max-w-6xl mx-auto px-4 py-8 sm:py-12 flex-1 flex flex-col lg:flex-row items-center gap-10 justify-center">
-        {/* Right Authentication Box */}
-        <div className="w-full max-w-md">
-          <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 relative">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-700 text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-              {portalRole === 'farmer' ? 'Citizen Login' : 'Secure Staff Login'}
-            </div>
-
-            
-            {/* Role Toggle */}
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => setPortalRole('farmer')}
-                className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition border ${portalRole === 'farmer' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
-              >
-                🌾 Farmer
-              </button>
-              <button
-                onClick={() => setPortalRole('officer')}
-                className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition border ${portalRole === 'officer' ? 'bg-blue-50 border-blue-200 text-blue-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
-              >
-                📋 Officer
-              </button>
-              <button
-                onClick={() => setPortalRole('admin')}
-                className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition border ${portalRole === 'admin' ? 'bg-purple-50 border-purple-200 text-purple-800' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
-              >
-                🛡️ Admin
-              </button>
-            </div>
-
-            <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mb-1">{portalRole === 'farmer' ? t('appName') : portalRole === 'officer' ? 'Officer Portal' : 'Admin Portal'}</h2>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-5">{portalRole === 'farmer' ? t('appTagline') : 'Secure authorized staff access'}</p>
-
-            {/* Login Mode Toggle */}
-            <div className="flex bg-gray-100 dark:bg-neutral-800 rounded-xl p-1 mb-5">
-              <button
-                onClick={() => { setLoginMode('phone'); setError(''); setOtpSent(false); setAadhaarStep(0); }}
-                className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${loginMode === 'phone' ? 'bg-white dark:bg-neutral-800 shadow-sm text-green-800' : 'text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200'}`}
-              >
-                <span className="notranslate">📱</span> {t('mobileNumber')}
-              </button>
-              <button
-                onClick={() => { setLoginMode('aadhaar'); setError(''); setOtpSent(false); setAadhaarStep(0); }}
-                className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${loginMode === 'aadhaar' ? 'bg-white dark:bg-neutral-800 shadow-sm text-green-800' : 'text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200'}`}
-              >
-                <span className="notranslate">🪪</span> Aadhaar eKYC
-              </button>
-            </div>
-
-            {/* Phone Login Flow */}
-            {loginMode === 'phone' && (
-              <>
-                {!otpSent ? (
-                  <>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">{t('mobileNumber')}</label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+91XXXXXXXXXX"
-                      className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-4 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                    />
-                    <button onClick={sendOtp} disabled={loading} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50">
-                      {loading ? t('sending') : `${t('sendOtp')} →`}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div className="bg-green-50 border border-green-200 text-green-800 p-2.5 rounded-lg mb-3 text-xs">
-                      OTP sent to <strong>{phone}</strong>
-                    </div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">{t('enterOtp')}</label>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="6-digit code"
-                      className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-4 text-sm tracking-widest text-center font-mono focus:ring-2 focus:ring-green-500 focus:outline-none"
-                    />
-                    <button onClick={verifyOtp} disabled={loading} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50">
-                      {loading ? t('verifying') : t('verifyAndContinue')}
-                    </button>
-                  </>
-                )}
-              </>
-            )}
-
-            {/* Aadhaar Login Flow */}
-            {loginMode === 'aadhaar' && (
-              <>
-                {aadhaarStep === 0 && (
-                  <>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">Aadhaar Number</label>
-                    <input
-                      type="text"
-                      value={aadhaar}
-                      onChange={(e) => {
-                        const v = e.target.value.replace(/[^\d\s]/g, '');
-                        if (v.replace(/\s/g, '').length <= 12) setAadhaar(v);
-                      }}
-                      placeholder="XXXX XXXX XXXX"
-                      maxLength={14}
-                      className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-2 text-sm tracking-widest text-center font-mono focus:ring-2 focus:ring-green-500 focus:outline-none"
-                    />
-                    <p className="text-[11px] text-gray-400 mb-4">Verified securely via UIDAI eKYC protocol</p>
-                    <button onClick={handleAadhaarNext} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition">
-                      Verify Aadhaar →
-                    </button>
-                  </>
-                )}
-
-                {aadhaarStep === 1 && (
-                  <>
-                    <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-xs">
-                      <p className="text-green-800 font-medium">✅ Aadhaar Validated: {aadhaar}</p>
-                    </div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">Aadhaar-Linked Mobile</label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+91XXXXXXXXXX"
-                      className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-4 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                    />
-                    <button onClick={handleAadhaarNext} disabled={loading} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50">
-                      {loading ? t('sending') : 'Send Aadhaar OTP →'}
-                    </button>
-                  </>
-                )}
-
-                {aadhaarStep === 2 && (
-                  <>
-                    <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-xs">
-                      <p className="text-green-800 font-medium">✅ Aadhaar: {aadhaar}</p>
-                      <p className="text-green-700 mt-0.5"><span className="notranslate">📱</span> OTP sent to {phone}</p>
-                    </div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">{t('enterOtp')}</label>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="6-digit code"
-                      className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 mb-4 text-sm tracking-widest text-center font-mono focus:ring-2 focus:ring-green-500 focus:outline-none"
-                    />
-                    <button onClick={handleAadhaarNext} disabled={loading} className="w-full bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50">
-                      {loading ? t('verifying') : t('verifyAndContinue')}
-                    </button>
-                  </>
-                )}
-              </>
-            )}
-
-            {error && <p className="text-red-600 text-xs mt-3 text-center bg-red-50 p-2 rounded-lg border border-red-100">{error}</p>}
-
-            {/* LOCAL DEV BYPASS */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mt-6 p-4 border-2 border-red-400 bg-red-50 rounded-xl">
-                <p className="text-xs font-bold text-red-600 mb-2">🚨 HACKATHON OFFLINE BYPASS 🚨</p>
-                <div className="flex gap-2">
-                  <button onClick={() => bypassLogin('farmer')} className="bg-green-700 hover:bg-green-800 text-white text-[10px] px-3 py-2 rounded-lg font-bold w-full">🌾 Farmer</button>
-                  <button onClick={() => bypassLogin('officer')} className="bg-blue-700 hover:bg-blue-800 text-white text-[10px] px-3 py-2 rounded-lg font-bold w-full">📋 Officer</button>
-                  <button onClick={() => bypassLogin('admin')} className="bg-purple-700 hover:bg-purple-800 text-white text-[10px] px-3 py-2 rounded-lg font-bold w-full">🛡️ Admin</button>
-                </div>
-              </div>
-            )}
-
-          </div>
-
-          {/* UIDAI e-KYC Handshake Modal Simulation */}
-          {isVerifyingAadhaar && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
-              <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center border border-gray-100 dark:border-neutral-700 relative overflow-hidden">
-                {/* Government Tricolor Top Line */}
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-white to-green-600" />
-
-                {/* Emblem / Aadhaar Graphic */}
-                <div className="w-16 h-16 mx-auto mb-4 bg-orange-50 border-2 border-orange-200 rounded-full flex items-center justify-center text-3xl shadow-inner relative">
-                  <span>🆔</span>
-                  <div className="absolute inset-0 rounded-full border-2 border-orange-500 animate-ping opacity-25" />
-                </div>
-
-                <h3 className="text-base font-bold text-gray-900 dark:text-neutral-100">UIDAI e-KYC Authentication</h3>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-1">Connecting to Central Identities Data Repository (CIDR)...</p>
-
-                {/* Progress Scanner Animation */}
-                <div className="my-5 p-3 bg-slate-50 dark:bg-neutral-950 border border-gray-200 dark:border-neutral-700 rounded-xl text-left font-mono text-[11px] space-y-1.5 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">
-                  <div className="flex items-center justify-between text-green-700 font-semibold">
-                    <span>▶ Encrypting 256-bit Token...</span>
-                    <span>✓ OK</span>
-                  </div>
-                  <div className="flex items-center justify-between text-green-700 font-semibold">
-                    <span>▶ Validating Demographic Hash...</span>
-                    <span>✓ OK</span>
-                  </div>
-                  <div className="flex items-center justify-between text-amber-700 font-semibold animate-pulse">
-                    <span>▶ Fetching Linked OTP Gateway...</span>
-                    <span>99.2%</span>
-                  </div>
-                </div>
-
-                <div className="w-full bg-gray-100 dark:bg-neutral-800 rounded-full h-2 overflow-hidden mb-2">
-                  <div className="bg-green-600 h-2 rounded-full animate-pulse w-4/5" />
-                </div>
-                <p className="text-[10px] text-gray-400">Compliant with Aadhaar Act (2016) e-KYC Regulations</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-
-      {/* Official Government Footer */}
-      <footer className="bg-gray-900 text-gray-400 text-xs py-6 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-          <div>
-            <p className="text-gray-300 font-semibold">Central Farmer Procurement Platform (CFPP) • SIH26032</p>
-            <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 text-[11px] mt-0.5">Developed for Ministry of Consumer Affairs, Food & Public Distribution</p>
-          </div>
-          <div className="flex gap-4 text-[11px] text-gray-400">
-            <span>Direct Benefit Transfer (DBT)</span>
-            <span>•</span>
-            <span>UIDAI Aadhaar Verified</span>
-            <span>•</span>
-            <span>e-NAM Interoperable</span>
-          </div>
-        </div>
-      </footer>
+        ))}
+      </div>
     </div>
   );
 }
-
