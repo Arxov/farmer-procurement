@@ -79,6 +79,22 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
 
     // The RPC returns a JSON object with either 'error' or 'booking'
     if (result?.error) {
+      if (result.error.toLowerCase().includes('weekly booking limit')) {
+        const { count } = await supabaseAdmin
+          .from('bookings')
+          .select('*', { count: 'exact', head: true })
+          .eq('farmer_id', req.user.id)
+          .gte('slot_date', new Date().toISOString().split('T')[0])
+          .not('status', 'eq', 'cancelled');
+          
+        const EXTENDED_LIMIT = 5;
+        if (count !== null && count >= EXTENDED_LIMIT) {
+          return res.status(400).json({ error: `You have reached your extended weekly booking limit of ${EXTENDED_LIMIT}. Cancel an existing booking or wait for current ones to complete.` });
+        }
+        
+        // Within extended limit, bypass RPC and use fallback insertion
+        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+      }
       return res.status(400).json({ error: result.error });
     }
 
