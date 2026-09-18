@@ -195,6 +195,20 @@ export default function OfficerDashboard() {
               <p className="text-[9px] text-emerald-600/80 mt-1 italic">Please manually verify AI grading suggestions below.</p>
             </div>
 
+            
+            {/* Dual-Grade Accountability Rule (Officer Polish Phase 1) */}
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-2.5 rounded-lg mb-4 mt-2">
+              <div className="flex items-start gap-2">
+                <span className="text-amber-600 dark:text-amber-400 mt-0.5">⚠️</span>
+                <div>
+                  <h4 className="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5">Dual-Grade Accountability Rule:</h4>
+                  <p className="text-[9px] text-amber-700/90 dark:text-amber-400/90 leading-tight">
+                    You have full authority to override the AI visual grade if physical inspection reveals discrepancies. Both the AI estimate and your verified manual grade will be permanently preserved in the hash-chained audit log to prevent fraudulent reporting.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">{t('qualityGrade')}</label>
             <select
               className="w-full border rounded-lg px-3 py-2 text-sm"
@@ -262,8 +276,9 @@ export default function OfficerDashboard() {
             onChange={e => setActionData({ ...actionData, accepted_quantity_quintals: e.target.value })}
           />
           <div className="flex gap-2">
-            <button onClick={() => advance(booking)} disabled={actionLoading || !actionData.accepted_quantity_quintals} className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50">
-              {actionLoading ? t('loading') : t('confirm')}
+            <button onClick={() => advance(booking)} disabled={actionLoading || !actionData.accepted_quantity_quintals} className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 shadow-sm flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              {actionLoading ? t('loading') : 'Generate Verified Weigh-Slip'}
             </button>
             <button onClick={cancelAction} className="bg-gray-200 text-gray-700 dark:text-neutral-300 px-4 py-2 rounded-lg text-sm font-medium">{t('cancel')}</button>
           </div>
