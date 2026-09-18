@@ -182,7 +182,7 @@ export default function BookSlot() {
     setLoading(true);
     setError('');
 
-    const bookingPayload = { centreId, commodityId, date, slotWindow, quantity };
+    const bookingPayload = { centreId, commodityId, date, slotWindow, quantity: quantity.trim() === '' ? null : quantity };
 
     // Offline fallback: queue locally
     if (!navigator.onLine) {
