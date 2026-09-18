@@ -27,6 +27,8 @@ export default function BookSlot() {
   const [availability, setAvailability] = useState([]);
   const [showCustomDate, setshowCustomDate] = useState(false);
   const [step, setStep] = useState(1);
+  const [centreCommodities, setCentreCommodities] = useState([]);
+  const [demandData, setDemandData] = useState(null);
   const router = useRouter();
   const { t } = useLanguage();
 
@@ -60,6 +62,63 @@ export default function BookSlot() {
     setDate(suggestion.date);
     setSlotWindow(suggestion.slotWindow);
   };
+
+  
+  // Fetch which commodities this centre procures
+  useEffect(() => {
+    if (!centreId) { setCentreCommodities([]); return; }
+    const fetchCC = async () => {
+      const { data } = await supabase
+        .from('centre_commodities')
+        .select('commodity_id, procurement_start_month, procurement_end_month')
+        .eq('centre_id', centreId);
+      setCentreCommodities(data || []);
+    };
+    fetchCC();
+  }, [centreId]);
+
+  // Fetch demand data when commodity + centre + date are selected
+  useEffect(() => {
+    if (!centreId || !commodityId || !date) { setDemandData(null); return; }
+    const fetchDemand = async () => {
+      const weekStart = new Date(date);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      
+      const { data: weekBookings } = await supabase
+        .from('bookings')
+        .select('expected_quantity_quintals')
+        .eq('centre_id', centreId)
+        .eq('commodity_id', commodityId)
+        .gte('slot_date', weekStart.toISOString().split('T')[0])
+        .lte('slot_date', weekEnd.toISOString().split('T')[0])
+        .neq('status', 'cancelled');
+      
+      const totalQty = (weekBookings || []).reduce((sum, b) => sum + (parseFloat(b.expected_quantity_quintals) || 0), 0);
+      const bookingCount = (weekBookings || []).length;
+      const selectedCentre = centres.find(c => c.id === centreId);
+      const weeklyCapacity = (selectedCentre?.daily_capacity || 100) * 6;
+      const loadPercent = Math.round((bookingCount / weeklyCapacity) * 100);
+      
+      let demandLevel = 'HIGH_DEMAND';
+      let demandColor = 'green';
+      let demandText = 'Low arrivals expected. Good time to sell!';
+      
+      if (loadPercent > 80) {
+        demandLevel = 'OVERSUPPLY';
+        demandColor = 'red';
+        demandText = 'Very high arrivals expected. Consider another mandi or date.';
+      } else if (loadPercent > 50) {
+        demandLevel = 'MODERATE';
+        demandColor = 'amber';
+        demandText = 'Moderate arrivals expected. Book early for best slots.';
+      }
+      
+      setDemandData({ totalQty, bookingCount, weeklyCapacity, loadPercent, demandLevel, demandColor, demandText });
+    };
+    fetchDemand();
+  }, [centreId, commodityId, date, centres]);
 
   // Fetch slot availability for next 4 days when centre is selected
   useEffect(() => {
@@ -308,6 +367,12 @@ export default function BookSlot() {
                 )}
 
                 <p className="text-[11px] text-gray-400 mt-1">Select the APMC yard closest to your farmland.</p>
+                {centreId && centreCommodities.length > 0 && commodities.filter(c => centreCommodities.some(cc => cc.commodity_id === c.id)).length === 0 && (
+                  <div className="mt-2 bg-orange-50 border border-orange-200 rounded-xl p-3">
+                    <p className="text-xs text-orange-700 font-semibold">⚠️ No crops are currently being procured at this mandi for the current season.</p>
+                  </div>
+                )}
+
               </div>
 
               <div>
@@ -320,11 +385,23 @@ export default function BookSlot() {
                   onChange={e => { setcommodityId(e.target.value); setError(''); }}
                 >
                   <option value="">Select commodity</option>
-                  {commodities.map(c => {
+                  {commodities
+                    .filter(c => {
+                      if (!centreId || centreCommodities.length === 0) return true;
+                      const cc = centreCommodities.find(cc => cc.commodity_id === c.id);
+                      if (!cc) return false;
+                      // Check if current month is within procurement window
+                      const month = new Date().getMonth() + 1;
+                      if (cc.procurement_start_month <= cc.procurement_end_month) {
+                        return month >= cc.procurement_start_month && month <= cc.procurement_end_month;
+                      }
+                      return month >= cc.procurement_start_month || month <= cc.procurement_end_month;
+                    })
+                    .map(c => {
                     const crop = getCropConfig(c.name);
                     return (
                       <option key={c.id} value={c.id}>
-                        {crop.icon} {c.name} — Govt MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}/quintal
+                        {crop.icon} {c.name} — MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}/q
                       </option>
                     );
                   })}

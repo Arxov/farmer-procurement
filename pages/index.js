@@ -100,6 +100,28 @@ export default function Home() {
   };
 
   // Aadhaar step tracking
+  
+  const bypassLogin = async (role) => {
+    setLoading(true);
+    setError('');
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: `${role}@demo.com`,
+        password: 'password123'
+      });
+      
+      if (signInError) throw signInError;
+      
+      if (role === 'officer') router.push('/officer/dashboard');
+      else if (role === 'admin') router.push('/admin/dashboard');
+      else router.push('/farmer/dashboard');
+      
+    } catch (err) {
+      setError('Bypass failed: ' + err.message);
+      setLoading(false);
+    }
+  };
+
   const [aadhaarStep, setAadhaarStep] = useState(0); // 0=enter aadhaar, 1=enter phone, 2=enter otp
   const [isVerifyingAadhaar, setIsVerifyingAadhaar] = useState(false);
 
@@ -333,6 +355,19 @@ export default function Home() {
             )}
 
             {error && <p className="text-red-600 text-xs mt-3 text-center bg-red-50 p-2 rounded-lg border border-red-100">{error}</p>}
+
+            {/* LOCAL DEV BYPASS */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-6 p-4 border-2 border-red-400 bg-red-50 rounded-xl">
+                <p className="text-xs font-bold text-red-600 mb-2">🚨 HACKATHON OFFLINE BYPASS 🚨</p>
+                <div className="flex gap-2">
+                  <button onClick={() => bypassLogin('farmer')} className="bg-green-700 hover:bg-green-800 text-white text-[10px] px-3 py-2 rounded-lg font-bold w-full">🌾 Farmer</button>
+                  <button onClick={() => bypassLogin('officer')} className="bg-blue-700 hover:bg-blue-800 text-white text-[10px] px-3 py-2 rounded-lg font-bold w-full">📋 Officer</button>
+                  <button onClick={() => bypassLogin('admin')} className="bg-purple-700 hover:bg-purple-800 text-white text-[10px] px-3 py-2 rounded-lg font-bold w-full">🛡️ Admin</button>
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* UIDAI e-KYC Handshake Modal Simulation */}

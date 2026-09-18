@@ -40,7 +40,7 @@ export default function OfficerDashboard() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, commodities(name, max_moisture, max_broken_percent, max_damaged_percent)')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -134,10 +134,22 @@ export default function OfficerDashboard() {
     }
 
         if (nextStatus === 'quality_checked') {
-      const isRejected = actionData.quality_grade === 'Rejected' || parseFloat(actionData.moisture_percent || 0) > 14;
+      const maxMoisture = booking?.commodities?.max_moisture || 14;
+      const isRejected = actionData.quality_grade === 'Rejected' || parseFloat(actionData.moisture_percent || 0) > maxMoisture;
       
       return (
         <div className="mt-3 p-3 bg-gray-50 dark:bg-neutral-900 rounded-lg space-y-3">
+          {booking?.commodities && (
+            <div className="mb-3 p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-[10px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-1.5">FCI Limits for {booking.commodities.name}</p>
+              <div className="flex gap-3 text-xs">
+                <span className="text-blue-700 dark:text-blue-400">Moisture: <strong>{booking.commodities.max_moisture || 14}%</strong></span>
+                <span className="text-blue-700 dark:text-blue-400">Broken: <strong>{booking.commodities.max_broken_percent || 6}%</strong></span>
+                <span className="text-blue-700 dark:text-blue-400">Damaged: <strong>{booking.commodities.max_damaged_percent || 4}%</strong></span>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider mb-1 text-gray-700">Moisture (%)</label>
@@ -145,7 +157,7 @@ export default function OfficerDashboard() {
                 type="number"
                 min="0"
                 step="0.1"
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${parseFloat(actionData.moisture_percent || 0) > 14 ? 'border-red-500 bg-red-50 text-red-900' : ''}`}
+                className={`w-full border rounded-lg px-3 py-2 text-sm ${parseFloat(actionData.moisture_percent || 0) > maxMoisture ? 'border-red-500 bg-red-50 text-red-900' : ''}`}
                 placeholder="e.g. 12.5"
                 value={actionData.moisture_percent || ''}
                 onChange={e => setActionData({ ...actionData, moisture_percent: e.target.value })}
@@ -190,7 +202,7 @@ export default function OfficerDashboard() {
                   onChange={e => setActionData({ ...actionData, rejection_reason: e.target.value, quality_grade: 'Rejected' })}
                 >
                   <option value="">Select Reason</option>
-                  <option value="High Moisture">High Moisture (&gt; 14%)</option>
+                  <option value="High Moisture">High Moisture (exceeds limit)</option>
                   <option value="High Admixture">High Admixture / Chaff</option>
                   <option value="Fungus / Discolored">Fungus / Discolored Grains</option>
                   <option value="Other">Other</option>
