@@ -185,14 +185,14 @@ export default function PriceOutlook() {
                 <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80 mt-1 mb-3">Supply dip in neighboring agricultural clusters creates short-term price surge.</p>
                 
                 <div className="text-2xl font-black text-emerald-700 dark:text-emerald-300">
-                  ₹{Math.round(selectedCommodity?.msp_rate_per_quintal * 1.08).toLocaleString()} - ₹{Math.round(selectedCommodity?.msp_rate_per_quintal * 1.12).toLocaleString()} <span className="text-xs font-medium text-emerald-600/70">/qtl</span>
+                  ₹{Math.round(msp * 1.08).toLocaleString()} - ₹{Math.round(msp * 1.12).toLocaleString()} <span className="text-xs font-medium text-emerald-600/70">/qtl</span>
                 </div>
                 <p className="text-[10px] font-bold text-emerald-600 mt-1 mb-4">+₹110/qtl estimated upside against today's spot rate</p>
                 
                 <div className="space-y-1.5 pt-3 border-t border-emerald-200 dark:border-emerald-800/50">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-emerald-700/70 dark:text-emerald-400/70">Downside Risk (P10):</span>
-                    <span className="font-bold text-emerald-800 dark:text-emerald-200">₹{Math.round(selectedCommodity?.msp_rate_per_quintal * 1.02).toLocaleString()}/qtl</span>
+                    <span className="font-bold text-emerald-800 dark:text-emerald-200">₹{Math.round(msp * 1.02).toLocaleString()}/qtl</span>
                   </div>
                   <div className="flex justify-between text-[10px]">
                     <span className="text-emerald-700/70 dark:text-emerald-400/70">Confidence Level:</span>
@@ -213,14 +213,14 @@ export default function PriceOutlook() {
                 <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1 mb-3">Immediate spot liquidation at nearest APMC. Eliminates post-harvest spoilage.</p>
                 
                 <div className="text-2xl font-black text-gray-900 dark:text-white">
-                  ₹{Math.round(selectedCommodity?.msp_rate_per_quintal * 1.01).toLocaleString()} - ₹{Math.round(selectedCommodity?.msp_rate_per_quintal * 1.03).toLocaleString()} <span className="text-xs font-medium text-gray-400">/qtl</span>
+                  ₹{Math.round(msp * 1.01).toLocaleString()} - ₹{Math.round(msp * 1.03).toLocaleString()} <span className="text-xs font-medium text-gray-400">/qtl</span>
                 </div>
                 <p className="text-[10px] font-bold text-gray-500 mt-1 mb-4">Current spot benchmark rate</p>
                 
                 <div className="space-y-1.5 pt-3 border-t border-gray-100 dark:border-neutral-700">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-gray-500">Downside Risk (P10):</span>
-                    <span className="font-bold text-gray-700 dark:text-neutral-300">₹{Math.round(selectedCommodity?.msp_rate_per_quintal * 0.98).toLocaleString()}/qtl</span>
+                    <span className="font-bold text-gray-700 dark:text-neutral-300">₹{Math.round(msp * 0.98).toLocaleString()}/qtl</span>
                   </div>
                   <div className="flex justify-between text-[10px]">
                     <span className="text-gray-500">Perishability Exposure:</span>
