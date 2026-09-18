@@ -104,13 +104,13 @@ export default function NetCalculator() {
               <div className="flex gap-2">
                 <button 
                   onClick={() => setTransportMode('solo')}
-                  className={\`flex-1 py-2 text-xs font-bold rounded-lg transition \${transportMode === 'solo' ? 'bg-orange-100 text-orange-800 border-2 border-orange-500' : 'bg-gray-50 text-gray-500 border border-gray-200'}\`}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${transportMode === 'solo' ? 'bg-orange-100 text-orange-800 border-2 border-orange-500' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}
                 >
                   🚜 Solo Tractor
                 </button>
                 <button 
                   onClick={() => setTransportMode('pooled')}
-                  className={\`flex-1 py-2 text-xs font-bold rounded-lg transition \${transportMode === 'pooled' ? 'bg-green-100 text-green-800 border-2 border-green-500' : 'bg-gray-50 text-gray-500 border border-gray-200'}\`}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${transportMode === 'pooled' ? 'bg-green-100 text-green-800 border-2 border-green-500' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}
                 >
                   🤝 Pooled Transport
                 </button>
