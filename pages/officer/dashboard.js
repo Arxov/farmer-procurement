@@ -40,7 +40,7 @@ export default function OfficerDashboard() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role, commodities(name, max_moisture, max_broken_percent, max_damaged_percent)')
+        .select('role')
         .eq('id', user.id)
         .maybeSingle();
 
