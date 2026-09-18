@@ -369,10 +369,6 @@ export default function FarmerDashboard() {
         )}
         
         {/* Legacy block removed */}
-)}
-            </div>
-          </div>
-        )}
 
         {/* 5-Star Mandi Feedback for Completed/Accepted Procurements */}
         {['accepted', 'paid'].includes(b.status) && (
