@@ -17,6 +17,7 @@ import CropBadge from '../../components/CropBadge';
 import BookingStepper from '../../components/BookingStepper';
 import PullToRefresh from '../../components/PullToRefresh';
 import InstallPwaBanner from '../../components/InstallPwaBanner';
+import VoiceAssistance from '../../components/VoiceAssistance';
 import KisanMitraWidget from '../../components/KisanMitraWidget';
 import { useFarmerBookings, bookingsQueryKeys } from '../../hooks/useBookings';
 import { useCommodities } from '../../hooks/useCommodities';
