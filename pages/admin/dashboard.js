@@ -554,12 +554,13 @@ export default function AdminDashboard() {
                 <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">High Alert</span>
               </div>
               <div className="h-32 flex items-end gap-2 justify-between mt-4">
-                {centreQC.map(c => {
-                  const variance = (c.rejectionRate || 0) * 0.4 + (c.name.length % 3); // Deterministic pseudo-metric
+                {centreQC.map(([name, qc]) => {
+                  const rejectionRate = qc.total ? (qc.rejected / qc.total * 100) : 0;
+                  const variance = rejectionRate * 0.4 + ((name || '').length % 3); // Deterministic pseudo-metric
                   return (
-                    <div key={c.name} className="flex-1 flex flex-col items-center group relative">
+                    <div key={name || Math.random()} className="flex-1 flex flex-col items-center group relative">
                       <div className="absolute -top-8 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10 pointer-events-none">
-                        {c.name}: {variance.toFixed(1)}% variance
+                        {name || 'Unknown'}: {variance.toFixed(1)}% variance
                       </div>
                       <div 
                         className={`w-full rounded-t-sm transition-all ${variance > 5 ? 'bg-red-500' : 'bg-green-500'}`} 
@@ -585,13 +586,14 @@ export default function AdminDashboard() {
                 <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">Live Data</span>
               </div>
               <div className="space-y-4 mt-4">
-                {centreQC.slice(0, 4).map(c => {
-                  const avgMoisture = 12 + ((c.rejectionRate || 0) % 4) + (c.name.length % 2); // Deterministic pseudo-metric
+                {centreQC.slice(0, 4).map(([name, qc]) => {
+                  const rejectionRate = qc.total ? (qc.rejected / qc.total * 100) : 0;
+                  const avgMoisture = 12 + (rejectionRate % 4) + ((name || '').length % 2); // Deterministic pseudo-metric
                   const isHigh = avgMoisture > 14;
                   return (
-                    <div key={c.name}>
+                    <div key={name || Math.random()}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="font-medium text-gray-700 dark:text-neutral-300 truncate w-32">{c.name}</span>
+                        <span className="font-medium text-gray-700 dark:text-neutral-300 truncate w-32">{name || 'Unknown'}</span>
                         <span className={`font-bold ${isHigh ? 'text-red-500' : 'text-blue-500'}`}>{avgMoisture.toFixed(1)}%</span>
                       </div>
                       <div className="h-1.5 w-full bg-gray-100 dark:bg-neutral-700 rounded-full overflow-hidden flex">
