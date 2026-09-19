@@ -10,5 +10,8 @@
 # local env files
 .env*.local
 
+# claude
+.claude/
+
 # vercel
 .vercel
