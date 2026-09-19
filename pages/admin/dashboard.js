@@ -1,12 +1,15 @@
+import { useClerk } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import { StatusDonutChart, TrendAreaChart, CapacityRadialCard } from '../../components/AdminCharts';
 import CropBadge from '../../components/CropBadge';
 
 export default function AdminDashboard() {
+  const clerk = useClerk();
+  const supabase = useSupabaseClient();
   const [stats, setStats] = useState({ total: 0, byStatus: {} });
   const [byCentre, setByCentre] = useState([]);
   const [centreQC, setCentreQC] = useState([]);
@@ -129,7 +132,7 @@ export default function AdminDashboard() {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await clerk.signOut();
     router.push('/');
   };
 

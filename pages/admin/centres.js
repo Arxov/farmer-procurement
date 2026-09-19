@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 
 export default function AdminCentres() {
+  const supabase = useSupabaseClient();
   const [centres, setCentres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);

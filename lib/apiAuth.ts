@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from './supabaseAdmin';
 import { UserRole } from '../types/database';
+import { getAuth } from '@clerk/nextjs/server';
 
 export interface AuthenticatedNextApiRequest extends NextApiRequest {
   user: {
@@ -19,16 +20,13 @@ export interface AuthOptions {
 export function withAuth(handler: ApiHandler, options?: AuthOptions) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const token = req.headers.authorization?.replace('Bearer ', '');
-      if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-      const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-      if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
+      const { userId } = getAuth(req);
+      if (!userId) return res.status(401).json({ error: 'Not authenticated' });
 
       const { data: profile, error: profileError } = await supabaseAdmin
         .from('profiles')
         .select('role, phone')
-        .eq('id', userData.user.id)
+        .eq('id', userId)
         .single();
 
       if (profileError || !profile) return res.status(401).json({ error: 'Profile not found' });
@@ -38,7 +36,7 @@ export function withAuth(handler: ApiHandler, options?: AuthOptions) {
       }
 
       (req as AuthenticatedNextApiRequest).user = {
-        id: userData.user.id,
+        id: userId,
         role: profile.role as UserRole,
         phone: profile.phone || undefined,
       };

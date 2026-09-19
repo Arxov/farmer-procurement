@@ -12,6 +12,7 @@ import { LanguageProvider } from '../lib/i18n';
 import LanguageToggle from '../components/LanguageToggle';
 import OfflineBanner from '../components/OfflineBanner';
 import { ToastProvider } from '../components/Toast';
+import { ClerkProvider } from '@clerk/nextjs';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -27,9 +28,10 @@ export default function App({ Component, pageProps }) {
   }, []);
 
   return (
-    <Providers>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-    <LanguageProvider>
+    <ClerkProvider {...pageProps}>
+      <Providers>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <LanguageProvider>
       <ToastProvider>
         <div id="app-root">
           <Head>
@@ -60,7 +62,8 @@ export default function App({ Component, pageProps }) {
       </ToastProvider>
     </LanguageProvider>
     </ThemeProvider>
-    </Providers>
+      </Providers>
+    </ClerkProvider>
   );
 }
 

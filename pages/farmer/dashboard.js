@@ -1,9 +1,10 @@
+import { useClerk } from '@clerk/nextjs';
 import { playQueueChime, triggerQueueHaptic } from '../../lib/audioAlert';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import { getOfflineQueue, syncOfflineQueue, clearOfflineQueue } from '../../lib/offlineQueue';
 import { BookingSkeleton, EmptyState } from '../../components/Skeleton';
@@ -24,6 +25,8 @@ import { useCommodities } from '../../hooks/useCommodities';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function FarmerDashboard() {
+  const clerk = useClerk();
+  const supabase = useSupabaseClient();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const queryClient = useQueryClient();
@@ -143,7 +146,7 @@ export default function FarmerDashboard() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await clerk.signOut();
     router.push('/');
   };
 

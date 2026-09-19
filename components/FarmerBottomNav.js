@@ -1,15 +1,18 @@
+import { useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../lib/i18n';
-import { supabase } from '../lib/supabaseClient';
+import { useSupabaseClient } from '../lib/supabaseClient';
 
 export default function FarmerBottomNav() {
+  const clerk = useClerk();
+  const supabase = useSupabaseClient();
   const router = useRouter();
   const { t, language, toggleLanguage } = useLanguage();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await clerk.signOut();
     router.push('/');
   };
 
