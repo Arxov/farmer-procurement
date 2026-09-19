@@ -78,7 +78,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     return res.status(409).json({ error: 'Feedback already submitted for this booking.' });
   }
 
-  if (!['paid', 'quality_approved', 'weighed', 'accepted'].includes(booking.status)) {
+  if (!['paid', 'quality_checked', 'weighed', 'accepted'].includes(booking.status)) {
     return res.status(400).json({ error: 'Booking must be completed to be rated.' });
   }
 

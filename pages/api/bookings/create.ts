@@ -67,12 +67,13 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       p_slot_date: date,
       p_slot_window: slotWindow,
       p_quantity: parsedQuantity,
+      p_ignore_weekly_limit: false // First try with normal limits
     });
 
     if (rpcError) {
       // If the RPC function doesn't exist yet (migration not run), fall back to legacy logic
       if (rpcError.message.includes('book_slot_atomic') || rpcError.code === '42883') {
-        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity, false);
       }
       return res.status(500).json({ error: rpcError.message });
     }
@@ -92,33 +93,70 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
           return res.status(400).json({ error: `You have reached your extended weekly booking limit of ${EXTENDED_LIMIT}. Cancel an existing booking or wait for current ones to complete.` });
         }
         
-        // Within extended limit, bypass RPC and use fallback insertion
-        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+        // Retry atomic RPC with limits bypassed
+        const { data: retryResult, error: retryError } = await supabaseAdmin.rpc('book_slot_atomic', {
+          p_farmer_id: req.user.id,
+          p_centre_id: centreId,
+          p_commodity_id: commodityId,
+          p_slot_date: date,
+          p_slot_window: slotWindow,
+          p_quantity: parsedQuantity,
+          p_ignore_weekly_limit: true
+        });
+
+        if (retryError || retryResult?.error) {
+           return res.status(400).json({ error: retryError?.message || retryResult?.error });
+        }
+        
+        return processSuccessfulBooking(res, retryResult.booking, retryResult.queue_position, retryResult.estimated_wait_minutes, date, slotWindow);
       }
       return res.status(400).json({ error: result.error });
     }
 
-    const booking = result?.booking;
-    const position = result?.queue_position;
-    const waitMinutes = result?.estimated_wait_minutes;
-
-    sendNotification({
-      bookingId: booking?.id,
-      message: `Your slot is booked for ${date} (${slotWindow}). Position: ${position ?? '?'}. Estimated wait: ~${waitMinutes ?? '?'} minutes.`,
-    });
-
-    return res.status(200).json({ booking, queue_position: position, estimated_wait_minutes: waitMinutes });
+    return processSuccessfulBooking(res, result.booking, result.queue_position, result.estimated_wait_minutes, date, slotWindow);
   } catch (err: any) {
-    return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+    return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity, false);
   }
 }
 
-// Legacy booking logic (fallback if atomic function not available)
+function processSuccessfulBooking(res: NextApiResponse, booking: any, position: any, waitMinutes: any, date: string, slotWindow: string) {
+  sendNotification({
+    bookingId: booking?.id,
+    message: `Your slot is booked for ${date} (${slotWindow}). Position: ${position ?? '?'}. Estimated wait: ~${waitMinutes ?? '?'} minutes.`,
+  }).catch(err => console.error('Notification failed:', err));
+
+  return res.status(200).json({ booking, queue_position: position, estimated_wait_minutes: waitMinutes });
+}
+
+// Keep legacy booking for fallback if RPC isn't deployed yet
 async function legacyBooking(
   req: AuthenticatedNextApiRequest, res: NextApiResponse,
-  centreId: string, commodityId: string, date: string, slotWindow: string, parsedQuantity: number | null
+  centreId: string, commodityId: string, date: string, slotWindow: string, parsedQuantity: number | null, ignoreWeeklyLimit: boolean
 ) {
   const { data: centre } = await supabaseAdmin.from('centres').select('daily_capacity').eq('id', centreId).single();
+  if (!centre) return res.status(404).json({ error: 'Centre not found' });
+
+  // 1. Check duplicate
+  const { count: existing } = await supabaseAdmin
+    .from('bookings')
+    .select('*', { count: 'exact', head: true })
+    .eq('farmer_id', req.user.id)
+    .eq('slot_date', date)
+    .not('status', 'eq', 'cancelled');
+    
+  if (existing && existing > 0) return res.status(400).json({ error: 'You already have a booking for this date.' });
+
+  // 2. Weekly Limit (simplified logic matching RPC)
+  if (!ignoreWeeklyLimit) {
+    const { count: weekly } = await supabaseAdmin
+      .from('bookings')
+      .select('*', { count: 'exact', head: true })
+      .eq('farmer_id', req.user.id)
+      .gte('slot_date', new Date(new Date(date).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      .lte('slot_date', new Date(new Date(date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      .not('status', 'eq', 'cancelled');
+    if (weekly && weekly >= 2) return res.status(400).json({ error: 'weekly booking limit exceeded' });
+  }
 
   if (centre) {
     const { count: existingCount } = await supabaseAdmin
@@ -133,19 +171,7 @@ async function legacyBooking(
     }
   }
 
-  const { data: existing } = await supabaseAdmin
-    .from('bookings')
-    .select('id')
-    .eq('farmer_id', req.user.id)
-    .eq('centre_id', centreId)
-    .eq('slot_date', date)
-    .eq('slot_window', slotWindow)
-    .not('status', 'eq', 'cancelled')
-    .maybeSingle();
 
-  if (existing) {
-    return res.status(400).json({ error: 'You already have a booking for this centre, date, and time slot.' });
-  }
 
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')

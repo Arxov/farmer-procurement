@@ -11,7 +11,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     const { data, error, count } = await supabaseAdmin
       .from('payments')
       .select('*, bookings(slot_date, farmer_id, profiles(full_name, phone), centres(name), commodities(name, msp_rate_per_quintal))', { count: 'exact' })
-      .order('booking_id', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) return res.status(500).json({ error: error.message });
@@ -29,7 +29,6 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     
     if (status === 'paid') {
       updateObj.paid_at = new Date().toISOString();
-      updateObj.utr_reference = `UTR${Date.now()}${Math.floor(Math.random() * 10000)}`;
     }
 
     const { data, error } = await supabaseAdmin

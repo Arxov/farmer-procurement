@@ -29,7 +29,7 @@ export default function BookSlot() {
   const [showCustomDate, setshowCustomDate] = useState(false);
   const [step, setStep] = useState(1);
   const [centreCommodities, setCentreCommodities] = useState([]);
-  const [demandData, setDemandData] = useState(null);
+
   const router = useRouter();
   const { t } = useLanguage();
 
@@ -78,48 +78,7 @@ export default function BookSlot() {
     fetchCC();
   }, [centreId]);
 
-  // Fetch demand data when commodity + centre + date are selected
-  useEffect(() => {
-    if (!centreId || !commodityId || !date) { setDemandData(null); return; }
-    const fetchDemand = async () => {
-      const weekStart = new Date(date);
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      
-      const { data: weekBookings } = await supabase
-        .from('bookings')
-        .select('expected_quantity_quintals')
-        .eq('centre_id', centreId)
-        .eq('commodity_id', commodityId)
-        .gte('slot_date', weekStart.toISOString().split('T')[0])
-        .lte('slot_date', weekEnd.toISOString().split('T')[0])
-        .neq('status', 'cancelled');
-      
-      const totalQty = (weekBookings || []).reduce((sum, b) => sum + (parseFloat(b.expected_quantity_quintals) || 0), 0);
-      const bookingCount = (weekBookings || []).length;
-      const selectedCentre = centres.find(c => c.id === centreId);
-      const weeklyCapacity = (selectedCentre?.daily_capacity || 100) * 6;
-      const loadPercent = Math.round((bookingCount / weeklyCapacity) * 100);
-      
-      let demandLevel = 'HIGH_DEMAND';
-      let demandColor = 'green';
-      let demandText = 'Low arrivals expected. Good time to sell!';
-      
-      if (loadPercent > 80) {
-        demandLevel = 'OVERSUPPLY';
-        demandColor = 'red';
-        demandText = 'Very high arrivals expected. Consider another mandi or date.';
-      } else if (loadPercent > 50) {
-        demandLevel = 'MODERATE';
-        demandColor = 'amber';
-        demandText = 'Moderate arrivals expected. Book early for best slots.';
-      }
-      
-      setDemandData({ totalQty, bookingCount, weeklyCapacity, loadPercent, demandLevel, demandColor, demandText });
-    };
-    fetchDemand();
-  }, [centreId, commodityId, date, centres]);
+
 
   // Fetch slot availability for next 4 days when centre is selected
   useEffect(() => {

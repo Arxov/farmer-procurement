@@ -1,14 +1,9 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { withAuth } from '../../../lib/apiAuth';
 
 // Creates a gate pass for an accepted booking.
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
 
   const { bookingId, vehicleNumber } = req.body;
   if (!bookingId) return res.status(400).json({ error: 'Missing bookingId' });
@@ -21,7 +16,12 @@ export default async function handler(req, res) {
     .single();
 
   if (!booking) return res.status(404).json({ error: 'Booking not found' });
-  if (booking.farmer_id !== userData.user.id) return res.status(403).json({ error: 'Not authorized to create gate pass for this booking' });
+  if (booking.farmer_id !== req.user.id) return res.status(403).json({ error: 'Not authorized to create gate pass for this booking' });
+  
+  // SECURITY FIX: Must be accepted or paid
+  if (!['accepted', 'paid'].includes(booking.status)) {
+    return res.status(400).json({ error: 'Gate pass can only be issued for accepted or paid bookings' });
+  }
 
   // Check if gate pass already exists
   const { data: existing } = await supabaseAdmin
@@ -57,3 +57,5 @@ export default async function handler(req, res) {
 
   return res.status(200).json({ gatePass });
 }
+
+export default withAuth(handler, { roles: ['farmer'] });

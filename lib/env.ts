@@ -4,7 +4,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z
     .string()
     .url()
-    .default('https://twkewkujjcohnujpvfwr.supabase.co'),
+    .default('https://dummy-url.supabase.co'),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z
     .string()
     .min(1)

@@ -232,7 +232,7 @@ export function StatusDonutChart({ byStatus = {}, total = 0 }) {
                   {activeItem.count} booking(s) ({activeItem.pct}%)
                 </span>
               </div>
-              <p className="text-[11px] text-gray-600 dark:text-neutral-400 dark:text-neutral-400 mt-0.5 leading-relaxed">
+              <p className="text-[11px] text-gray-600 dark:text-neutral-400 mt-0.5 leading-relaxed">
                 {activeItem.config.desc}
               </p>
             </div>
@@ -332,7 +332,7 @@ export function TrendAreaChart({ data = [] }) {
       </div>
 
       {/* Date Labels */}
-      <div className="flex justify-between px-3 text-[11px] font-medium text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-1">
+      <div className="flex justify-between px-3 text-[11px] font-medium text-gray-500 dark:text-neutral-400 mt-1">
         {data.map(([date]) => {
           const d = new Date(date + 'T00:00:00');
           const dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
@@ -366,7 +366,7 @@ export function CapacityRadialCard({ name, booked, capacity, pct }) {
     <div className="bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4">
       <div className="min-w-0">
         <h4 className="font-bold text-gray-900 dark:text-neutral-100 text-sm truncate">{name}</h4>
-        <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">
+        <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">
           <strong className="text-gray-900 dark:text-neutral-100">{booked}</strong> of {capacity} slots used today
         </p>
         <span

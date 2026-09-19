@@ -40,7 +40,12 @@ async function handler(req, res) {
     const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'Missing id' });
     const { error } = await supabaseAdmin.from('centres').delete().eq('id', id);
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      if (error.code === '23503' || error.message.includes('foreign key constraint')) {
+        return res.status(400).json({ error: 'Cannot delete centre: it has existing bookings associated with it.' });
+      }
+      return res.status(500).json({ error: error.message });
+    }
     return res.status(200).json({ success: true });
   }
 
