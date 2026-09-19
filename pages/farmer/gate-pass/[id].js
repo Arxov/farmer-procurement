@@ -61,7 +61,7 @@ export default function GatePassPage() {
 
         {!gatePass ? (
           <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow p-8 text-center border border-gray-200 dark:border-neutral-700">
-            <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 font-medium">{t('noGatePass')}</p>
+            <p className="text-gray-500 dark:text-neutral-400 font-medium">{t('noGatePass')}</p>
             <p className="text-xs text-gray-400 mt-1">Gate pass is issued once your booking has been accepted by the mandi procurement officer.</p>
           </div>
         ) : (
@@ -74,7 +74,7 @@ export default function GatePassPage() {
               <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/10 border border-amber-600/30 flex items-center justify-center text-2xl font-bold text-amber-800 mb-2">
                 🏛️
               </div>
-              <p className="text-[11px] uppercase tracking-widest font-bold text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Government of India • Ministry of Consumer Affairs</p>
+              <p className="text-[11px] uppercase tracking-widest font-bold text-gray-500 dark:text-neutral-400">Government of India • Ministry of Consumer Affairs</p>
               <h1 className="text-xl font-extrabold text-gray-900 dark:text-neutral-100 mt-0.5">OFFICIAL MANDI PROCUREMENT GATE PASS</h1>
               <p className="text-xs text-emerald-800 font-semibold mt-0.5">Central Farmer Procurement Platform (CFPP) • DBT Integrated</p>
 
@@ -90,14 +90,14 @@ export default function GatePassPage() {
                 <div>
                   <p className="text-gray-400 uppercase font-semibold text-[10px]">Farmer Information</p>
                   <p className="text-sm font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking?.profiles?.full_name || 'N/A'}</p>
-                  <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">📱 {booking?.profiles?.phone || '-'}</p>
-                  {booking?.profiles?.village && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">📍 {booking.profiles.village}</p>}
+                  <p className="text-gray-500 dark:text-neutral-400">📱 {booking?.profiles?.phone || '-'}</p>
+                  {booking?.profiles?.village && <p className="text-gray-500 dark:text-neutral-400">📍 {booking.profiles.village}</p>}
                 </div>
                 <div>
                   <p className="text-gray-400 uppercase font-semibold text-[10px]">Procurement Centre</p>
                   <p className="text-sm font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking?.centres?.name || 'Mandi Centre'}</p>
-                  <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{booking?.centres?.district || '-'}, {booking?.centres?.state || 'Maharashtra'}</p>
-                  <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">📅 Date: {booking?.slot_date} ({booking?.slot_window})</p>
+                  <p className="text-gray-500 dark:text-neutral-400">{booking?.centres?.district || '-'}, {booking?.centres?.state || 'Maharashtra'}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">📅 Date: {booking?.slot_date} ({booking?.slot_window})</p>
                 </div>
               </div>
 
@@ -106,7 +106,7 @@ export default function GatePassPage() {
                 <p className="text-gray-400 uppercase font-semibold text-[10px] mb-2">Consignment & Weighment Breakdown</p>
                 <div className="border border-gray-200 dark:border-neutral-700 rounded-xl overflow-hidden text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 font-semibold">
+                    <thead className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-neutral-400 font-semibold">
                       <tr>
                         <th className="p-2.5">Commodity</th>
                         <th className="p-2.5">Grade</th>
@@ -120,7 +120,7 @@ export default function GatePassPage() {
                         <td className="p-2.5 font-medium text-gray-900 dark:text-neutral-100">{booking?.commodities?.name || 'Wheat'}</td>
                         <td className="p-2.5 font-semibold text-emerald-700">{booking?.quality_grade || 'FAQ Standard'}</td>
                         <td className="p-2.5 text-right font-medium">{acceptedQty} q</td>
-                        <td className="p-2.5 text-right text-gray-600 dark:text-neutral-400 dark:text-neutral-400">₹{Number(mspRate).toLocaleString()}</td>
+                        <td className="p-2.5 text-right text-gray-600 dark:text-neutral-400">₹{Number(mspRate).toLocaleString()}</td>
                         <td className="p-2.5 text-right font-bold text-gray-900 dark:text-neutral-100">₹{Number(totalVal).toLocaleString()}</td>
                       </tr>
                     </tbody>
@@ -140,7 +140,7 @@ export default function GatePassPage() {
                   />
                   <div>
                     <p className="text-xs font-bold text-gray-800 dark:text-neutral-200">Security Gate Scanner</p>
-                    <p className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 max-w-[180px] mt-0.5 leading-snug">
+                    <p className="text-[11px] text-gray-500 dark:text-neutral-400 max-w-[180px] mt-0.5 leading-snug">
                       Scan at mandi entrance/exit boom-barrier for automated weighbridge clearance.
                     </p>
                     {gatePass.vehicle_number && (
@@ -160,7 +160,7 @@ export default function GatePassPage() {
               </div>
 
               {/* Official Disclaimer */}
-              <div className="bg-slate-50 dark:bg-neutral-950 rounded-xl p-3 text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 text-center leading-relaxed border border-gray-100 dark:border-neutral-700">
+              <div className="bg-slate-50 dark:bg-neutral-950 rounded-xl p-3 text-[10px] text-gray-500 dark:text-neutral-400 text-center leading-relaxed border border-gray-100 dark:border-neutral-700">
                 Notice: This electronic gate pass certifies that the consignment has been inspected, weighed, and accepted under official Minimum Support Price (MSP) procurement guidelines. Direct payment will be deposited into the farmer's linked Aadhaar DBT bank account.
               </div>
 

@@ -61,7 +61,7 @@ export default function AdminUsers() {
             <Link href="/admin/dashboard" className="text-green-700 text-sm">&larr; Dashboard</Link>
             <h1 className="text-xl font-bold mt-1">User & Role Management</h1>
           </div>
-          <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{users.length} registered users</p>
+          <p className="text-sm text-gray-500 dark:text-neutral-400">{users.length} registered users</p>
         </div>
 
         {/* Filter */}
@@ -70,7 +70,7 @@ export default function AdminUsers() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 border'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
             >
               {f} ({counts[f] || 0})
             </button>
@@ -81,7 +81,7 @@ export default function AdminUsers() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Name</th>
                 <th className="p-3">Phone</th>
                 <th className="p-3">Village</th>
@@ -117,7 +117,7 @@ export default function AdminUsers() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No users found.</td></tr>
+                <tr><td colSpan={6} className="p-6 text-center text-gray-500 dark:text-neutral-400">No users found.</td></tr>
               )}
             </tbody>
           </table>

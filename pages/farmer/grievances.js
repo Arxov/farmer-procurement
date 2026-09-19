@@ -168,7 +168,7 @@ export default function GrievancesPage() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-6">
           <h2 className="text-lg font-bold mb-4">{t('myGrievances')}</h2>
 
-          {grievances.length === 0 && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{t('noGrievances')}</p>}
+          {grievances.length === 0 && <p className="text-gray-500 dark:text-neutral-400">{t('noGrievances')}</p>}
 
           <div className="space-y-3">
             {grievances.map(g => (
@@ -176,13 +176,13 @@ export default function GrievancesPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium text-sm capitalize">{(g.issue_type || '').replace(/_/g, ' ')}</p>
-                    <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{g.centre_name || ''} — {g.slot_date || ''}</p>
+                    <p className="text-xs text-gray-500 dark:text-neutral-400">{g.centre_name || ''} — {g.slot_date || ''}</p>
                   </div>
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[g.status] || 'bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-neutral-200'}`}>
                     {getStatusLabel(g.status)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400 mt-2 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-2 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
                 <p className="text-xs text-gray-400 mt-2">Filed: {new Date(g.created_at).toLocaleDateString()}</p>
               </div>
             ))}

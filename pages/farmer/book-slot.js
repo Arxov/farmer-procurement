@@ -239,7 +239,7 @@ export default function BookSlot() {
           <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5 flex justify-between items-start">
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
             </div>
             <LanguageToggle />
           </div>
@@ -394,11 +394,11 @@ export default function BookSlot() {
                 {selectedComm && (
                   <div className="mt-2.5 p-3 rounded-xl bg-slate-50 dark:bg-neutral-950 border border-slate-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Selected Crop:</span>
+                      <span className="text-xs text-gray-500 dark:text-neutral-400">Selected Crop:</span>
                       <CropBadge name={selectedComm.name} size="sm" />
                     </div>
                     <div className="text-right">
-                      <span className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 block">MSP Rate</span>
+                      <span className="text-[11px] text-gray-500 dark:text-neutral-400 block">MSP Rate</span>
                       <span className="text-xs font-bold text-green-800">₹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
                     </div>
                   </div>
@@ -473,7 +473,7 @@ export default function BookSlot() {
                           <div className="flex justify-between items-start">
                             <div>
                               <span className="text-[11px] font-bold text-gray-900 dark:text-neutral-100 block leading-tight">{dayName}</span>
-                              <span className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{dayMonth}</span>
+                              <span className="text-[10px] text-gray-500 dark:text-neutral-400">{dayMonth}</span>
                             </div>
                             <span
                               className={`w-2 h-2 rounded-full mt-1 ${
@@ -484,7 +484,7 @@ export default function BookSlot() {
 
                           <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-neutral-700">
                             <p className="text-[10px] font-semibold text-gray-700 dark:text-neutral-300">
-                              {item.available} <span className="text-[9px] font-normal text-gray-500 dark:text-neutral-400 dark:text-neutral-400">left</span>
+                              {item.available} <span className="text-[9px] font-normal text-gray-500 dark:text-neutral-400">left</span>
                             </p>
                             <div className="w-full bg-gray-100 dark:bg-neutral-800 rounded-full h-1 mt-1 overflow-hidden">
                               <div
@@ -605,23 +605,23 @@ export default function BookSlot() {
                   📋 Appointment Summary
                 </p>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Mandi Centre:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Mandi Centre:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{selectedCentre?.name || '-'} ({selectedCentre?.district})</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Commodity:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Commodity:</span>
                   <CropBadge name={selectedComm?.name} size="xs" />
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Inspection date:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Inspection date:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{date}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Time Window:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Time Window:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{slotWindow}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-1.5">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Moisture Standard:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Moisture Standard:</span>
                   <span className="font-semibold text-emerald-700">&le; 12-14% Required</span>
                 </div>
               </div>

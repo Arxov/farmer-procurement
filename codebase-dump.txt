@@ -273,7 +273,7 @@ export function StatusDonutChart({ byStatus = {}, total = 0 }) {
                   {activeItem.count} booking(s) ({activeItem.pct}%)
                 </span>
               </div>
-              <p className="text-[11px] text-gray-600 dark:text-neutral-400 dark:text-neutral-400 mt-0.5 leading-relaxed">
+              <p className="text-[11px] text-gray-600 dark:text-neutral-400 mt-0.5 leading-relaxed">
                 {activeItem.config.desc}
               </p>
             </div>
@@ -373,7 +373,7 @@ export function TrendAreaChart({ data = [] }) {
       </div>
 
       {/* Date Labels */}
-      <div className="flex justify-between px-3 text-[11px] font-medium text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-1">
+      <div className="flex justify-between px-3 text-[11px] font-medium text-gray-500 dark:text-neutral-400 mt-1">
         {data.map(([date]) => {
           const d = new Date(date + 'T00:00:00');
           const dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
@@ -407,7 +407,7 @@ export function CapacityRadialCard({ name, booked, capacity, pct }) {
     <div className="bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4">
       <div className="min-w-0">
         <h4 className="font-bold text-gray-900 dark:text-neutral-100 text-sm truncate">{name}</h4>
-        <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">
+        <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">
           <strong className="text-gray-900 dark:text-neutral-100">{booked}</strong> of {capacity} slots used today
         </p>
         <span
@@ -2650,7 +2650,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z
     .string()
     .url()
-    .default('https://twkewkujjcohnujpvfwr.supabase.co'),
+    .default('https://dummy-url.supabase.co'),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z
     .string()
     .min(1)
@@ -4983,7 +4983,12 @@ async function handler(req, res) {
     const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'Missing id' });
     const { error } = await supabaseAdmin.from('centres').delete().eq('id', id);
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      if (error.code === '23503' || error.message.includes('foreign key constraint')) {
+        return res.status(400).json({ error: 'Cannot delete centre: it has existing bookings associated with it.' });
+      }
+      return res.status(500).json({ error: error.message });
+    }
     return res.status(200).json({ success: true });
   }
 
@@ -5111,7 +5116,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     const { data, error, count } = await supabaseAdmin
       .from('payments')
       .select('*, bookings(slot_date, farmer_id, profiles(full_name, phone), centres(name), commodities(name, msp_rate_per_quintal))', { count: 'exact' })
-      .order('booking_id', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) return res.status(500).json({ error: error.message });
@@ -5129,7 +5134,6 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     
     if (status === 'paid') {
       updateObj.paid_at = new Date().toISOString();
-      updateObj.utr_reference = `UTR${Date.now()}${Math.floor(Math.random() * 10000)}`;
     }
 
     const { data, error } = await supabaseAdmin
@@ -5270,12 +5274,13 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       p_slot_date: date,
       p_slot_window: slotWindow,
       p_quantity: parsedQuantity,
+      p_ignore_weekly_limit: false // First try with normal limits
     });
 
     if (rpcError) {
       // If the RPC function doesn't exist yet (migration not run), fall back to legacy logic
       if (rpcError.message.includes('book_slot_atomic') || rpcError.code === '42883') {
-        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity, false);
       }
       return res.status(500).json({ error: rpcError.message });
     }
@@ -5295,33 +5300,70 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
           return res.status(400).json({ error: `You have reached your extended weekly booking limit of ${EXTENDED_LIMIT}. Cancel an existing booking or wait for current ones to complete.` });
         }
         
-        // Within extended limit, bypass RPC and use fallback insertion
-        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+        // Retry atomic RPC with limits bypassed
+        const { data: retryResult, error: retryError } = await supabaseAdmin.rpc('book_slot_atomic', {
+          p_farmer_id: req.user.id,
+          p_centre_id: centreId,
+          p_commodity_id: commodityId,
+          p_slot_date: date,
+          p_slot_window: slotWindow,
+          p_quantity: parsedQuantity,
+          p_ignore_weekly_limit: true
+        });
+
+        if (retryError || retryResult?.error) {
+           return res.status(400).json({ error: retryError?.message || retryResult?.error });
+        }
+        
+        return processSuccessfulBooking(res, retryResult.booking, retryResult.queue_position, retryResult.estimated_wait_minutes, date, slotWindow);
       }
       return res.status(400).json({ error: result.error });
     }
 
-    const booking = result?.booking;
-    const position = result?.queue_position;
-    const waitMinutes = result?.estimated_wait_minutes;
-
-    sendNotification({
-      bookingId: booking?.id,
-      message: `Your slot is booked for ${date} (${slotWindow}). Position: ${position ?? '?'}. Estimated wait: ~${waitMinutes ?? '?'} minutes.`,
-    });
-
-    return res.status(200).json({ booking, queue_position: position, estimated_wait_minutes: waitMinutes });
+    return processSuccessfulBooking(res, result.booking, result.queue_position, result.estimated_wait_minutes, date, slotWindow);
   } catch (err: any) {
-    return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity);
+    return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity, false);
   }
 }
 
-// Legacy booking logic (fallback if atomic function not available)
+function processSuccessfulBooking(res: NextApiResponse, booking: any, position: any, waitMinutes: any, date: string, slotWindow: string) {
+  sendNotification({
+    bookingId: booking?.id,
+    message: `Your slot is booked for ${date} (${slotWindow}). Position: ${position ?? '?'}. Estimated wait: ~${waitMinutes ?? '?'} minutes.`,
+  }).catch(err => console.error('Notification failed:', err));
+
+  return res.status(200).json({ booking, queue_position: position, estimated_wait_minutes: waitMinutes });
+}
+
+// Keep legacy booking for fallback if RPC isn't deployed yet
 async function legacyBooking(
   req: AuthenticatedNextApiRequest, res: NextApiResponse,
-  centreId: string, commodityId: string, date: string, slotWindow: string, parsedQuantity: number | null
+  centreId: string, commodityId: string, date: string, slotWindow: string, parsedQuantity: number | null, ignoreWeeklyLimit: boolean
 ) {
   const { data: centre } = await supabaseAdmin.from('centres').select('daily_capacity').eq('id', centreId).single();
+  if (!centre) return res.status(404).json({ error: 'Centre not found' });
+
+  // 1. Check duplicate
+  const { count: existing } = await supabaseAdmin
+    .from('bookings')
+    .select('*', { count: 'exact', head: true })
+    .eq('farmer_id', req.user.id)
+    .eq('slot_date', date)
+    .not('status', 'eq', 'cancelled');
+    
+  if (existing && existing > 0) return res.status(400).json({ error: 'You already have a booking for this date.' });
+
+  // 2. Weekly Limit (simplified logic matching RPC)
+  if (!ignoreWeeklyLimit) {
+    const { count: weekly } = await supabaseAdmin
+      .from('bookings')
+      .select('*', { count: 'exact', head: true })
+      .eq('farmer_id', req.user.id)
+      .gte('slot_date', new Date(new Date(date).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      .lte('slot_date', new Date(new Date(date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      .not('status', 'eq', 'cancelled');
+    if (weekly && weekly >= 2) return res.status(400).json({ error: 'weekly booking limit exceeded' });
+  }
 
   if (centre) {
     const { count: existingCount } = await supabaseAdmin
@@ -5336,19 +5378,7 @@ async function legacyBooking(
     }
   }
 
-  const { data: existing } = await supabaseAdmin
-    .from('bookings')
-    .select('id')
-    .eq('farmer_id', req.user.id)
-    .eq('centre_id', centreId)
-    .eq('slot_date', date)
-    .eq('slot_window', slotWindow)
-    .not('status', 'eq', 'cancelled')
-    .maybeSingle();
 
-  if (existing) {
-    return res.status(400).json({ error: 'You already have a booking for this centre, date, and time slot.' });
-  }
 
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from('bookings')
@@ -5395,93 +5425,91 @@ File: pages/api/bookings/suggest.js
 ================================================================================
 
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { withAuth } from '../../../lib/apiAuth';
 
 // Returns the least busy centre + date + slot combination.
-// GET /api/bookings/suggest?centreId=xxx&date=yyyy-mm-dd
-export default async function handler(req, res) {
+// GET /api/bookings/suggest
+async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
-  // Tech Scalability: Cache the suggestion for 5 minutes at the edge (Vercel CDN)
-  // and revalidate in background up to 10 minutes (stale-while-revalidate).
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
-
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
-
   try {
-  const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
+    const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
-  // Get all centres
-  const { data: centres } = await supabaseAdmin.from('centres').select('*');
-  if (!centres || centres.length === 0) return res.status(200).json({ suggestion: null });
+    // Get all centres
+    const { data: centres } = await supabaseAdmin.from('centres').select('*');
+    if (!centres || centres.length === 0) return res.status(200).json({ suggestion: null });
 
-  // Check next 3 days
-  const dates = [];
-  for (let i = 0; i < 3; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i + 1);
-    dates.push(d.toISOString().split('T')[0]);
-  }
+    // Check next 3 days
+    const dates = [];
+    for (let i = 0; i < 3; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i + 1);
+      dates.push(d.toISOString().split('T')[0]);
+    }
 
-  let bestOption = null;
-  let maxRemaining = -1;
+    // Single query to get all relevant active bookings grouped by js below
+    const { data: activeBookings, error } = await supabaseAdmin
+      .from('bookings')
+      .select('centre_id, slot_date, slot_window')
+      .in('slot_date', dates)
+      .not('status', 'eq', 'cancelled');
 
-  for (const centre of centres) {
-    for (const date of dates) {
-      // Count existing bookings for this centre + date
-      const { count } = await supabaseAdmin
-        .from('bookings')
-        .select('*', { count: 'exact', head: true })
-        .eq('centre_id', centre.id)
-        .eq('slot_date', date)
-        .not('status', 'eq', 'cancelled');
+    if (error) throw error;
 
-      const remaining = centre.daily_capacity - (count || 0);
+    // Build frequency map
+    // map[centre_id][slot_date][slot_window] = count
+    const usage = {};
+    activeBookings?.forEach(b => {
+      if (!usage[b.centre_id]) usage[b.centre_id] = {};
+      if (!usage[b.centre_id][b.slot_date]) usage[b.centre_id][b.slot_date] = { total: 0 };
+      usage[b.centre_id][b.slot_date].total++;
+      usage[b.centre_id][b.slot_date][b.slot_window] = (usage[b.centre_id][b.slot_date][b.slot_window] || 0) + 1;
+    });
 
-      if (remaining > maxRemaining) {
-        // Find the least busy slot window
-        let bestWindow = SLOT_WINDOWS[0];
-        let minWindowCount = Infinity;
+    let bestOption = null;
+    let maxRemaining = -1;
 
-        for (const sw of SLOT_WINDOWS) {
-          const { count: windowCount } = await supabaseAdmin
-            .from('bookings')
-            .select('*', { count: 'exact', head: true })
-            .eq('centre_id', centre.id)
-            .eq('slot_date', date)
-            .eq('slot_window', sw)
-            .not('status', 'eq', 'cancelled');
+    for (const centre of centres) {
+      for (const date of dates) {
+        const dateUsage = usage[centre.id]?.[date] || { total: 0 };
+        const remaining = centre.daily_capacity - dateUsage.total;
 
-          if ((windowCount || 0) < minWindowCount) {
-            minWindowCount = windowCount || 0;
-            bestWindow = sw;
+        if (remaining > maxRemaining) {
+          // Find least busy window
+          let bestWindow = SLOT_WINDOWS[0];
+          let minWindowCount = Infinity;
+
+          for (const sw of SLOT_WINDOWS) {
+            const windowCount = dateUsage[sw] || 0;
+            if (windowCount < minWindowCount) {
+              minWindowCount = windowCount;
+              bestWindow = sw;
+            }
           }
-        }
 
-        maxRemaining = remaining;
-        bestOption = {
-          centreId: centre.id,
-          centreName: centre.name,
-          district: centre.district,
-          date,
-          slotWindow: bestWindow,
-          currentBookings: count || 0,
-          dailyCapacity: centre.daily_capacity,
-          remainingCapacity: remaining,
-        };
+          maxRemaining = remaining;
+          bestOption = {
+            centreId: centre.id,
+            centreName: centre.name,
+            district: centre.district,
+            date,
+            slotWindow: bestWindow,
+            currentBookings: dateUsage.total,
+            dailyCapacity: centre.daily_capacity,
+            remainingCapacity: remaining,
+          };
+        }
       }
     }
-  }
 
-  return res.status(200).json({ suggestion: bestOption });
+    return res.status(200).json({ suggestion: bestOption });
   } catch (err) {
     console.error('Suggest API error:', err);
     return res.status(500).json({ error: 'Failed to generate suggestion' });
   }
 }
+
+export default withAuth(handler);
 
 
 ================================================================================
@@ -5568,7 +5596,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     return res.status(409).json({ error: 'Feedback already submitted for this booking.' });
   }
 
-  if (!['paid', 'quality_approved', 'weighed', 'accepted'].includes(booking.status)) {
+  if (!['paid', 'quality_checked', 'weighed', 'accepted'].includes(booking.status)) {
     return res.status(400).json({ error: 'Booking must be completed to be rated.' });
   }
 
@@ -5728,16 +5756,11 @@ File: pages/api/gate-passes/create.js
 ================================================================================
 
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { withAuth } from '../../../lib/apiAuth';
 
 // Creates a gate pass for an accepted booking.
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
 
   const { bookingId, vehicleNumber } = req.body;
   if (!bookingId) return res.status(400).json({ error: 'Missing bookingId' });
@@ -5750,7 +5773,12 @@ export default async function handler(req, res) {
     .single();
 
   if (!booking) return res.status(404).json({ error: 'Booking not found' });
-  if (booking.farmer_id !== userData.user.id) return res.status(403).json({ error: 'Not authorized to create gate pass for this booking' });
+  if (booking.farmer_id !== req.user.id) return res.status(403).json({ error: 'Not authorized to create gate pass for this booking' });
+  
+  // SECURITY FIX: Must be accepted or paid
+  if (!['accepted', 'paid'].includes(booking.status)) {
+    return res.status(400).json({ error: 'Gate pass can only be issued for accepted or paid bookings' });
+  }
 
   // Check if gate pass already exists
   const { data: existing } = await supabaseAdmin
@@ -5787,27 +5815,27 @@ export default async function handler(req, res) {
   return res.status(200).json({ gatePass });
 }
 
+export default withAuth(handler, { roles: ['farmer'] });
+
 
 ================================================================================
 File: pages/api/grievances/create.js
 ================================================================================
 
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { withAuth } from '../../../lib/apiAuth';
+import { CreateGrievanceSchema, validateBody } from '../../../lib/validations';
 
 // Creates a grievance for a booking owned by the authenticated farmer.
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
-
-  const { bookingId, issueType, description } = req.body;
-  if (!bookingId || !issueType || !description) {
-    return res.status(400).json({ error: 'Missing required fields (bookingId, issueType, description)' });
+  const validation = validateBody(CreateGrievanceSchema, req.body);
+  if (validation.success === false) {
+    return res.status(400).json({ error: validation.error });
   }
+
+  const { bookingId, issueType, description } = validation.data;
 
   // Verify booking belongs to this farmer
   const { data: booking } = await supabaseAdmin
@@ -5816,7 +5844,7 @@ export default async function handler(req, res) {
     .eq('id', bookingId)
     .single();
 
-  if (!booking || booking.farmer_id !== userData.user.id) {
+  if (!booking || booking.farmer_id !== req.user.id) {
     return res.status(403).json({ error: 'You can only file grievances for your own bookings' });
   }
 
@@ -5834,6 +5862,8 @@ export default async function handler(req, res) {
 
   return res.status(200).json({ grievance });
 }
+
+export default withAuth(handler, { roles: ['farmer'] });
 
 
 ================================================================================
@@ -6200,7 +6230,7 @@ export default function BookSlot() {
   const [showCustomDate, setshowCustomDate] = useState(false);
   const [step, setStep] = useState(1);
   const [centreCommodities, setCentreCommodities] = useState([]);
-  const [demandData, setDemandData] = useState(null);
+
   const router = useRouter();
   const { t } = useLanguage();
 
@@ -6249,48 +6279,7 @@ export default function BookSlot() {
     fetchCC();
   }, [centreId]);
 
-  // Fetch demand data when commodity + centre + date are selected
-  useEffect(() => {
-    if (!centreId || !commodityId || !date) { setDemandData(null); return; }
-    const fetchDemand = async () => {
-      const weekStart = new Date(date);
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      
-      const { data: weekBookings } = await supabase
-        .from('bookings')
-        .select('expected_quantity_quintals')
-        .eq('centre_id', centreId)
-        .eq('commodity_id', commodityId)
-        .gte('slot_date', weekStart.toISOString().split('T')[0])
-        .lte('slot_date', weekEnd.toISOString().split('T')[0])
-        .neq('status', 'cancelled');
-      
-      const totalQty = (weekBookings || []).reduce((sum, b) => sum + (parseFloat(b.expected_quantity_quintals) || 0), 0);
-      const bookingCount = (weekBookings || []).length;
-      const selectedCentre = centres.find(c => c.id === centreId);
-      const weeklyCapacity = (selectedCentre?.daily_capacity || 100) * 6;
-      const loadPercent = Math.round((bookingCount / weeklyCapacity) * 100);
-      
-      let demandLevel = 'HIGH_DEMAND';
-      let demandColor = 'green';
-      let demandText = 'Low arrivals expected. Good time to sell!';
-      
-      if (loadPercent > 80) {
-        demandLevel = 'OVERSUPPLY';
-        demandColor = 'red';
-        demandText = 'Very high arrivals expected. Consider another mandi or date.';
-      } else if (loadPercent > 50) {
-        demandLevel = 'MODERATE';
-        demandColor = 'amber';
-        demandText = 'Moderate arrivals expected. Book early for best slots.';
-      }
-      
-      setDemandData({ totalQty, bookingCount, weeklyCapacity, loadPercent, demandLevel, demandColor, demandText });
-    };
-    fetchDemand();
-  }, [centreId, commodityId, date, centres]);
+
 
   // Fetch slot availability for next 4 days when centre is selected
   useEffect(() => {
@@ -10947,6 +10936,121 @@ insert into commodities (name, msp_rate_per_quintal, season) values
 -- Note: officer/admin accounts should be created by first signing up normally,
 -- then manually updating their role in the `profiles` table, e.g.:
 -- update profiles set role = 'officer' where phone = '+91XXXXXXXXXX';
+
+
+================================================================================
+File: supabase_fixes.sql
+================================================================================
+
+-- PHASE 1: DATABASE HARDENING SCRIPT
+
+-- 1. ADD MISSING COLUMNS FOR RATING
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS rating INT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS feedback_tags TEXT[];
+
+-- 2. ADD UNIQUE CONSTRAINTS FOR PAYMENTS AND GATE PASSES
+ALTER TABLE payments ADD CONSTRAINT unique_payment_per_booking UNIQUE (booking_id);
+ALTER TABLE gate_passes ADD CONSTRAINT unique_gatepass_per_booking UNIQUE (booking_id);
+
+-- 3. THE book_slot_atomic RPC FUNCTION
+CREATE OR REPLACE FUNCTION book_slot_atomic(
+    p_farmer_id UUID,
+    p_centre_id UUID,
+    p_commodity_id UUID,
+    p_slot_date DATE,
+    p_slot_window TEXT,
+    p_quantity DECIMAL,
+    p_ignore_weekly_limit BOOLEAN DEFAULT FALSE
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_centre RECORD;
+    v_current_count INT;
+    v_weekly_count INT;
+    v_duplicate_count INT;
+    v_booking_id UUID;
+    v_queue_position INT;
+    v_wait_minutes INT;
+    v_booking_record JSON;
+BEGIN
+    -- 1. Lock the centre row to prevent concurrent capacity race conditions
+    SELECT * INTO v_centre
+    FROM centres
+    WHERE id = p_centre_id
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RETURN json_build_object('error', 'Centre not found');
+    END IF;
+
+    -- 2. Check for duplicate bookings on the same day
+    SELECT COUNT(*) INTO v_duplicate_count
+    FROM bookings
+    WHERE farmer_id = p_farmer_id
+      AND slot_date = p_slot_date
+      AND status != 'cancelled';
+
+    IF v_duplicate_count > 0 THEN
+        RETURN json_build_object('error', 'You already have a booking for this date.');
+    END IF;
+
+    -- 3. Check weekly limit (unless overridden)
+    IF NOT p_ignore_weekly_limit THEN
+        SELECT COUNT(*) INTO v_weekly_count
+        FROM bookings
+        WHERE farmer_id = p_farmer_id
+          AND slot_date >= p_slot_date - INTERVAL '7 days'
+          AND slot_date <= p_slot_date + INTERVAL '7 days'
+          AND status != 'cancelled';
+        
+        IF v_weekly_count >= 2 THEN
+            RETURN json_build_object('error', 'weekly booking limit exceeded');
+        END IF;
+    END IF;
+
+    -- 4. Check daily capacity
+    SELECT COUNT(*) INTO v_current_count
+    FROM bookings
+    WHERE centre_id = p_centre_id
+      AND slot_date = p_slot_date
+      AND status != 'cancelled';
+
+    IF v_current_count >= v_centre.daily_capacity THEN
+        RETURN json_build_object('error', 'Daily capacity reached for this centre on the selected date.');
+    END IF;
+
+    -- 5. Insert the booking safely
+    INSERT INTO bookings (
+        farmer_id, centre_id, commodity_id, slot_date, slot_window, 
+        expected_quantity_quintals, status
+    ) VALUES (
+        p_farmer_id, p_centre_id, p_commodity_id, p_slot_date, p_slot_window, 
+        p_quantity, 'booked'
+    ) RETURNING id INTO v_booking_id;
+
+    -- 6. Generate Queue Entry (estimated position based on count + 1)
+    v_queue_position := v_current_count + 1;
+    v_wait_minutes := v_queue_position * 10;
+
+    INSERT INTO queue_entries (
+        booking_id, queue_position, estimated_wait_minutes
+    ) VALUES (
+        v_booking_id, v_queue_position, v_wait_minutes
+    );
+
+    -- 7. Return successful booking object
+    SELECT row_to_json(b) INTO v_booking_record FROM bookings b WHERE id = v_booking_id;
+
+    RETURN json_build_object(
+        'booking', v_booking_record,
+        'queue_position', v_queue_position,
+        'estimated_wait_minutes', v_wait_minutes
+    );
+END;
+$$;
 
 
 ================================================================================

@@ -218,7 +218,7 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">Procurement Stage Distribution</h2>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Live breakdown of bookings by fulfillment stage</p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400">Live breakdown of bookings by fulfillment stage</p>
               </div>
               <span className="text-[11px] font-semibold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">
                 ● Live Funnel
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">7-Day Influx Trend</h2>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Daily procurement bookings volume</p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400">Daily procurement bookings volume</p>
               </div>
               <span className="text-[11px] font-semibold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
                 📈 Past 7 Days
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">{t('revenueSummary')} & Payout Assurance</h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Direct Bank Transfer (DBT) disbursement status</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">Direct Bank Transfer (DBT) disbursement status</p>
             </div>
             <span className="text-xs font-bold text-gray-900 dark:text-neutral-100">
               Total ₹{revenue.total.toLocaleString()}
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
                 <div className="p-3 bg-gray-50 dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-semibold text-gray-700 dark:text-neutral-300">🏛️ Total Committed</span>
-                    <span className="text-xs font-bold text-gray-600 dark:text-neutral-400 dark:text-neutral-400">100%</span>
+                    <span className="text-xs font-bold text-gray-600 dark:text-neutral-400">100%</span>
                   </div>
                   <p className="text-lg font-black text-gray-900 dark:text-neutral-100 mt-1">₹{revenue.total.toLocaleString()}</p>
                 </div>
@@ -310,7 +310,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">{t('capacityUtilization')}</h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Real-time daily mandi congestion status</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">Real-time daily mandi congestion status</p>
             </div>
           </div>
 
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
         {/* Bookings by Centre Distribution */}
         <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-6 mb-6">
           <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100 mb-1">{t('bookingsByCentre')}</h2>
-          <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-4">Overall volume handled across individual Mandi hubs</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400 mb-4">Overall volume handled across individual Mandi hubs</p>
           <div className="space-y-3.5">
             {byCentre.map(([name, count]) => (
               <div key={name}>
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-neutral-100">{t('recentBookings')}</h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Live booking stream across all procurement centres</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">Live booking stream across all procurement centres</p>
             </div>
 
             {/* Table Search & Status Filter */}
@@ -421,7 +421,7 @@ export default function AdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-neutral-700 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 uppercase tracking-wider">
+                <tr className="border-b border-gray-200 dark:border-neutral-700 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                   <th className="pb-3">{t('farmer')}</th>
                   <th className="pb-3">{t('centre')}</th>
                   <th className="pb-3">{t('commodity')}</th>
@@ -455,11 +455,11 @@ export default function AdminDashboard() {
                     return (
                       <tr key={b.id} className="hover:bg-slate-50 dark:bg-neutral-950 transition">
                         <td className="py-3 font-semibold text-gray-900 dark:text-neutral-100">{b.profiles?.full_name || '-'}</td>
-                        <td className="py-3 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">{b.centres?.name || '-'}</td>
+                        <td className="py-3 text-gray-600 dark:text-neutral-400">{b.centres?.name || '-'}</td>
                         <td className="py-3">
                           <CropBadge name={b.commodities?.name} size="xs" />
                         </td>
-                        <td className="py-3 text-gray-500 dark:text-neutral-400 dark:text-neutral-400 text-xs">{b.slot_date}</td>
+                        <td className="py-3 text-gray-500 dark:text-neutral-400 text-xs">{b.slot_date}</td>
                         <td className="py-3">
                           <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border capitalize ${statusColors[b.status] || 'bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 border-gray-200 dark:border-neutral-700'}`}>
                             {(b.status ?? '').replace(/_/g, ' ')}

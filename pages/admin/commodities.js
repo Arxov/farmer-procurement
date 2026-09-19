@@ -127,7 +127,7 @@ export default function AdminCommodities() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Commodity</th>
                 <th className="p-3">MSP Rate (₹/q)</th>
                 <th className="p-3">Season</th>
@@ -149,7 +149,7 @@ export default function AdminCommodities() {
                 </tr>
               ))}
               {commodities.length === 0 && (
-                <tr><td colSpan={4} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No commodities. Click "Add Commodity" to create one.</td></tr>
+                <tr><td colSpan={4} className="p-6 text-center text-gray-500 dark:text-neutral-400">No commodities. Click "Add Commodity" to create one.</td></tr>
               )}
             </tbody>
           </table>

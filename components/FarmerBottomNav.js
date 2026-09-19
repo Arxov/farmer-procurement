@@ -34,7 +34,7 @@ export default function FarmerBottomNav() {
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-green-600 ${
-                  isActive ? 'text-green-700 font-bold bg-green-50/70' : 'text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100'
+                  isActive ? 'text-green-700 font-bold bg-green-50/70' : 'text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100'
                 }`}
               >
                 <span className="text-xl" aria-hidden="true">{item.icon}</span>
@@ -49,7 +49,7 @@ export default function FarmerBottomNav() {
           whileTap={{ scale: 0.9 }}
           onClick={toggleLanguage}
           aria-label="Switch Language"
-          className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-green-600"
         >
           <span className="text-xl" aria-hidden="true">🌐</span>
           <span className="text-[10px] mt-0.5 font-medium">{language === 'hi' ? 'English' : 'हिंदी'}</span>

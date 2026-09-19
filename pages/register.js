@@ -94,7 +94,7 @@ export default function Register() {
   if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-green-50 px-4">
-        <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{t('loading')}</p>
+        <p className="text-gray-500 dark:text-neutral-400">{t('loading')}</p>
       </div>
     );
   }

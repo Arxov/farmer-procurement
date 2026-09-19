@@ -1,20 +1,15 @@
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { withAuth } from '../../../lib/apiAuth';
 
 // GET: Returns all grievances for the authenticated farmer's bookings.
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
-
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
 
   // Get farmer's booking IDs
   const { data: bookings } = await supabaseAdmin
     .from('bookings')
     .select('id')
-    .eq('farmer_id', userData.user.id);
+    .eq('farmer_id', req.user.id);
 
   const bookingIds = (bookings || []).map(b => b.id);
   if (bookingIds.length === 0) return res.status(200).json({ grievances: [] });
@@ -42,3 +37,5 @@ export default async function handler(req, res) {
 
   return res.status(200).json({ grievances: formatted });
 }
+
+export default withAuth(handler, { roles: ['farmer'] });

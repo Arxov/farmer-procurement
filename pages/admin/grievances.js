@@ -70,7 +70,7 @@ export default function AdminGrievances() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 border'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
             >
               {f.replace(/_/g, ' ')} ({counts[f]})
             </button>
@@ -79,7 +79,7 @@ export default function AdminGrievances() {
 
         {/* Grievance Cards */}
         <div className="space-y-3">
-          {filtered.length === 0 && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No grievances found.</p>}
+          {filtered.length === 0 && <p className="text-gray-500 dark:text-neutral-400">No grievances found.</p>}
           {filtered.map(g => (
             <div key={g.id} className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4">
               <div className="flex justify-between items-start">
@@ -92,7 +92,7 @@ export default function AdminGrievances() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 dark:text-neutral-300 capitalize"><strong>Type:</strong> {(g.issue_type || '').replace(/_/g, ' ')}</p>
-                  <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400 mt-1 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
                   <p className="text-xs text-gray-400 mt-2">
                     Centre: {g.bookings?.centres?.name} | Date: {g.bookings?.slot_date} | Filed: {new Date(g.created_at).toLocaleDateString()}
                   </p>

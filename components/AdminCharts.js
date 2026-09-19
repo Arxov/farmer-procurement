@@ -166,7 +166,7 @@ export function StatusDonutChart({ byStatus = {}, total = 0 }) {
                 <span className="text-xl font-extrabold text-gray-900 dark:text-neutral-100 block leading-tight">
                   {activeItem.count}
                 </span>
-                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">
                   {activeItem.pct}% of total
                 </span>
               </div>

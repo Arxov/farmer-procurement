@@ -77,7 +77,7 @@ export default function AppointmentTokenPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-2xl shadow text-center">
-          <p className="text-gray-600 dark:text-neutral-400 dark:text-neutral-400">Booking not found.</p>
+          <p className="text-gray-600 dark:text-neutral-400">Booking not found.</p>
           <Link href="/farmer/dashboard" className="text-green-700 text-sm font-semibold mt-2 inline-block">
             &larr; Back to Dashboard
           </Link>
@@ -134,7 +134,7 @@ export default function AppointmentTokenPage() {
               Confirmed Appointment Token
             </span>
             <h1 className="text-lg font-black text-gray-900 dark:text-neutral-100">MANDI ENTRY & WEIGHBRIDGE SLIP</h1>
-            <p className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Department of Food & Public Distribution • Govt. of India</p>
+            <p className="text-[11px] text-gray-500 dark:text-neutral-400">Department of Food & Public Distribution • Govt. of India</p>
 
             <div className="mt-2 text-xs font-mono font-bold text-gray-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 inline-block px-3 py-1 rounded-lg">
               TOKEN #{booking.id.slice(0, 8).toUpperCase()}
@@ -149,7 +149,7 @@ export default function AppointmentTokenPage() {
                 <div>
                   <p className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Designated Mandi Centre</p>
                   <p className="text-sm font-bold text-gray-900 dark:text-neutral-100 mt-0.5">{booking.centres?.name}</p>
-                  <p className="text-xs text-gray-600 dark:text-neutral-400 dark:text-neutral-400">{booking.centres?.district}, {booking.centres?.state || 'Maharashtra'}</p>
+                  <p className="text-xs text-gray-600 dark:text-neutral-400">{booking.centres?.district}, {booking.centres?.state || 'Maharashtra'}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Scheduled Window</p>
@@ -164,14 +164,14 @@ export default function AppointmentTokenPage() {
               <div>
                 <p className="text-gray-400 font-semibold text-[10px] uppercase">Farmer Details</p>
                 <p className="font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking.profiles?.full_name || 'N/A'}</p>
-                <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 font-mono text-[11px]">{booking.profiles?.phone}</p>
-                {booking.profiles?.village && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{booking.profiles.village}</p>}
+                <p className="text-gray-500 dark:text-neutral-400 font-mono text-[11px]">{booking.profiles?.phone}</p>
+                {booking.profiles?.village && <p className="text-gray-500 dark:text-neutral-400">{booking.profiles.village}</p>}
               </div>
 
               <div>
                 <p className="text-gray-400 font-semibold text-[10px] uppercase">Consignment Info</p>
                 <p className="font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking.commodities?.name}</p>
-                <p className="text-gray-600 dark:text-neutral-400 dark:text-neutral-400">Expected: <strong>{booking.expected_quantity_quintals || '—'} q</strong></p>
+                <p className="text-gray-600 dark:text-neutral-400">Expected: <strong>{booking.expected_quantity_quintals || '—'} q</strong></p>
                 <p className="text-emerald-700 font-semibold">MSP: ₹{Number(booking.commodities?.msp_rate_per_quintal || 0).toLocaleString()}/q</p>
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function AppointmentTokenPage() {
                 />
                 <div>
                   <p className="text-xs font-bold text-gray-900 dark:text-neutral-100">Mandi Gate Verification</p>
-                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 leading-snug mt-0.5">
+                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 leading-snug mt-0.5">
                     Show this QR code at the Mandi entry barrier for automated driver check-in.
                   </p>
                 </div>

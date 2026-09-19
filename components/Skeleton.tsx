@@ -75,7 +75,7 @@ export function EmptyState({
         </svg>
       </div>
       <h3 className="text-base font-bold text-gray-800 dark:text-neutral-200">{title}</h3>
-      <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400 max-w-sm mx-auto mt-1.5 mb-5 leading-relaxed">
+      <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 max-w-sm mx-auto mt-1.5 mb-5 leading-relaxed">
         {description}
       </p>
       {actionText && onAction && (

@@ -254,7 +254,7 @@ export default function FarmerDashboard() {
               <CropBadge name={b.commodities?.name} size="xs" />
               <span className="text-xs font-bold text-gray-800 dark:text-neutral-200">{b.centres?.name}</span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{b.slot_date} — {b.slot_window}</p>
+            <p className="text-xs text-gray-500 dark:text-neutral-400">{b.slot_date} — {b.slot_window}</p>
             {b.expected_quantity_quintals && (
               <p className="text-xs text-gray-400 mt-0.5">Qty: {b.expected_quantity_quintals} quintals</p>
             )}
@@ -266,7 +266,7 @@ export default function FarmerDashboard() {
 
         {b.queue_entries?.[0] && ['booked', 'checked_in'].includes(b.status) && (
           <div className="mt-2 bg-gray-50 dark:bg-neutral-900 rounded-lg p-2">
-            <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('queuePosition')}: <strong className="text-lg">{b.queue_entries[0].queue_position ?? '-'}</strong>
               <span className="mx-2">•</span>
               {t('estWait')}: <strong>{b.queue_entries[0].estimated_wait_minutes ?? '-'} {t('min')}</strong>
@@ -338,7 +338,7 @@ export default function FarmerDashboard() {
         )}
 
         {b.actual_weight_quintals && (
-          <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">⚖️ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
+          <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400">⚖️ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
             {b.quality_grade && <span> • Grade: <strong>{b.quality_grade}</strong></span>}
           </p>
         )}
@@ -485,7 +485,7 @@ export default function FarmerDashboard() {
                 type="button"
                 onClick={() => setAudioAlerts(!audioAlerts)}
                 className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1 ${
-                  audioAlerts ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 dark:text-neutral-400 border-gray-200 dark:border-neutral-700'
+                  audioAlerts ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 border-gray-200 dark:border-neutral-700'
                 }`}
                 title={audioAlerts ? 'Audio alert enabled for your queue turn' : 'Audio alert muted'}
                 aria-label={audioAlerts ? 'Mute queue audio alerts' : 'Enable queue audio alerts'}
@@ -572,7 +572,7 @@ export default function FarmerDashboard() {
                       )}
                     </div>
                     <p className="text-sm font-extrabold text-green-700 mt-1">
-                      ₹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400 dark:text-neutral-400">/q</span>
+                      ₹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400">/q</span>
                     </p>
                   </div>
                   <Link
@@ -742,7 +742,7 @@ export default function FarmerDashboard() {
         {/* Past Bookings */}
         {past.length > 0 && (
           <>
-            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-3">📋 Past / Completed</h2>
+            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 mb-3">📋 Past / Completed</h2>
             <div className="space-y-3 opacity-80">
               {past.map(renderBookingCard)}
             </div>

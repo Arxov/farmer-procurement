@@ -126,7 +126,7 @@ export default function AdminCentres() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Name</th>
                 <th className="p-3">District</th>
                 <th className="p-3">State</th>
@@ -150,7 +150,7 @@ export default function AdminCentres() {
                 </tr>
               ))}
               {centres.length === 0 && (
-                <tr><td colSpan={5} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No centres. Click "Add Centre" to create one.</td></tr>
+                <tr><td colSpan={5} className="p-6 text-center text-gray-500 dark:text-neutral-400">No centres. Click "Add Centre" to create one.</td></tr>
               )}
             </tbody>
           </table>

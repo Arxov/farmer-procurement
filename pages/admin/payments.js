@@ -70,15 +70,15 @@ export default function AdminPayments() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 text-center">
             <p className="text-2xl font-bold text-yellow-600">₹{totalPending.toLocaleString()}</p>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Pending</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Pending</p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 text-center">
             <p className="text-2xl font-bold text-green-600">₹{totalPaid.toLocaleString()}</p>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Paid</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Paid</p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 text-center">
             <p className="text-2xl font-bold text-gray-800 dark:text-neutral-200">₹{(totalPending + totalPaid).toLocaleString()}</p>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Total</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Total</p>
           </div>
         </div>
 
@@ -88,7 +88,7 @@ export default function AdminPayments() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 border'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
             >
               {f} ({counts[f] || 0})
             </button>
@@ -99,7 +99,7 @@ export default function AdminPayments() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Farmer</th>
                 <th className="p-3">Centre</th>
                 <th className="p-3">Commodity</th>
@@ -144,7 +144,7 @@ export default function AdminPayments() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={8} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No payments found.</td></tr>
+                <tr><td colSpan={8} className="p-6 text-center text-gray-500 dark:text-neutral-400">No payments found.</td></tr>
               )}
             </tbody>
           </table>

@@ -87,7 +87,7 @@ export default function WeatherAdvisory({ district = 'Mandi Region' }) {
               <p className="text-[9px] text-gray-400">{item.date}</p>
               <span className="text-xl my-1 block">{item.icon}</span>
               <p className="text-xs font-black text-gray-900 dark:text-neutral-100">{item.temp}</p>
-              <p className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 truncate leading-tight mt-0.5">{item.condition}</p>
+              <p className="text-[10px] text-gray-500 dark:text-neutral-400 truncate leading-tight mt-0.5">{item.condition}</p>
             </div>
 
             <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700">

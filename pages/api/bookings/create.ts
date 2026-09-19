@@ -85,7 +85,8 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
           .from('bookings')
           .select('*', { count: 'exact', head: true })
           .eq('farmer_id', req.user.id)
-          .gte('slot_date', new Date().toISOString().split('T')[0])
+          .gte('slot_date', new Date(new Date(date).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .lte('slot_date', new Date(new Date(date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
           .not('status', 'eq', 'cancelled');
           
         const EXTENDED_LIMIT = 5;

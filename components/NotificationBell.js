@@ -154,7 +154,7 @@ export default function NotificationBell({ bookings = [] }) {
                 <span className="text-lg">🔔</span>
                 <div>
                   <h3 className="text-sm font-bold text-gray-900 dark:text-neutral-100">Notifications & Alerts</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{unreadCount} unread update(s)</p>
+                  <p className="text-[10px] text-gray-500 dark:text-neutral-400">{unreadCount} unread update(s)</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export default function NotificationBell({ bookings = [] }) {
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-7 h-7 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 flex items-center justify-center text-xs font-bold"
+                  className="w-7 h-7 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-600 dark:text-neutral-400 flex items-center justify-center text-xs font-bold"
                 >
                   ✖
                 </button>
@@ -229,7 +229,7 @@ export default function NotificationBell({ bookings = [] }) {
                         </button>
                         <span className="text-[9px] text-gray-400 font-medium ml-2">{n.time}</span>
                       </div>
-                      <p className="text-[11px] text-gray-600 dark:text-neutral-400 dark:text-neutral-400 leading-snug">{n.message}</p>
+                      <p className="text-[11px] text-gray-600 dark:text-neutral-400 leading-snug">{n.message}</p>
 
                       <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700 flex justify-between items-center text-[10px]">
                         <button
@@ -259,7 +259,7 @@ export default function NotificationBell({ bookings = [] }) {
                           <button
                             type="button"
                             onClick={(e) => markSingleRead(n.id, e)}
-                            className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200 bg-white dark:bg-neutral-800/90 border border-gray-200 dark:border-neutral-700 px-2 py-0.5 rounded font-medium transition hover:bg-gray-50 dark:bg-neutral-900"
+                            className="text-gray-500 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200 bg-white dark:bg-neutral-800/90 border border-gray-200 dark:border-neutral-700 px-2 py-0.5 rounded font-medium transition hover:bg-gray-50 dark:bg-neutral-900"
                           >
                             ✓ Mark as read
                           </button>
