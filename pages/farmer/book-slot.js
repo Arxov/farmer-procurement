@@ -39,13 +39,40 @@ export default function BookSlot() {
     }
   }, [router.query.commodityId]);
 
+  const [location, setLocation] = useState(null);
+  const [locating, setLocating] = useState(false);
+
+  const requestLocation = () => {
+    setLocating(true);
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      setLocating(false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      setLocating(false);
+    }, (err) => {
+      console.error(err);
+      alert('Could not get location. Ensure permissions are granted.');
+      setLocating(false);
+    });
+  };
+
   useEffect(() => {
-    // Fetch auto-suggestion
     const fetchSuggestion = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       try {
-        const res = await fetch('/api/bookings/suggest', {
+        const params = new URLSearchParams();
+        if (location) {
+          params.append('lat', location.lat);
+          params.append('lng', location.lng);
+        }
+        if (commodityId) params.append('commodityId', commodityId);
+        if (quantity) params.append('qty', quantity);
+
+        const res = await fetch(`/api/bookings/suggest?${params.toString()}`, {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
         if (res.ok) {
@@ -54,8 +81,10 @@ export default function BookSlot() {
         }
       } catch (e) { /* ignore */ }
     };
-    fetchSuggestion();
-  }, []);
+    
+    const tId = setTimeout(fetchSuggestion, 400);
+    return () => clearTimeout(tId);
+  }, [commodityId, quantity, location]);
 
   const applySuggestion = () => {
     if (!suggestion) return;
@@ -212,27 +241,53 @@ export default function BookSlot() {
           </Link>
         </div>
 
-        {/* Auto-suggestion banner */}
-        {suggestion && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-5 shadow-xs">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">💡</span>
-              <p className="text-sm font-bold text-emerald-900">{t('suggestedSlot')}</p>
+        {/* Location & Auto-suggestion banner */}
+        <div className="mb-5 flex flex-col gap-3">
+          <button
+            onClick={requestLocation}
+            disabled={locating}
+            className="self-start text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1 transition-colors bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 hover:bg-gray-50 text-gray-700 dark:text-neutral-300 shadow-sm"
+          >
+            {locating ? '📍 Locating...' : (location ? '📍 Location Active (Calculates Transport)' : '📍 Use My Location (Find Closest/Best Deals)')}
+          </button>
+
+          {suggestion && (
+            <div className={`border rounded-2xl p-4 shadow-xs ${suggestion.netBenefit > 0 ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20' : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20'}`}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-base">💡</span>
+                <p className={`text-sm font-bold ${suggestion.netBenefit > 0 ? 'text-amber-900 dark:text-amber-300' : 'text-emerald-900 dark:text-emerald-300'}`}>
+                  {suggestion.netBenefit > 0 ? 'Smart Financial Suggestion' : 'Least Crowded Recommendation'}
+                </p>
+              </div>
+              
+              <p className={`text-xs ${suggestion.netBenefit > 0 ? 'text-amber-800 dark:text-amber-400' : 'text-emerald-800 dark:text-emerald-400'}`}>
+                {suggestion.netBenefit > 0 
+                  ? <>Drive {suggestion.distanceKm}km to <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus per quintal.</>
+                  : <>Slot at <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>.</>}
+              </p>
+
+              {suggestion.netBenefit > 0 && (
+                <div className="mt-2 bg-white/60 dark:bg-black/20 rounded-lg p-2 text-[11px] text-amber-900 dark:text-amber-200 font-medium">
+                  Estimated Net Profit Increase: <strong className="text-emerald-600 dark:text-emerald-400">₹{suggestion.netBenefit.toLocaleString()}</strong> 
+                  <span className="text-amber-700/70 block mt-0.5 text-[9px]">(Includes -₹{suggestion.transportCost.toLocaleString()} est. transport cost)</span>
+                </div>
+              )}
+
+              {!suggestion.netBenefit && suggestion.distanceKm && (
+                <p className="text-[11px] text-emerald-600 mt-1 font-medium">
+                  📍 {suggestion.distanceKm} km away • ⚡ {suggestion.remainingCapacity} slots remaining
+                </p>
+              )}
+
+              <button
+                onClick={applySuggestion}
+                className={`mt-2.5 text-xs text-white px-3.5 py-1.5 rounded-lg font-semibold shadow-xs transition ${suggestion.netBenefit > 0 ? 'bg-amber-600 hover:bg-amber-700' : 'bg-emerald-700 hover:bg-emerald-800'}`}
+              >
+                Apply Recommended Slot
+              </button>
             </div>
-            <p className="text-xs text-emerald-800">
-              Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>
-            </p>
-            <p className="text-[11px] text-emerald-600 mt-1 font-medium">
-              ⚡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
-            </p>
-            <button
-              onClick={applySuggestion}
-              className="mt-2.5 text-xs bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-lg font-semibold shadow-xs transition"
-            >
-              Apply Recommended Slot
-            </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Main Booking Wizard Card */}
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
