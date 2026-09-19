@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
   if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
 
+  try {
   const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
   // Get all centres
@@ -80,4 +81,8 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ suggestion: bestOption });
+  } catch (err) {
+    console.error('Suggest API error:', err);
+    return res.status(500).json({ error: 'Failed to generate suggestion' });
+  }
 }

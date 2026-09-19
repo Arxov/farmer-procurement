@@ -359,7 +359,8 @@ export default function OfficerDashboard() {
                   {NEXT_STATUS[b.status] && activeId !== b.id && (
                     <button
                       onClick={() => NEXT_STATUS[b.status] === 'checked_in' ? advance(b) : startAction(b)}
-                      className="bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                      disabled={actionLoading}
+                      className="bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
                     >
                       {t('markAs')} {NEXT_STATUS[b.status].replace(/_/g, ' ')}
                     </button>

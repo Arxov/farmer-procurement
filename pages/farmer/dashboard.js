@@ -1,6 +1,6 @@
 import { playQueueChime, triggerQueueHaptic } from '../../lib/audioAlert';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -72,6 +72,7 @@ export default function FarmerDashboard() {
         if (profileError) throw profileError;
         if (!cancelled && profileData) setProfile(profileData);
 
+        if (cancelled) return;
         if (!channelRef.current) {
           channelRef.current = supabase
             .channel('farmer-bookings')
@@ -109,7 +110,9 @@ export default function FarmerDashboard() {
       await refetchBookings();
       await trySyncOffline();
       showToast('Dashboard refreshed with latest Mandi updates', 'success');
-    } catch (e) {}
+    } catch (e) {
+      showToast('Failed to refresh. Check your connection.', 'error');
+    }
   };
 
   const handleLogout = async () => {
@@ -119,8 +122,8 @@ export default function FarmerDashboard() {
 
 
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = bookings.filter(b => b.slot_date >= today && !['paid', 'cancelled', 'rejected'].includes(b.status));
-  const past = bookings.filter(b => b.slot_date < today || ['paid', 'cancelled', 'rejected'].includes(b.status));
+  const upcoming = useMemo(() => bookings.filter(b => b.slot_date >= today && !['paid', 'cancelled', 'rejected'].includes(b.status)), [bookings, today]);
+  const past = useMemo(() => bookings.filter(b => b.slot_date < today || ['paid', 'cancelled', 'rejected'].includes(b.status)), [bookings, today]);
 
   // Audio and Haptic queue turn alarm
   useEffect(() => {

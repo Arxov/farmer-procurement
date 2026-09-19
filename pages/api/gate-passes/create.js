@@ -21,6 +21,7 @@ export default async function handler(req, res) {
     .single();
 
   if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  if (booking.farmer_id !== userData.user.id) return res.status(403).json({ error: 'Not authorized to create gate pass for this booking' });
 
   // Check if gate pass already exists
   const { data: existing } = await supabaseAdmin

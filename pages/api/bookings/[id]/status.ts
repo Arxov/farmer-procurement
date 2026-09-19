@@ -28,17 +28,17 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   }
 
   const updateObj: any = { status };
-  if (status === 'weighed' && actual_weight_quintals) {
+  if (status === 'weighed' && actual_weight_quintals != null) {
     updateObj.actual_weight_quintals = parseFloat(actual_weight_quintals as string);
   }
   if (status === 'quality_checked') {
     if (quality_grade) updateObj.quality_grade = quality_grade;
     if (quality_notes) updateObj.quality_notes = quality_notes;
-    if (moisture_percent) updateObj.moisture_percent = parseFloat(moisture_percent as string);
-    if (admixture_percent) updateObj.admixture_percent = parseFloat(admixture_percent as string);
+    if (moisture_percent != null) updateObj.moisture_percent = parseFloat(moisture_percent as string);
+    if (admixture_percent != null) updateObj.admixture_percent = parseFloat(admixture_percent as string);
     if (rejection_reason) updateObj.rejection_reason = rejection_reason;
   }
-  if (status === 'accepted' && accepted_quantity_quintals) {
+  if (status === 'accepted' && accepted_quantity_quintals != null) {
     updateObj.accepted_quantity_quintals = parseFloat(accepted_quantity_quintals as string);
   }
 
@@ -84,7 +84,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     });
   }
 
-  // Recalculate queue positions
+  // Recalculate queue positions (PERF-01: uses Promise.all instead of sequential loop)
   if (['weighed', 'quality_checked', 'accepted', 'rejected', 'paid', 'cancelled'].includes(status)) {
     const { data: remaining } = await supabaseAdmin
       .from('bookings')
@@ -95,22 +95,22 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       .order('created_at', { ascending: true });
 
     if (remaining) {
-      for (let i = 0; i < remaining.length; i++) {
-        await supabaseAdmin
+      await Promise.all(remaining.map((entry, i) =>
+        supabaseAdmin
           .from('queue_entries')
           .update({
             queue_position: i + 1,
             estimated_wait_minutes: (i + 1) * 10,
           })
-          .eq('booking_id', remaining[i].id);
-      }
+          .eq('booking_id', entry.id)
+      ));
     }
   }
 
   sendNotification({
     bookingId: id,
     message: `Your booking status changed to: ${status.replace(/_/g, ' ')}.${status === 'accepted' ? ' Gate pass and payment record created.' : ''}`,
-  });
+  }).catch(err => console.error('Notification failed:', err));
 
   return res.status(200).json({ booking: data });
 }
