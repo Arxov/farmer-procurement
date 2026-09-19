@@ -523,23 +523,40 @@ export default function FarmerDashboard() {
             </div>
 
             {/* Lifetime Procurement Stats */}
-            <div className="grid grid-cols-3 gap-2 pt-3 text-center">
-              <div>
-                <p className="text-[11px] text-emerald-200 font-medium">Total DBT Earned</p>
-                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 text-center">
+              <div className="border-b sm:border-b-0 sm:border-r border-emerald-700/60 pb-2 sm:pb-0">
+                <p className="text-[10px] text-emerald-200 font-medium">DBT EARNED</p>
+                <p className="text-lg font-extrabold text-white mt-0.5">
                   ₹{totalEarnings.toLocaleString()}
                 </p>
               </div>
-              <div className="border-x border-emerald-700/60">
-                <p className="text-[11px] text-emerald-200 font-medium">Procured Qty</p>
-                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
+              <div className="border-b sm:border-b-0 sm:border-r border-emerald-700/60 pb-2 sm:pb-0">
+                <p className="text-[10px] text-emerald-200 font-medium">PROCURED QTY</p>
+                <p className="text-lg font-extrabold text-white mt-0.5">
                   {totalQuintals.toLocaleString()} <span className="text-xs font-normal">q</span>
                 </p>
               </div>
-              <div>
-                <p className="text-[11px] text-emerald-200 font-medium">Active Tokens</p>
-                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
-                  {activeTokens}
+              <div className="border-r border-emerald-700/60 pt-2 sm:pt-0">
+                <p className="text-[10px] text-emerald-200 font-medium">QUALITY SCORE</p>
+                <p className="text-lg font-extrabold text-white mt-0.5 flex justify-center items-center gap-1">
+                  {(() => {
+                    const completed = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status)).length;
+                    const accepted = bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length;
+                    const ratio = completed > 0 ? Math.round((accepted / completed) * 100) : 100;
+                    return `${ratio}% ${ratio >= 90 ? '🏆' : (ratio < 50 ? '⚠️' : '👍')}`;
+                  })()}
+                </p>
+              </div>
+              <div className="pt-2 sm:pt-0">
+                <p className="text-[10px] text-emerald-200 font-medium">TOP CROP</p>
+                <p className="text-sm font-extrabold text-white mt-1.5 truncate px-1">
+                  {(() => {
+                    const counts = bookings.reduce((acc, b) => {
+                      if (b.commodities?.name) acc[b.commodities.name] = (acc[b.commodities.name] || 0) + 1;
+                      return acc;
+                    }, {});
+                    return Object.keys(counts).length > 0 ? Object.keys(counts).sort((a,b) => counts[b] - counts[a])[0] : 'N/A';
+                  })()}
                 </p>
               </div>
             </div>

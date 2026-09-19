@@ -207,7 +207,7 @@ export function StatusDonutChart({ byStatus = {}, total = 0 }) {
                 <span className="text-xl font-extrabold text-gray-900 dark:text-neutral-100 block leading-tight">
                   {activeItem.count}
                 </span>
-                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">
                   {activeItem.pct}% of total
                 </span>
               </div>
@@ -708,7 +708,7 @@ export default function FarmerBottomNav() {
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-green-600 ${
-                  isActive ? 'text-green-700 font-bold bg-green-50/70' : 'text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100'
+                  isActive ? 'text-green-700 font-bold bg-green-50/70' : 'text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100'
                 }`}
               >
                 <span className="text-xl" aria-hidden="true">{item.icon}</span>
@@ -723,7 +723,7 @@ export default function FarmerBottomNav() {
           whileTap={{ scale: 0.9 }}
           onClick={toggleLanguage}
           aria-label="Switch Language"
-          className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+          className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-green-600"
         >
           <span className="text-xl" aria-hidden="true">🌐</span>
           <span className="text-[10px] mt-0.5 font-medium">{language === 'hi' ? 'English' : 'हिंदी'}</span>
@@ -1336,7 +1336,7 @@ export default function NotificationBell({ bookings = [] }) {
                 <span className="text-lg">🔔</span>
                 <div>
                   <h3 className="text-sm font-bold text-gray-900 dark:text-neutral-100">Notifications & Alerts</h3>
-                  <p className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{unreadCount} unread update(s)</p>
+                  <p className="text-[10px] text-gray-500 dark:text-neutral-400">{unreadCount} unread update(s)</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1350,7 +1350,7 @@ export default function NotificationBell({ bookings = [] }) {
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-7 h-7 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 flex items-center justify-center text-xs font-bold"
+                  className="w-7 h-7 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-600 dark:text-neutral-400 flex items-center justify-center text-xs font-bold"
                 >
                   ✖
                 </button>
@@ -1411,7 +1411,7 @@ export default function NotificationBell({ bookings = [] }) {
                         </button>
                         <span className="text-[9px] text-gray-400 font-medium ml-2">{n.time}</span>
                       </div>
-                      <p className="text-[11px] text-gray-600 dark:text-neutral-400 dark:text-neutral-400 leading-snug">{n.message}</p>
+                      <p className="text-[11px] text-gray-600 dark:text-neutral-400 leading-snug">{n.message}</p>
 
                       <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700 flex justify-between items-center text-[10px]">
                         <button
@@ -1441,7 +1441,7 @@ export default function NotificationBell({ bookings = [] }) {
                           <button
                             type="button"
                             onClick={(e) => markSingleRead(n.id, e)}
-                            className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200 bg-white dark:bg-neutral-800/90 border border-gray-200 dark:border-neutral-700 px-2 py-0.5 rounded font-medium transition hover:bg-gray-50 dark:bg-neutral-900"
+                            className="text-gray-500 dark:text-neutral-400 hover:text-gray-800 dark:text-neutral-200 bg-white dark:bg-neutral-800/90 border border-gray-200 dark:border-neutral-700 px-2 py-0.5 rounded font-medium transition hover:bg-gray-50 dark:bg-neutral-900"
                           >
                             ✓ Mark as read
                           </button>
@@ -1750,7 +1750,7 @@ export function EmptyState({
         </svg>
       </div>
       <h3 className="text-base font-bold text-gray-800 dark:text-neutral-200">{title}</h3>
-      <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400 max-w-sm mx-auto mt-1.5 mb-5 leading-relaxed">
+      <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 max-w-sm mx-auto mt-1.5 mb-5 leading-relaxed">
         {description}
       </p>
       {actionText && onAction && (
@@ -2108,7 +2108,7 @@ export default function WeatherAdvisory({ district = 'Mandi Region' }) {
               <p className="text-[9px] text-gray-400">{item.date}</p>
               <span className="text-xl my-1 block">{item.icon}</span>
               <p className="text-xs font-black text-gray-900 dark:text-neutral-100">{item.temp}</p>
-              <p className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 truncate leading-tight mt-0.5">{item.condition}</p>
+              <p className="text-[10px] text-gray-500 dark:text-neutral-400 truncate leading-tight mt-0.5">{item.condition}</p>
             </div>
 
             <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700">
@@ -3728,7 +3728,7 @@ export default function AdminCentres() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Name</th>
                 <th className="p-3">District</th>
                 <th className="p-3">State</th>
@@ -3752,7 +3752,7 @@ export default function AdminCentres() {
                 </tr>
               ))}
               {centres.length === 0 && (
-                <tr><td colSpan={5} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No centres. Click "Add Centre" to create one.</td></tr>
+                <tr><td colSpan={5} className="p-6 text-center text-gray-500 dark:text-neutral-400">No centres. Click "Add Centre" to create one.</td></tr>
               )}
             </tbody>
           </table>
@@ -3896,7 +3896,7 @@ export default function AdminCommodities() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Commodity</th>
                 <th className="p-3">MSP Rate (₹/q)</th>
                 <th className="p-3">Season</th>
@@ -3918,7 +3918,7 @@ export default function AdminCommodities() {
                 </tr>
               ))}
               {commodities.length === 0 && (
-                <tr><td colSpan={4} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No commodities. Click "Add Commodity" to create one.</td></tr>
+                <tr><td colSpan={4} className="p-6 text-center text-gray-500 dark:text-neutral-400">No commodities. Click "Add Commodity" to create one.</td></tr>
               )}
             </tbody>
           </table>
@@ -4153,7 +4153,7 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">Procurement Stage Distribution</h2>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Live breakdown of bookings by fulfillment stage</p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400">Live breakdown of bookings by fulfillment stage</p>
               </div>
               <span className="text-[11px] font-semibold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">
                 ● Live Funnel
@@ -4167,7 +4167,7 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">7-Day Influx Trend</h2>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Daily procurement bookings volume</p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400">Daily procurement bookings volume</p>
               </div>
               <span className="text-[11px] font-semibold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
                 📈 Past 7 Days
@@ -4182,7 +4182,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">{t('revenueSummary')} & Payout Assurance</h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Direct Bank Transfer (DBT) disbursement status</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">Direct Bank Transfer (DBT) disbursement status</p>
             </div>
             <span className="text-xs font-bold text-gray-900 dark:text-neutral-100">
               Total ₹{revenue.total.toLocaleString()}
@@ -4229,7 +4229,7 @@ export default function AdminDashboard() {
                 <div className="p-3 bg-gray-50 dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-semibold text-gray-700 dark:text-neutral-300">🏛️ Total Committed</span>
-                    <span className="text-xs font-bold text-gray-600 dark:text-neutral-400 dark:text-neutral-400">100%</span>
+                    <span className="text-xs font-bold text-gray-600 dark:text-neutral-400">100%</span>
                   </div>
                   <p className="text-lg font-black text-gray-900 dark:text-neutral-100 mt-1">₹{revenue.total.toLocaleString()}</p>
                 </div>
@@ -4245,7 +4245,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100">{t('capacityUtilization')}</h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Real-time daily mandi congestion status</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">Real-time daily mandi congestion status</p>
             </div>
           </div>
 
@@ -4265,7 +4265,7 @@ export default function AdminDashboard() {
         {/* Bookings by Centre Distribution */}
         <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-6 mb-6">
           <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100 mb-1">{t('bookingsByCentre')}</h2>
-          <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-4">Overall volume handled across individual Mandi hubs</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400 mb-4">Overall volume handled across individual Mandi hubs</p>
           <div className="space-y-3.5">
             {byCentre.map(([name, count]) => (
               <div key={name}>
@@ -4328,7 +4328,7 @@ export default function AdminDashboard() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-neutral-100">{t('recentBookings')}</h2>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Live booking stream across all procurement centres</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">Live booking stream across all procurement centres</p>
             </div>
 
             {/* Table Search & Status Filter */}
@@ -4356,7 +4356,7 @@ export default function AdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-neutral-700 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 uppercase tracking-wider">
+                <tr className="border-b border-gray-200 dark:border-neutral-700 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                   <th className="pb-3">{t('farmer')}</th>
                   <th className="pb-3">{t('centre')}</th>
                   <th className="pb-3">{t('commodity')}</th>
@@ -4390,11 +4390,11 @@ export default function AdminDashboard() {
                     return (
                       <tr key={b.id} className="hover:bg-slate-50 dark:bg-neutral-950 transition">
                         <td className="py-3 font-semibold text-gray-900 dark:text-neutral-100">{b.profiles?.full_name || '-'}</td>
-                        <td className="py-3 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">{b.centres?.name || '-'}</td>
+                        <td className="py-3 text-gray-600 dark:text-neutral-400">{b.centres?.name || '-'}</td>
                         <td className="py-3">
                           <CropBadge name={b.commodities?.name} size="xs" />
                         </td>
-                        <td className="py-3 text-gray-500 dark:text-neutral-400 dark:text-neutral-400 text-xs">{b.slot_date}</td>
+                        <td className="py-3 text-gray-500 dark:text-neutral-400 text-xs">{b.slot_date}</td>
                         <td className="py-3">
                           <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border capitalize ${statusColors[b.status] || 'bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 border-gray-200 dark:border-neutral-700'}`}>
                             {(b.status ?? '').replace(/_/g, ' ')}
@@ -4573,7 +4573,7 @@ export default function AdminGrievances() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 border'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
             >
               {f.replace(/_/g, ' ')} ({counts[f]})
             </button>
@@ -4582,7 +4582,7 @@ export default function AdminGrievances() {
 
         {/* Grievance Cards */}
         <div className="space-y-3">
-          {filtered.length === 0 && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No grievances found.</p>}
+          {filtered.length === 0 && <p className="text-gray-500 dark:text-neutral-400">No grievances found.</p>}
           {filtered.map(g => (
             <div key={g.id} className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4">
               <div className="flex justify-between items-start">
@@ -4595,7 +4595,7 @@ export default function AdminGrievances() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 dark:text-neutral-300 capitalize"><strong>Type:</strong> {(g.issue_type || '').replace(/_/g, ' ')}</p>
-                  <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400 mt-1 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
                   <p className="text-xs text-gray-400 mt-2">
                     Centre: {g.bookings?.centres?.name} | Date: {g.bookings?.slot_date} | Filed: {new Date(g.created_at).toLocaleDateString()}
                   </p>
@@ -4718,15 +4718,15 @@ export default function AdminPayments() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 text-center">
             <p className="text-2xl font-bold text-yellow-600">₹{totalPending.toLocaleString()}</p>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Pending</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Pending</p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 text-center">
             <p className="text-2xl font-bold text-green-600">₹{totalPaid.toLocaleString()}</p>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Paid</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Paid</p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 text-center">
             <p className="text-2xl font-bold text-gray-800 dark:text-neutral-200">₹{(totalPending + totalPaid).toLocaleString()}</p>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Total</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Total</p>
           </div>
         </div>
 
@@ -4736,7 +4736,7 @@ export default function AdminPayments() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 border'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
             >
               {f} ({counts[f] || 0})
             </button>
@@ -4747,7 +4747,7 @@ export default function AdminPayments() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Farmer</th>
                 <th className="p-3">Centre</th>
                 <th className="p-3">Commodity</th>
@@ -4792,7 +4792,7 @@ export default function AdminPayments() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={8} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No payments found.</td></tr>
+                <tr><td colSpan={8} className="p-6 text-center text-gray-500 dark:text-neutral-400">No payments found.</td></tr>
               )}
             </tbody>
           </table>
@@ -4870,7 +4870,7 @@ export default function AdminUsers() {
             <Link href="/admin/dashboard" className="text-green-700 text-sm">&larr; Dashboard</Link>
             <h1 className="text-xl font-bold mt-1">User & Role Management</h1>
           </div>
-          <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{users.length} registered users</p>
+          <p className="text-sm text-gray-500 dark:text-neutral-400">{users.length} registered users</p>
         </div>
 
         {/* Filter */}
@@ -4879,7 +4879,7 @@ export default function AdminUsers() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 border'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
             >
               {f} ({counts[f] || 0})
             </button>
@@ -4890,7 +4890,7 @@ export default function AdminUsers() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400 dark:text-neutral-400">
+              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
                 <th className="p-3">Name</th>
                 <th className="p-3">Phone</th>
                 <th className="p-3">Village</th>
@@ -4926,7 +4926,7 @@ export default function AdminUsers() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="p-6 text-center text-gray-500 dark:text-neutral-400 dark:text-neutral-400">No users found.</td></tr>
+                <tr><td colSpan={6} className="p-6 text-center text-gray-500 dark:text-neutral-400">No users found.</td></tr>
               )}
             </tbody>
           </table>
@@ -5292,7 +5292,8 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
           .from('bookings')
           .select('*', { count: 'exact', head: true })
           .eq('farmer_id', req.user.id)
-          .gte('slot_date', new Date().toISOString().split('T')[0])
+          .gte('slot_date', new Date(new Date(date).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .lte('slot_date', new Date(new Date(date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
           .not('status', 'eq', 'cancelled');
           
         const EXTENDED_LIMIT = 5;
@@ -5871,22 +5872,17 @@ File: pages/api/grievances/list.js
 ================================================================================
 
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { withAuth } from '../../../lib/apiAuth';
 
 // GET: Returns all grievances for the authenticated farmer's bookings.
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
-
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
-  const { data: userData, error: authError } = await supabaseAdmin.auth.getUser(token);
-  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
 
   // Get farmer's booking IDs
   const { data: bookings } = await supabaseAdmin
     .from('bookings')
     .select('id')
-    .eq('farmer_id', userData.user.id);
+    .eq('farmer_id', req.user.id);
 
   const bookingIds = (bookings || []).map(b => b.id);
   if (bookingIds.length === 0) return res.status(200).json({ grievances: [] });
@@ -5914,6 +5910,8 @@ export default async function handler(req, res) {
 
   return res.status(200).json({ grievances: formatted });
 }
+
+export default withAuth(handler, { roles: ['farmer'] });
 
 
 ================================================================================
@@ -6440,7 +6438,7 @@ export default function BookSlot() {
           <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5 flex justify-between items-start">
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
             </div>
             <LanguageToggle />
           </div>
@@ -6595,11 +6593,11 @@ export default function BookSlot() {
                 {selectedComm && (
                   <div className="mt-2.5 p-3 rounded-xl bg-slate-50 dark:bg-neutral-950 border border-slate-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Selected Crop:</span>
+                      <span className="text-xs text-gray-500 dark:text-neutral-400">Selected Crop:</span>
                       <CropBadge name={selectedComm.name} size="sm" />
                     </div>
                     <div className="text-right">
-                      <span className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 block">MSP Rate</span>
+                      <span className="text-[11px] text-gray-500 dark:text-neutral-400 block">MSP Rate</span>
                       <span className="text-xs font-bold text-green-800">₹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
                     </div>
                   </div>
@@ -6674,7 +6672,7 @@ export default function BookSlot() {
                           <div className="flex justify-between items-start">
                             <div>
                               <span className="text-[11px] font-bold text-gray-900 dark:text-neutral-100 block leading-tight">{dayName}</span>
-                              <span className="text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{dayMonth}</span>
+                              <span className="text-[10px] text-gray-500 dark:text-neutral-400">{dayMonth}</span>
                             </div>
                             <span
                               className={`w-2 h-2 rounded-full mt-1 ${
@@ -6685,7 +6683,7 @@ export default function BookSlot() {
 
                           <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-neutral-700">
                             <p className="text-[10px] font-semibold text-gray-700 dark:text-neutral-300">
-                              {item.available} <span className="text-[9px] font-normal text-gray-500 dark:text-neutral-400 dark:text-neutral-400">left</span>
+                              {item.available} <span className="text-[9px] font-normal text-gray-500 dark:text-neutral-400">left</span>
                             </p>
                             <div className="w-full bg-gray-100 dark:bg-neutral-800 rounded-full h-1 mt-1 overflow-hidden">
                               <div
@@ -6806,23 +6804,23 @@ export default function BookSlot() {
                   📋 Appointment Summary
                 </p>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Mandi Centre:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Mandi Centre:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{selectedCentre?.name || '-'} ({selectedCentre?.district})</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Commodity:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Commodity:</span>
                   <CropBadge name={selectedComm?.name} size="xs" />
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Inspection date:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Inspection date:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{date}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Time Window:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Time Window:</span>
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">{slotWindow}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-1.5">
-                  <span className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Moisture Standard:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">Moisture Standard:</span>
                   <span className="font-semibold text-emerald-700">&le; 12-14% Required</span>
                 </div>
               </div>
@@ -7124,7 +7122,7 @@ export default function FarmerDashboard() {
               <CropBadge name={b.commodities?.name} size="xs" />
               <span className="text-xs font-bold text-gray-800 dark:text-neutral-200">{b.centres?.name}</span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{b.slot_date} — {b.slot_window}</p>
+            <p className="text-xs text-gray-500 dark:text-neutral-400">{b.slot_date} — {b.slot_window}</p>
             {b.expected_quantity_quintals && (
               <p className="text-xs text-gray-400 mt-0.5">Qty: {b.expected_quantity_quintals} quintals</p>
             )}
@@ -7136,7 +7134,7 @@ export default function FarmerDashboard() {
 
         {b.queue_entries?.[0] && ['booked', 'checked_in'].includes(b.status) && (
           <div className="mt-2 bg-gray-50 dark:bg-neutral-900 rounded-lg p-2">
-            <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400">
+            <p className="text-sm text-gray-600 dark:text-neutral-400">
               {t('queuePosition')}: <strong className="text-lg">{b.queue_entries[0].queue_position ?? '-'}</strong>
               <span className="mx-2">•</span>
               {t('estWait')}: <strong>{b.queue_entries[0].estimated_wait_minutes ?? '-'} {t('min')}</strong>
@@ -7208,7 +7206,7 @@ export default function FarmerDashboard() {
         )}
 
         {b.actual_weight_quintals && (
-          <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400 dark:text-neutral-400">⚖️ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
+          <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400">⚖️ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
             {b.quality_grade && <span> • Grade: <strong>{b.quality_grade}</strong></span>}
           </p>
         )}
@@ -7355,7 +7353,7 @@ export default function FarmerDashboard() {
                 type="button"
                 onClick={() => setAudioAlerts(!audioAlerts)}
                 className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1 ${
-                  audioAlerts ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 dark:text-neutral-400 border-gray-200 dark:border-neutral-700'
+                  audioAlerts ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 border-gray-200 dark:border-neutral-700'
                 }`}
                 title={audioAlerts ? 'Audio alert enabled for your queue turn' : 'Audio alert muted'}
                 aria-label={audioAlerts ? 'Mute queue audio alerts' : 'Enable queue audio alerts'}
@@ -7442,7 +7440,7 @@ export default function FarmerDashboard() {
                       )}
                     </div>
                     <p className="text-sm font-extrabold text-green-700 mt-1">
-                      ₹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400 dark:text-neutral-400">/q</span>
+                      ₹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400">/q</span>
                     </p>
                   </div>
                   <Link
@@ -7612,7 +7610,7 @@ export default function FarmerDashboard() {
         {/* Past Bookings */}
         {past.length > 0 && (
           <>
-            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 dark:text-neutral-400 mb-3">📋 Past / Completed</h2>
+            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 mb-3">📋 Past / Completed</h2>
             <div className="space-y-3 opacity-80">
               {past.map(renderBookingCard)}
             </div>
@@ -7702,7 +7700,7 @@ export default function GatePassPage() {
 
         {!gatePass ? (
           <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow p-8 text-center border border-gray-200 dark:border-neutral-700">
-            <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 font-medium">{t('noGatePass')}</p>
+            <p className="text-gray-500 dark:text-neutral-400 font-medium">{t('noGatePass')}</p>
             <p className="text-xs text-gray-400 mt-1">Gate pass is issued once your booking has been accepted by the mandi procurement officer.</p>
           </div>
         ) : (
@@ -7715,7 +7713,7 @@ export default function GatePassPage() {
               <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/10 border border-amber-600/30 flex items-center justify-center text-2xl font-bold text-amber-800 mb-2">
                 🏛️
               </div>
-              <p className="text-[11px] uppercase tracking-widest font-bold text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Government of India • Ministry of Consumer Affairs</p>
+              <p className="text-[11px] uppercase tracking-widest font-bold text-gray-500 dark:text-neutral-400">Government of India • Ministry of Consumer Affairs</p>
               <h1 className="text-xl font-extrabold text-gray-900 dark:text-neutral-100 mt-0.5">OFFICIAL MANDI PROCUREMENT GATE PASS</h1>
               <p className="text-xs text-emerald-800 font-semibold mt-0.5">Central Farmer Procurement Platform (CFPP) • DBT Integrated</p>
 
@@ -7731,14 +7729,14 @@ export default function GatePassPage() {
                 <div>
                   <p className="text-gray-400 uppercase font-semibold text-[10px]">Farmer Information</p>
                   <p className="text-sm font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking?.profiles?.full_name || 'N/A'}</p>
-                  <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">📱 {booking?.profiles?.phone || '-'}</p>
-                  {booking?.profiles?.village && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">📍 {booking.profiles.village}</p>}
+                  <p className="text-gray-500 dark:text-neutral-400">📱 {booking?.profiles?.phone || '-'}</p>
+                  {booking?.profiles?.village && <p className="text-gray-500 dark:text-neutral-400">📍 {booking.profiles.village}</p>}
                 </div>
                 <div>
                   <p className="text-gray-400 uppercase font-semibold text-[10px]">Procurement Centre</p>
                   <p className="text-sm font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking?.centres?.name || 'Mandi Centre'}</p>
-                  <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{booking?.centres?.district || '-'}, {booking?.centres?.state || 'Maharashtra'}</p>
-                  <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">📅 Date: {booking?.slot_date} ({booking?.slot_window})</p>
+                  <p className="text-gray-500 dark:text-neutral-400">{booking?.centres?.district || '-'}, {booking?.centres?.state || 'Maharashtra'}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">📅 Date: {booking?.slot_date} ({booking?.slot_window})</p>
                 </div>
               </div>
 
@@ -7747,7 +7745,7 @@ export default function GatePassPage() {
                 <p className="text-gray-400 uppercase font-semibold text-[10px] mb-2">Consignment & Weighment Breakdown</p>
                 <div className="border border-gray-200 dark:border-neutral-700 rounded-xl overflow-hidden text-xs">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-neutral-400 dark:text-neutral-400 font-semibold">
+                    <thead className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-neutral-400 font-semibold">
                       <tr>
                         <th className="p-2.5">Commodity</th>
                         <th className="p-2.5">Grade</th>
@@ -7761,7 +7759,7 @@ export default function GatePassPage() {
                         <td className="p-2.5 font-medium text-gray-900 dark:text-neutral-100">{booking?.commodities?.name || 'Wheat'}</td>
                         <td className="p-2.5 font-semibold text-emerald-700">{booking?.quality_grade || 'FAQ Standard'}</td>
                         <td className="p-2.5 text-right font-medium">{acceptedQty} q</td>
-                        <td className="p-2.5 text-right text-gray-600 dark:text-neutral-400 dark:text-neutral-400">₹{Number(mspRate).toLocaleString()}</td>
+                        <td className="p-2.5 text-right text-gray-600 dark:text-neutral-400">₹{Number(mspRate).toLocaleString()}</td>
                         <td className="p-2.5 text-right font-bold text-gray-900 dark:text-neutral-100">₹{Number(totalVal).toLocaleString()}</td>
                       </tr>
                     </tbody>
@@ -7781,7 +7779,7 @@ export default function GatePassPage() {
                   />
                   <div>
                     <p className="text-xs font-bold text-gray-800 dark:text-neutral-200">Security Gate Scanner</p>
-                    <p className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 max-w-[180px] mt-0.5 leading-snug">
+                    <p className="text-[11px] text-gray-500 dark:text-neutral-400 max-w-[180px] mt-0.5 leading-snug">
                       Scan at mandi entrance/exit boom-barrier for automated weighbridge clearance.
                     </p>
                     {gatePass.vehicle_number && (
@@ -7801,7 +7799,7 @@ export default function GatePassPage() {
               </div>
 
               {/* Official Disclaimer */}
-              <div className="bg-slate-50 dark:bg-neutral-950 rounded-xl p-3 text-[10px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 text-center leading-relaxed border border-gray-100 dark:border-neutral-700">
+              <div className="bg-slate-50 dark:bg-neutral-950 rounded-xl p-3 text-[10px] text-gray-500 dark:text-neutral-400 text-center leading-relaxed border border-gray-100 dark:border-neutral-700">
                 Notice: This electronic gate pass certifies that the consignment has been inspected, weighed, and accepted under official Minimum Support Price (MSP) procurement guidelines. Direct payment will be deposited into the farmer's linked Aadhaar DBT bank account.
               </div>
 
@@ -7991,7 +7989,7 @@ export default function GrievancesPage() {
         <div className="bg-white dark:bg-neutral-800 rounded-xl shadow p-6">
           <h2 className="text-lg font-bold mb-4">{t('myGrievances')}</h2>
 
-          {grievances.length === 0 && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{t('noGrievances')}</p>}
+          {grievances.length === 0 && <p className="text-gray-500 dark:text-neutral-400">{t('noGrievances')}</p>}
 
           <div className="space-y-3">
             {grievances.map(g => (
@@ -7999,13 +7997,13 @@ export default function GrievancesPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium text-sm capitalize">{(g.issue_type || '').replace(/_/g, ' ')}</p>
-                    <p className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{g.centre_name || ''} — {g.slot_date || ''}</p>
+                    <p className="text-xs text-gray-500 dark:text-neutral-400">{g.centre_name || ''} — {g.slot_date || ''}</p>
                   </div>
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[g.status] || 'bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-neutral-200'}`}>
                     {getStatusLabel(g.status)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-neutral-400 dark:text-neutral-400 mt-2 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-2 bg-gray-50 dark:bg-neutral-900 rounded p-2">{g.description}</p>
                 <p className="text-xs text-gray-400 mt-2">Filed: {new Date(g.created_at).toLocaleDateString()}</p>
               </div>
             ))}
@@ -8702,7 +8700,7 @@ export default function AppointmentTokenPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white dark:bg-neutral-800 p-6 rounded-2xl shadow text-center">
-          <p className="text-gray-600 dark:text-neutral-400 dark:text-neutral-400">Booking not found.</p>
+          <p className="text-gray-600 dark:text-neutral-400">Booking not found.</p>
           <Link href="/farmer/dashboard" className="text-green-700 text-sm font-semibold mt-2 inline-block">
             &larr; Back to Dashboard
           </Link>
@@ -8759,7 +8757,7 @@ export default function AppointmentTokenPage() {
               Confirmed Appointment Token
             </span>
             <h1 className="text-lg font-black text-gray-900 dark:text-neutral-100">MANDI ENTRY & WEIGHBRIDGE SLIP</h1>
-            <p className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Department of Food & Public Distribution • Govt. of India</p>
+            <p className="text-[11px] text-gray-500 dark:text-neutral-400">Department of Food & Public Distribution • Govt. of India</p>
 
             <div className="mt-2 text-xs font-mono font-bold text-gray-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 inline-block px-3 py-1 rounded-lg">
               TOKEN #{booking.id.slice(0, 8).toUpperCase()}
@@ -8774,7 +8772,7 @@ export default function AppointmentTokenPage() {
                 <div>
                   <p className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Designated Mandi Centre</p>
                   <p className="text-sm font-bold text-gray-900 dark:text-neutral-100 mt-0.5">{booking.centres?.name}</p>
-                  <p className="text-xs text-gray-600 dark:text-neutral-400 dark:text-neutral-400">{booking.centres?.district}, {booking.centres?.state || 'Maharashtra'}</p>
+                  <p className="text-xs text-gray-600 dark:text-neutral-400">{booking.centres?.district}, {booking.centres?.state || 'Maharashtra'}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Scheduled Window</p>
@@ -8789,14 +8787,14 @@ export default function AppointmentTokenPage() {
               <div>
                 <p className="text-gray-400 font-semibold text-[10px] uppercase">Farmer Details</p>
                 <p className="font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking.profiles?.full_name || 'N/A'}</p>
-                <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400 font-mono text-[11px]">{booking.profiles?.phone}</p>
-                {booking.profiles?.village && <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{booking.profiles.village}</p>}
+                <p className="text-gray-500 dark:text-neutral-400 font-mono text-[11px]">{booking.profiles?.phone}</p>
+                {booking.profiles?.village && <p className="text-gray-500 dark:text-neutral-400">{booking.profiles.village}</p>}
               </div>
 
               <div>
                 <p className="text-gray-400 font-semibold text-[10px] uppercase">Consignment Info</p>
                 <p className="font-bold text-gray-800 dark:text-neutral-200 mt-0.5">{booking.commodities?.name}</p>
-                <p className="text-gray-600 dark:text-neutral-400 dark:text-neutral-400">Expected: <strong>{booking.expected_quantity_quintals || '—'} q</strong></p>
+                <p className="text-gray-600 dark:text-neutral-400">Expected: <strong>{booking.expected_quantity_quintals || '—'} q</strong></p>
                 <p className="text-emerald-700 font-semibold">MSP: ₹{Number(booking.commodities?.msp_rate_per_quintal || 0).toLocaleString()}/q</p>
               </div>
             </div>
@@ -8813,7 +8811,7 @@ export default function AppointmentTokenPage() {
                 />
                 <div>
                   <p className="text-xs font-bold text-gray-900 dark:text-neutral-100">Mandi Gate Verification</p>
-                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 dark:text-neutral-400 leading-snug mt-0.5">
+                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 leading-snug mt-0.5">
                     Show this QR code at the Mandi entry barrier for automated driver check-in.
                   </p>
                 </div>
@@ -9688,23 +9686,23 @@ export default function OfficerDashboard() {
         {/* Counter Board */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-blue-500">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Total Scheduled</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">Total Scheduled</p>
             <p className="text-xl font-bold text-gray-800 dark:text-neutral-200 mt-1">{bookings.length}</p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-yellow-500">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Checked In</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">Checked In</p>
             <p className="text-xl font-bold text-yellow-600 mt-1">
               {bookings.filter(b => b.status === 'checked_in').length}
             </p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-purple-500">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400 dark:text-neutral-400">In Inspection</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">In Inspection</p>
             <p className="text-xl font-bold text-purple-600 mt-1">
               {bookings.filter(b => ['weighed', 'quality_checked'].includes(b.status)).length}
             </p>
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-green-600">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400 dark:text-neutral-400">Accepted</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">Accepted</p>
             <p className="text-xl font-bold text-green-600 mt-1">
               {bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length}
             </p>
@@ -9728,10 +9726,10 @@ export default function OfficerDashboard() {
                     <p className="font-bold text-gray-900 dark:text-neutral-100">{b.profiles?.full_name}</p>
                     <CropBadge name={b.commodities?.name} size="xs" />
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{b.slot_window} - {b.profiles?.phone}</p>
+                  <p className="text-sm text-gray-500 dark:text-neutral-400">{b.slot_window} - {b.profiles?.phone}</p>
                   <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full capitalize inline-block mt-1">{(b.status ?? '').replace(/_/g, ' ')}</span>
-                  {b.actual_weight_quintals && <span className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 ml-2">Weight: {b.actual_weight_quintals}q</span>}
-                  {b.quality_grade && <span className="text-xs text-gray-500 dark:text-neutral-400 dark:text-neutral-400 ml-2">Grade: {b.quality_grade}</span>}
+                  {b.actual_weight_quintals && <span className="text-xs text-gray-500 dark:text-neutral-400 ml-2">Weight: {b.actual_weight_quintals}q</span>}
+                  {b.quality_grade && <span className="text-xs text-gray-500 dark:text-neutral-400 ml-2">Grade: {b.quality_grade}</span>}
                 </div>
                 <div className="flex gap-2">
                   {NEXT_STATUS[b.status] && activeId !== b.id && (
@@ -9896,7 +9894,7 @@ export default function Register() {
   if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-green-50 px-4">
-        <p className="text-gray-500 dark:text-neutral-400 dark:text-neutral-400">{t('loading')}</p>
+        <p className="text-gray-500 dark:text-neutral-400">{t('loading')}</p>
       </div>
     );
   }
@@ -11030,6 +11028,139 @@ BEGIN
         p_farmer_id, p_centre_id, p_commodity_id, p_slot_date, p_slot_window, 
         p_quantity, 'booked'
     ) RETURNING id INTO v_booking_id;
+
+    -- 6. Generate Queue Entry (estimated position based on count + 1)
+    v_queue_position := v_current_count + 1;
+    v_wait_minutes := v_queue_position * 10;
+
+    INSERT INTO queue_entries (
+        booking_id, queue_position, estimated_wait_minutes
+    ) VALUES (
+        v_booking_id, v_queue_position, v_wait_minutes
+    );
+
+    -- 7. Return successful booking object
+    SELECT row_to_json(b) INTO v_booking_record FROM bookings b WHERE id = v_booking_id;
+
+    RETURN json_build_object(
+        'booking', v_booking_record,
+        'queue_position', v_queue_position,
+        'estimated_wait_minutes', v_wait_minutes
+    );
+END;
+$$;
+
+
+================================================================================
+File: supabase_fixes_v2.sql
+================================================================================
+
+-- PHASE 2: FIXES FOR ISSUES FOUND IN THE SECOND REVIEW PASS
+-- Run this in the Supabase SQL Editor after supabase_fixes.sql
+
+-- =============================================================
+-- 1. FIX: payments table is missing timestamp columns
+-- =============================================================
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
+UPDATE payments SET created_at = paid_at WHERE paid_at IS NOT NULL AND created_at = updated_at;
+
+
+-- =============================================================
+-- 2. FIX: close the residual cross-centre duplicate-booking race
+-- =============================================================
+CREATE UNIQUE INDEX IF NOT EXISTS unique_farmer_date_active
+  ON bookings (farmer_id, slot_date)
+  WHERE status != 'cancelled';
+
+DROP INDEX IF EXISTS unique_farmer_slot;
+
+
+-- =============================================================
+-- 3. FIX: make book_slot_atomic handle the new unique index
+-- =============================================================
+CREATE OR REPLACE FUNCTION book_slot_atomic(
+    p_farmer_id UUID,
+    p_centre_id UUID,
+    p_commodity_id UUID,
+    p_slot_date DATE,
+    p_slot_window TEXT,
+    p_quantity DECIMAL,
+    p_ignore_weekly_limit BOOLEAN DEFAULT FALSE
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_centre RECORD;
+    v_current_count INT;
+    v_weekly_count INT;
+    v_duplicate_count INT;
+    v_booking_id UUID;
+    v_queue_position INT;
+    v_wait_minutes INT;
+    v_booking_record JSON;
+BEGIN
+    -- 1. Lock the centre row to prevent concurrent capacity race conditions
+    SELECT * INTO v_centre
+    FROM centres
+    WHERE id = p_centre_id
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RETURN json_build_object('error', 'Centre not found');
+    END IF;
+
+    -- 2. Fast-path duplicate check
+    SELECT COUNT(*) INTO v_duplicate_count
+    FROM bookings
+    WHERE farmer_id = p_farmer_id
+      AND slot_date = p_slot_date
+      AND status != 'cancelled';
+
+    IF v_duplicate_count > 0 THEN
+        RETURN json_build_object('error', 'You already have a booking for this date.');
+    END IF;
+
+    -- 3. Check weekly limit (unless overridden)
+    IF NOT p_ignore_weekly_limit THEN
+        SELECT COUNT(*) INTO v_weekly_count
+        FROM bookings
+        WHERE farmer_id = p_farmer_id
+          AND slot_date >= p_slot_date - INTERVAL '7 days'
+          AND slot_date <= p_slot_date + INTERVAL '7 days'
+          AND status != 'cancelled';
+
+        IF v_weekly_count >= 2 THEN
+            RETURN json_build_object('error', 'weekly booking limit exceeded');
+        END IF;
+    END IF;
+
+    -- 4. Check daily capacity
+    SELECT COUNT(*) INTO v_current_count
+    FROM bookings
+    WHERE centre_id = p_centre_id
+      AND slot_date = p_slot_date
+      AND status != 'cancelled';
+
+    IF v_current_count >= v_centre.daily_capacity THEN
+        RETURN json_build_object('error', 'Daily capacity reached for this centre on the selected date.');
+    END IF;
+
+    -- 5. Insert the booking safely
+    BEGIN
+        INSERT INTO bookings (
+            farmer_id, centre_id, commodity_id, slot_date, slot_window,
+            expected_quantity_quintals, status
+        ) VALUES (
+            p_farmer_id, p_centre_id, p_commodity_id, p_slot_date, p_slot_window,
+            p_quantity, 'booked'
+        ) RETURNING id INTO v_booking_id;
+    EXCEPTION WHEN unique_violation THEN
+        RETURN json_build_object('error', 'You already have a booking for this date.');
+    END;
 
     -- 6. Generate Queue Entry (estimated position based on count + 1)
     v_queue_position := v_current_count + 1;
