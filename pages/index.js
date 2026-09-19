@@ -3,17 +3,10 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabaseClient';
 
-// Map specific phone/Aadhaar numbers to the seeded demo accounts
-const CREDENTIAL_MAP = {
-  '9822100011': { email: 'farmer@demo.com', role: 'farmer' },
-  '9422088990': { email: 'officer@demo.com', role: 'officer' },
-  '0202555123': { email: 'admin@demo.com', role: 'admin' },
-};
-
 export default function MobileOtpLogin() {
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const [identifier, setIdentifier] = useState('9822100011');
+  const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,55 +20,63 @@ export default function MobileOtpLogin() {
               if (data.role === 'farmer') router.push('/farmer/dashboard');
               if (data.role === 'officer') router.push('/officer/dashboard');
               if (data.role === 'admin') router.push('/admin/dashboard');
+            } else {
+              router.push('/register');
             }
           });
       }
     });
   }, [router]);
 
-  const handleSendOtp = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     setError(null);
-    if (!identifier || identifier.length < 10) {
-      setError('Please enter a valid 10-digit mobile number or 12-digit Aadhaar.');
+    if (!phone || phone.length < 10) {
+      setError('Please enter a valid 10-digit mobile number.');
       return;
     }
     
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: '+91' + phone,
+      });
+      if (error) throw error;
       setStep(2);
-    }, 800);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setError(null);
-    
-    if (otp !== '123456') {
-      setError('Invalid OTP. Please enter 123456 for the demo.');
-      return;
-    }
-
-    const account = CREDENTIAL_MAP[identifier];
-    if (!account) {
-      setError('Account not found for this mobile/Aadhaar number.');
-      return;
-    }
-
     setLoading(true);
+    
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: account.email,
-        password: 'password123',
+      const { data, error: authError } = await supabase.auth.verifyOtp({
+        phone: '+91' + phone,
+        token: otp,
+        type: 'sms',
       });
       if (authError) throw authError;
 
-      if (account.role === 'farmer') router.push('/farmer/dashboard');
-      if (account.role === 'officer') router.push('/officer/dashboard');
-      if (account.role === 'admin') router.push('/admin/dashboard');
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+      
+      if (!profile) {
+        router.push('/register');
+      } else if (profile.role === 'farmer') {
+        router.push('/farmer/dashboard');
+      } else if (profile.role === 'officer') {
+        router.push('/officer/dashboard');
+      } else if (profile.role === 'admin') {
+        router.push('/admin/dashboard');
+      }
     } catch (err) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -97,9 +98,6 @@ export default function MobileOtpLogin() {
               <p className="text-emerald-200 text-[10px] font-semibold uppercase tracking-wider">Govt. of Maharashtra</p>
             </div>
           </div>
-          <span className="bg-emerald-900 text-emerald-100 text-[10px] px-2 py-1 rounded font-bold tracking-widest border border-emerald-700/50">
-            e-GOV PORTAL
-          </span>
         </div>
 
         <div className="p-8">
@@ -108,8 +106,8 @@ export default function MobileOtpLogin() {
           </h2>
           <p className="text-sm text-slate-500 mb-8 font-medium">
             {step === 1 
-              ? 'Enter your registered mobile or Aadhaar number to proceed.' 
-              : `We have sent a 6-digit secure OTP to ${identifier}.`}
+              ? 'Enter your registered mobile number to proceed.' 
+              : `We have sent a 6-digit secure OTP to +91 ${phone}.`}
           </p>
 
           {error && (
@@ -123,7 +121,7 @@ export default function MobileOtpLogin() {
             <form onSubmit={handleSendOtp} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Mobile / Aadhaar Number
+                  Mobile Number
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 font-bold">
@@ -131,11 +129,11 @@ export default function MobileOtpLogin() {
                   </div>
                   <input
                     type="text"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value.replace(/[^0-9]/g, ''))}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                     placeholder="Enter 10-digit mobile"
                     className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-lg"
-                    maxLength={12}
+                    maxLength={10}
                   />
                 </div>
               </div>
@@ -196,27 +194,6 @@ export default function MobileOtpLogin() {
             </form>
           )}
 
-        </div>
-
-        <div className="bg-slate-50 border-t border-slate-200 p-4">
-          <div className="flex justify-center items-center gap-6 opacity-70 grayscale">
-             <div className="text-[10px] font-bold text-slate-600 flex items-center gap-1">
-               <span className="text-base">🔐</span> 256-bit AES
-             </div>
-             <div className="text-[10px] font-bold text-slate-600 flex items-center gap-1 border-l border-slate-300 pl-6">
-               <span className="text-base">📲</span> UIDAI e-KYC
-             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-8 text-center bg-white/50 p-4 rounded-xl border border-slate-200 max-w-md w-full">
-        <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">Presentation Demo Keys</p>
-        <div className="text-xs font-medium text-slate-700 space-y-1">
-          <p><strong>Farmer:</strong> 9822100011</p>
-          <p><strong>Officer:</strong> 9422088990</p>
-          <p><strong>Admin:</strong> 0202555123</p>
-          <p className="mt-2 text-emerald-700 font-bold">Universal OTP: 123456</p>
         </div>
       </div>
     </div>

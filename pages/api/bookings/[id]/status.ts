@@ -48,11 +48,21 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     return res.status(403).json({ error: 'Not authorized' });
   }
 
-  const updateObj: any = { status: targetStatus };
-  if (targetStatus === 'weighed' && actual_weight_quintals != null) {
-    updateObj.actual_weight_quintals = parseFloat(actual_weight_quintals as string);
+  let finalTargetStatus = targetStatus;
+  if (targetStatus === 'quality_checked' && quality_grade === 'Rejected') {
+    finalTargetStatus = 'rejected'; // Skip to rejected if grade is Rejected
   }
-  if (targetStatus === 'quality_checked') {
+
+  const updateObj: any = { status: finalTargetStatus };
+  if (targetStatus === 'weighed') {
+    const parsedWeight = parseFloat(actual_weight_quintals as string);
+    if (Number.isNaN(parsedWeight) || parsedWeight <= 0) {
+      return res.status(400).json({ error: 'Valid actual weight is required for weighing step.' });
+    }
+    updateObj.actual_weight_quintals = parsedWeight;
+  }
+  // Store quality fields even if we transition straight to rejected
+  if (targetStatus === 'quality_checked' || finalTargetStatus === 'rejected') {
     if (quality_grade) updateObj.quality_grade = quality_grade;
     if (quality_notes) updateObj.quality_notes = quality_notes;
     if (moisture_percent != null) updateObj.moisture_percent = parseFloat(moisture_percent as string);
@@ -63,15 +73,24 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     updateObj.accepted_quantity_quintals = parseFloat(accepted_quantity_quintals as string);
   }
 
-  const { data, error } = await supabaseAdmin.from('bookings').update(updateObj).eq('id', id).select().single();
-  if (error) return res.status(500).json({ error: error.message });
+  // Use optimistic concurrency control (check status matches what we fetched)
+  const { data, error } = await supabaseAdmin.from('bookings')
+    .update(updateObj)
+    .eq('id', id)
+    .eq('status', currentBooking.status)
+    .select().single();
+    
+  if (error) {
+    if (error.code === 'PGRST116') return res.status(409).json({ error: 'Concurrency error: status was modified by another request.' });
+    return res.status(500).json({ error: error.message });
+  }
 
-  if (targetStatus === 'checked_in') {
+  if (finalTargetStatus === 'checked_in') {
     await supabaseAdmin.from('queue_entries').update({ check_in_time: new Date().toISOString() }).eq('booking_id', id);
   }
 
   // On acceptance: create payment record + gate pass
-  if (targetStatus === 'accepted') {
+  if (finalTargetStatus === 'accepted') {
     const acceptedQty = parseFloat(accepted_quantity_quintals as string) || parseFloat(actual_weight_quintals as string) || parseFloat(data.actual_weight_quintals as string) || 0;
 
     const { data: commodity } = await supabaseAdmin
@@ -84,13 +103,14 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     const utr = `UTR${Date.now()}${Math.floor(Math.random() * 10000)}`;
     
     if (amount > 0) {
-      await supabaseAdmin.from('payments').insert({
+      const { error: payError } = await supabaseAdmin.from('payments').insert({
         booking_id: id,
         accepted_quantity_quintals: acceptedQty,
         amount,
         utr_reference: utr,
         status: 'initiated',
       });
+      if (payError) console.error('Payment insert error:', payError);
     }
 
     const qrData = JSON.stringify({
@@ -101,14 +121,24 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       accepted_at: new Date().toISOString(),
     });
 
-    await supabaseAdmin.from('gate_passes').insert({
+    const { error: gpError } = await supabaseAdmin.from('gate_passes').insert({
       booking_id: id,
       qr_code: qrData,
     });
+    if (gpError) console.error('Gate pass insert error:', gpError);
+  }
+
+  // Update payment status if marked paid via this generic status endpoint
+  if (finalTargetStatus === 'paid') {
+    await supabaseAdmin.from('payments').update({
+      status: 'completed',
+      paid_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }).eq('booking_id', id);
   }
 
   // Recalculate queue positions efficiently via RPC instead of Promise.all loops
-  if (['weighed', 'quality_checked', 'accepted', 'rejected', 'paid', 'cancelled'].includes(targetStatus)) {
+  if (['weighed', 'quality_checked', 'accepted', 'rejected', 'paid', 'cancelled'].includes(finalTargetStatus)) {
     const { error: rpcError } = await supabaseAdmin.rpc('recalculate_queue_for_date', { 
       p_centre_id: currentBooking.centre_id, 
       p_date: currentBooking.slot_date 
@@ -118,7 +148,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
 
   sendNotification({
     bookingId: id,
-    message: `Your booking status changed to: ${targetStatus.replace(/_/g, ' ')}.${targetStatus === 'accepted' ? ' Gate pass and payment record created.' : ''}`,
+    message: `Your booking status changed to: ${finalTargetStatus.replace(/_/g, ' ')}.${finalTargetStatus === 'accepted' ? ' Gate pass and payment record created.' : ''}`,
   }).catch(err => console.error('Notification failed:', err));
 
   return res.status(200).json({ booking: data });

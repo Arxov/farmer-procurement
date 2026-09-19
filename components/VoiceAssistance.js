@@ -28,7 +28,7 @@ export default function VoiceAssistance({ profile, bookings = [], commodities = 
 
     const name = profile?.full_name || (language === 'hi' ? 'किसान भाई' : 'Farmer');
     const activeBookings = bookings.filter(b => ['booked', 'checked_in'].includes(b.status));
-    const activeQueue = bookings.find(b => b.queue_entries?.[0]);
+    const activeQueue = activeBookings.find(b => b.queue_entries?.[0]);
 
     let text = '';
     let voiceLang = 'hi-IN';

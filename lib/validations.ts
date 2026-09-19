@@ -6,6 +6,7 @@ export const CreateBookingSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
   slotWindow: z.string().min(1, 'Slot window is required'),
   quantity: z.union([z.number().positive(), z.string().regex(/^\d+(\.\d+)?$/)]).optional().nullable(),
+  rescheduleId: z.string().uuid().optional(),
 });
 
 export const UpdateBookingStatusSchema = z.object({

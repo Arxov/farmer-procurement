@@ -24,8 +24,9 @@ async function handler(req, res) {
     const { lat, lng, commodityId, qty } = req.query;
     const userLat = parseFloat(lat);
     const userLng = parseFloat(lng);
+    const hasUserLoc = !Number.isNaN(userLat) && !Number.isNaN(userLng);
     const quantity = parseFloat(qty) || 50; // Default 50 quintals if not provided
-    const TRANSPORT_RATE_PER_KM_PER_QUINTAL = 10; // ₹10 per km per quintal
+    const TRANSPORT_RATE_PER_KM_PER_QUINTAL = 2; // ₹2 per km per quintal
 
     const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
@@ -83,8 +84,14 @@ async function handler(req, res) {
         const totalBonus = localBonus * quantity;
         financialScore = totalBonus - transportCost; // Net benefit
       } else {
-        // If no GPS, fallback to just rewarding local bonuses and penalizing heavily busy centres
-        financialScore = (localBonus * quantity); 
+        // If user provided location but centre has no coordinates, heavily penalize it
+        // so it doesn't artificially 'beat' centres with real transport costs.
+        if (hasUserLoc) {
+          transportCost = 500 * TRANSPORT_RATE_PER_KM_PER_QUINTAL * quantity; // Assume 500km penalty
+          financialScore = (localBonus * quantity) - transportCost;
+        } else {
+          financialScore = (localBonus * quantity);
+        }
       }
 
       for (const date of dates) {

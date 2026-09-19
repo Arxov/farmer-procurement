@@ -67,63 +67,28 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       p_slot_date: date,
       p_slot_window: slotWindow,
       p_quantity: parsedQuantity,
-      p_ignore_weekly_limit: false // First try with normal limits
+      p_ignore_weekly_limit: false // Always enforce normal limit
     });
 
     if (rpcError) {
-      // If the RPC function doesn't exist yet (migration not run), fall back to legacy logic
-      if (rpcError.message.includes('book_slot_atomic') || rpcError.code === '42883') {
-        return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity, false);
-      }
       return res.status(500).json({ error: rpcError.message });
     }
 
-    // The RPC returns a JSON object with either 'error' or 'booking'
     if (result?.error) {
-      if (result.error.toLowerCase().includes('weekly booking limit')) {
-        const d = new Date(date);
-        const day = d.getDay() || 7; // 1 (Mon) to 7 (Sun)
-        const start = new Date(d); start.setDate(d.getDate() - day + 1);
-        const end = new Date(d); end.setDate(d.getDate() - day + 7);
-        const startStr = start.toISOString().split('T')[0];
-        const endStr = end.toISOString().split('T')[0];
-
-        const { count } = await supabaseAdmin
-          .from('bookings')
-          .select('*', { count: 'exact', head: true })
-          .eq('farmer_id', req.user.id)
-          .gte('slot_date', startStr)
-          .lte('slot_date', endStr)
-          .not('status', 'eq', 'cancelled');
-          
-        const EXTENDED_LIMIT = 5;
-        if (count !== null && count >= EXTENDED_LIMIT) {
-          return res.status(400).json({ error: `You have reached your extended weekly booking limit of ${EXTENDED_LIMIT}. Cancel an existing booking or wait for current ones to complete.` });
-        }
-        
-        // Retry atomic RPC with limits bypassed
-        const { data: retryResult, error: retryError } = await supabaseAdmin.rpc('book_slot_atomic', {
-          p_farmer_id: req.user.id,
-          p_centre_id: centreId,
-          p_commodity_id: commodityId,
-          p_slot_date: date,
-          p_slot_window: slotWindow,
-          p_quantity: parsedQuantity,
-          p_ignore_weekly_limit: true
-        });
-
-        if (retryError || retryResult?.error) {
-           return res.status(400).json({ error: retryError?.message || retryResult?.error });
-        }
-        
-        return processSuccessfulBooking(res, retryResult.booking, retryResult.queue_position, retryResult.estimated_wait_minutes, date, slotWindow);
-      }
       return res.status(400).json({ error: result.error });
+    }
+
+    // Cancel old booking ONLY AFTER new one successfully books (reschedule logic)
+    if ((validation as any).data.rescheduleId) {
+      await supabaseAdmin.from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', (validation as any).data.rescheduleId)
+        .eq('farmer_id', req.user.id);
     }
 
     return processSuccessfulBooking(res, result.booking, result.queue_position, result.estimated_wait_minutes, date, slotWindow);
   } catch (err: any) {
-    return await legacyBooking(req, res, centreId, commodityId, date, slotWindow, parsedQuantity, false);
+    return res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
 

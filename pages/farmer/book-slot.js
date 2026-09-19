@@ -14,9 +14,13 @@ import LanguageToggle from '../../components/LanguageToggle';
 
 const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
+const EMPTY_ARRAY = [];
+
 export default function BookSlot() {
-  const { data: centres = [] } = useCentres();
-  const { data: commodities = [] } = useCommodities();
+  const { data = EMPTY_ARRAY } = useCentres();
+  const centres = data;
+  const { data: commoditiesData = EMPTY_ARRAY } = useCommodities();
+  const commodities = commoditiesData;
   const [centreId, setCentreId] = useState('');
   const [commodityId, setcommodityId] = useState('');
   const [date, setDate] = useState('');
@@ -165,32 +169,21 @@ export default function BookSlot() {
         dates.push(d.toISOString().split('T')[0]);
       }
 
-      const { data: bookingsData } = await supabase
-        .from('bookings')
-        .select('slot_date')
-        .eq('centre_id', centreId)
-        .in('slot_date', dates)
-        .neq('status', 'cancelled');
-
-      const countMap = {};
-      (bookingsData || []).forEach(b => {
-        countMap[b.slot_date] = (countMap[b.slot_date] || 0) + 1;
-      });
-
-      const list = dates.map(dStr => {
-        const booked = countMap[dStr] || 0;
-        const available = Math.max(0, capacity - booked);
-        const percent = Math.min(100, Math.round((booked / capacity) * 100));
-        return {
-          date: dStr,
-          booked,
-          capacity,
-          available,
-          percent,
-        };
-      });
-
-      setAvailability(list);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch(`/api/centres/${centreId}/availability?dates=${dates.join(',')}`, {
+          headers: { Authorization: `Bearer ${session?.access_token}` }
+        });
+        if (res.ok) {
+          const { availability } = await res.json();
+          setAvailability(availability || []);
+        } else {
+          setAvailability([]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch availability:', err);
+        setAvailability([]);
+      }
     };
 
     fetchAvailability();
@@ -208,7 +201,15 @@ export default function BookSlot() {
     setLoading(true);
     setError('');
 
-    const bookingPayload = { centreId, commodityId, date, slotWindow, quantity: quantity.trim() === '' ? null : quantity };
+    const rescheduleId = router.query.reschedule;
+    const bookingPayload = { 
+      centreId, 
+      commodityId, 
+      date, 
+      slotWindow, 
+      quantity: quantity.trim() === '' ? null : quantity,
+      rescheduleId: rescheduleId || undefined
+    };
 
     // Offline fallback: queue locally
     if (!navigator.onLine) {
@@ -221,21 +222,6 @@ export default function BookSlot() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-
-      // If rescheduling, cancel the old booking first to avoid unique constraints or double-booking
-      const rescheduleId = router.query.reschedule;
-      if (rescheduleId) {
-        const cancelRes = await fetch(`/api/bookings/${rescheduleId}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-          body: JSON.stringify({ status: 'cancelled' }),
-        });
-        if (!cancelRes.ok) {
-          setError('Failed to cancel the existing booking. Please try again or refresh.');
-          setLoading(false);
-          return;
-        }
-      }
 
       const res = await fetch('/api/bookings/create', {
         method: 'POST',

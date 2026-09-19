@@ -17,7 +17,6 @@ import CropBadge from '../../components/CropBadge';
 import BookingStepper from '../../components/BookingStepper';
 import PullToRefresh from '../../components/PullToRefresh';
 import InstallPwaBanner from '../../components/InstallPwaBanner';
-import VoiceAssistance from '../../components/VoiceAssistance';
 import KisanMitraWidget from '../../components/KisanMitraWidget';
 import { useFarmerBookings, bookingsQueryKeys } from '../../hooks/useBookings';
 import { useCommodities } from '../../hooks/useCommodities';
@@ -41,27 +40,26 @@ export default function FarmerDashboard() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const queueRaw = window.localStorage.getItem('offline_booking_queue');
-      if (queueRaw) {
-        try {
-          const parsed = JSON.parse(queueRaw);
-          setOfflineQueueCount(parsed.length);
-        } catch (e) {
-          setOfflineQueueCount(0);
-        }
-      }
-      
-      const handleStorageChange = () => {
-        const q = window.localStorage.getItem('offline_booking_queue');
-        setOfflineQueueCount(q ? JSON.parse(q).length : 0);
+      const updateQueueCount = async () => {
+        const queue = await getOfflineQueue();
+        setOfflineQueueCount(queue.length);
       };
       
+      updateQueueCount();
+      
+      const handleStorageChange = () => updateQueueCount();
+      
       window.addEventListener('storage', handleStorageChange);
-      // Trigger sync logic if online
       window.addEventListener('online', handleStorageChange);
+      
+      // Since IndexedDB doesn't trigger 'storage' events reliably across tabs without a BroadcastChannel,
+      // we'll poll it briefly or just rely on focus/online events
+      window.addEventListener('focus', handleStorageChange);
+      
       return () => {
         window.removeEventListener('storage', handleStorageChange);
         window.removeEventListener('online', handleStorageChange);
+        window.removeEventListener('focus', handleStorageChange);
       };
     }
   }, []);
@@ -157,7 +155,7 @@ export default function FarmerDashboard() {
   useEffect(() => {
     const hasLeaveNow = upcoming.some(b => {
       const q = b.queue_entries?.[0];
-      return q && ['booked', 'checked_in'].includes(b.status) && q.queue_position != null && q.queue_position <= 2;
+      return b.slot_date === today && q && ['booked', 'checked_in'].includes(b.status) && q.queue_position != null && q.queue_position <= 2;
     });
 
     if (hasLeaveNow && !alertedRef.current) {
@@ -218,7 +216,8 @@ export default function FarmerDashboard() {
   const renderBookingCard = (b) => {
     const queuePos = b.queue_entries?.[0]?.queue_position;
     const waitMins = b.queue_entries?.[0]?.estimated_wait_minutes;
-    const isLeaveNow = waitMins !== undefined && waitMins <= 45 && ['booked', 'checked_in'].includes(b.status);
+    const today = new Date().toISOString().split('T')[0];
+    const isLeaveNow = b.slot_date === today && waitMins != null && waitMins <= 45 && ['booked', 'checked_in'].includes(b.status);
 
     return (
       <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={b.id} id={`booking-${b.id}`} className={`bg-white dark:bg-neutral-800 rounded-xl shadow p-4 ${getBorderColor(b.status)} ${isLeaveNow ? 'ring-2 ring-orange-400' : ''}`}>
