@@ -83,13 +83,15 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     const amount = acceptedQty * (commodity?.msp_rate_per_quintal || 0);
     const utr = `UTR${Date.now()}${Math.floor(Math.random() * 10000)}`;
     
-    await supabaseAdmin.from('payments').insert({
-      booking_id: id,
-      accepted_quantity_quintals: acceptedQty,
-      amount,
-      utr_reference: utr,
-      status: 'initiated',
-    });
+    if (amount > 0) {
+      await supabaseAdmin.from('payments').insert({
+        booking_id: id,
+        accepted_quantity_quintals: acceptedQty,
+        amount,
+        utr_reference: utr,
+        status: 'initiated',
+      });
+    }
 
     const qrData = JSON.stringify({
       booking_id: id,

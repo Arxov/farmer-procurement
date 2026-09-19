@@ -221,6 +221,22 @@ export default function BookSlot() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
+
+      // If rescheduling, cancel the old booking first to avoid unique constraints or double-booking
+      const rescheduleId = router.query.reschedule;
+      if (rescheduleId) {
+        const cancelRes = await fetch(`/api/bookings/${rescheduleId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+          body: JSON.stringify({ status: 'cancelled' }),
+        });
+        if (!cancelRes.ok) {
+          setError('Failed to cancel the existing booking. Please try again or refresh.');
+          setLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
@@ -231,16 +247,6 @@ export default function BookSlot() {
         const result = await res.json().catch(() => ({}));
         setError(result.error || 'Something went wrong on the server.');
         return;
-      }
-
-      // If rescheduling, cancel the old booking
-      const rescheduleId = router.query.reschedule;
-      if (rescheduleId) {
-        await fetch(`/api/bookings/${rescheduleId}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-          body: JSON.stringify({ status: 'cancelled' }),
-        }).catch(() => {});
       }
       // Success celebrations
       confetti({

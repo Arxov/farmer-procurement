@@ -1,3 +1,5 @@
+import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+
 // Notification service - demo mode logs to the server console.
 // Replace the marked block with a real SMS/WhatsApp provider call for production;
 // nothing else in the app needs to change since every caller just POSTs here.
@@ -12,7 +14,17 @@ export default async function handler(req, res) {
 
   const { bookingId, message } = req.body;
 
-  console.log(`[NOTIFY] Booking ${bookingId}: ${message}`);
+  let farmerPhoneNumber = 'Unknown';
+  try {
+    const { data: booking } = await supabaseAdmin
+      .from('bookings')
+      .select('profiles(phone)')
+      .eq('id', bookingId)
+      .single();
+    if (booking?.profiles?.phone) farmerPhoneNumber = booking.profiles.phone;
+  } catch (err) {}
+
+  console.log(`[NOTIFY SMS to ${farmerPhoneNumber}] Booking ${bookingId}: ${message}`);
 
   // --- Swap this in for real SMS delivery (example using a generic provider) ---
   // await fetch('https://www.fast2sms.com/dev/bulkV2', {

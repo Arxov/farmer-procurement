@@ -95,14 +95,16 @@ async function handler(req, res) {
           // Find least busy window
           let bestWindow = SLOT_WINDOWS[0];
           let minWindowCount = Infinity;
-
+          const windowCapacity = Math.ceil(centre.daily_capacity / SLOT_WINDOWS.length);
           for (const sw of SLOT_WINDOWS) {
             const windowCount = dateUsage[sw] || 0;
-            if (windowCount < minWindowCount) {
+            if (windowCount < windowCapacity && windowCount < minWindowCount) {
               minWindowCount = windowCount;
               bestWindow = sw;
             }
           }
+          
+          if (minWindowCount === Infinity) continue; // All windows full despite total capacity appearing open
 
           // Combine financial score with capacity availability (so we don't send to a full centre)
           // Weight: 1 remaining spot = +50 score (to break financial ties)

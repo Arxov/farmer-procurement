@@ -81,12 +81,19 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     // The RPC returns a JSON object with either 'error' or 'booking'
     if (result?.error) {
       if (result.error.toLowerCase().includes('weekly booking limit')) {
+        const d = new Date(date);
+        const day = d.getDay() || 7; // 1 (Mon) to 7 (Sun)
+        const start = new Date(d); start.setDate(d.getDate() - day + 1);
+        const end = new Date(d); end.setDate(d.getDate() - day + 7);
+        const startStr = start.toISOString().split('T')[0];
+        const endStr = end.toISOString().split('T')[0];
+
         const { count } = await supabaseAdmin
           .from('bookings')
           .select('*', { count: 'exact', head: true })
           .eq('farmer_id', req.user.id)
-          .gte('slot_date', new Date(new Date(date).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-          .lte('slot_date', new Date(new Date(date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .gte('slot_date', startStr)
+          .lte('slot_date', endStr)
           .not('status', 'eq', 'cancelled');
           
         const EXTENDED_LIMIT = 5;
@@ -149,12 +156,17 @@ async function legacyBooking(
 
   // 2. Weekly Limit (simplified logic matching RPC)
   if (!ignoreWeeklyLimit) {
+    const d = new Date(date);
+    const day = d.getDay() || 7;
+    const start = new Date(d); start.setDate(d.getDate() - day + 1);
+    const end = new Date(d); end.setDate(d.getDate() - day + 7);
+
     const { count: weekly } = await supabaseAdmin
       .from('bookings')
       .select('*', { count: 'exact', head: true })
       .eq('farmer_id', req.user.id)
-      .gte('slot_date', new Date(new Date(date).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-      .lte('slot_date', new Date(new Date(date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      .gte('slot_date', start.toISOString().split('T')[0])
+      .lte('slot_date', end.toISOString().split('T')[0])
       .not('status', 'eq', 'cancelled');
     if (weekly && weekly >= 2) return res.status(400).json({ error: 'weekly booking limit exceeded' });
   }

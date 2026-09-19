@@ -4262,6 +4262,58 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Centre Quality Control & Rejection Ratios */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-6 mb-6">
+          <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100 mb-1">Centre Quality Control (QC) & Rejection Ratios</h2>
+          <p className="text-xs text-gray-500 dark:text-neutral-400 mb-4">Acceptance vs Rejection rates to monitor strictness and crop quality per Mandi.</p>
+          
+          <div className="space-y-4">
+            {centreQC.map(([name, qc]) => {
+              if (qc.total === 0) return null;
+              const rejectionPct = Math.round((qc.rejected / qc.total) * 100);
+              const acceptedPct = Math.round((qc.accepted / qc.total) * 100);
+              
+              return (
+                <div key={name} className="border border-gray-100 dark:border-neutral-700 rounded-xl p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-bold text-sm text-gray-800 dark:text-neutral-200">{name}</h3>
+                      <p className="text-[10px] text-gray-500">{qc.total} total completed assessments</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-2 py-1 rounded text-[10px] font-bold ${rejectionPct > 25 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                        {rejectionPct}% Rejected
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="w-full bg-gray-100 dark:bg-neutral-800 rounded-full h-2 flex overflow-hidden mb-2">
+                    <div className="bg-emerald-500 h-2 transition-all" style={{ width: `${acceptedPct}%` }} title={`Accepted: ${qc.accepted}`} />
+                    <div className="bg-red-500 h-2 transition-all" style={{ width: `${rejectionPct}%` }} title={`Rejected: ${qc.rejected}`} />
+                  </div>
+                  
+                  {Object.keys(qc.reasons).length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-50 dark:border-neutral-800">
+                      <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Top Rejection Reasons</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {Object.entries(qc.reasons).sort((a,b)=>b[1]-a[1]).map(([reason, count]) => (
+                          <span key={reason} className="text-[10px] bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300 px-2 py-0.5 rounded border border-gray-200 dark:border-neutral-700">
+                            {reason}: <strong>{count}</strong>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            
+            {centreQC.length === 0 && (
+              <p className="text-xs text-gray-400 py-3 text-center">No quality control data available yet.</p>
+            )}
+          </div>
+        </div>
+
         {/* Bookings by Centre Distribution */}
         <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-6 mb-6">
           <h2 className="text-base font-bold text-gray-900 dark:text-neutral-100 mb-1">{t('bookingsByCentre')}</h2>
@@ -5430,14 +5482,37 @@ import { withAuth } from '../../../lib/apiAuth';
 
 // Returns the least busy centre + date + slot combination.
 // GET /api/bookings/suggest
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+  const R = 6371; 
+  const dLat = (lat2-lat1) * (Math.PI/180);
+  const dLon = (lon2-lon1) * (Math.PI/180); 
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2); 
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  return R * c;
+}
+
+// GET /api/bookings/suggest?lat=...&lng=...&commodityId=...&qty=...
 async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
   try {
+    const { lat, lng, commodityId, qty } = req.query;
+    const userLat = parseFloat(lat);
+    const userLng = parseFloat(lng);
+    const quantity = parseFloat(qty) || 50; // Default 50 quintals if not provided
+    const TRANSPORT_RATE_PER_KM_PER_QUINTAL = 10; // ₹10 per km per quintal
+
     const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
-    // Get all centres
-    const { data: centres } = await supabaseAdmin.from('centres').select('*');
+    // Get all centres and their local bonuses
+    const { data: centres } = await supabaseAdmin
+      .from('centres')
+      .select('*, centre_commodities(commodity_id, local_bonus_per_quintal)');
+
     if (!centres || centres.length === 0) return res.status(200).json({ suggestion: null });
 
     // Check next 3 days
@@ -5448,7 +5523,6 @@ async function handler(req, res) {
       dates.push(d.toISOString().split('T')[0]);
     }
 
-    // Single query to get all relevant active bookings grouped by js below
     const { data: activeBookings, error } = await supabaseAdmin
       .from('bookings')
       .select('centre_id, slot_date, slot_window')
@@ -5457,8 +5531,6 @@ async function handler(req, res) {
 
     if (error) throw error;
 
-    // Build frequency map
-    // map[centre_id][slot_date][slot_window] = count
     const usage = {};
     activeBookings?.forEach(b => {
       if (!usage[b.centre_id]) usage[b.centre_id] = {};
@@ -5468,14 +5540,37 @@ async function handler(req, res) {
     });
 
     let bestOption = null;
-    let maxRemaining = -1;
+    let bestScore = -Infinity;
 
     for (const centre of centres) {
+      // Calculate distance
+      const distance = getDistanceFromLatLonInKm(userLat, userLng, centre.latitude, centre.longitude);
+      
+      // Calculate financial benefit if commodity is provided
+      let localBonus = 0;
+      if (commodityId) {
+        const cc = centre.centre_commodities?.find(c => c.commodity_id === commodityId);
+        if (cc && cc.local_bonus_per_quintal) {
+          localBonus = parseFloat(cc.local_bonus_per_quintal);
+        }
+      }
+
+      let financialScore = 0;
+      let transportCost = 0;
+      if (distance !== null) {
+        transportCost = distance * TRANSPORT_RATE_PER_KM_PER_QUINTAL * quantity;
+        const totalBonus = localBonus * quantity;
+        financialScore = totalBonus - transportCost; // Net benefit
+      } else {
+        // If no GPS, fallback to just rewarding local bonuses and penalizing heavily busy centres
+        financialScore = (localBonus * quantity); 
+      }
+
       for (const date of dates) {
         const dateUsage = usage[centre.id]?.[date] || { total: 0 };
         const remaining = centre.daily_capacity - dateUsage.total;
 
-        if (remaining > maxRemaining) {
+        if (remaining > 0) {
           // Find least busy window
           let bestWindow = SLOT_WINDOWS[0];
           let minWindowCount = Infinity;
@@ -5488,17 +5583,27 @@ async function handler(req, res) {
             }
           }
 
-          maxRemaining = remaining;
-          bestOption = {
-            centreId: centre.id,
-            centreName: centre.name,
-            district: centre.district,
-            date,
-            slotWindow: bestWindow,
-            currentBookings: dateUsage.total,
-            dailyCapacity: centre.daily_capacity,
-            remainingCapacity: remaining,
-          };
+          // Combine financial score with capacity availability (so we don't send to a full centre)
+          // Weight: 1 remaining spot = +50 score (to break financial ties)
+          const totalScore = financialScore + (remaining * 50);
+
+          if (totalScore > bestScore) {
+            bestScore = totalScore;
+            bestOption = {
+              centreId: centre.id,
+              centreName: centre.name,
+              district: centre.district,
+              date,
+              slotWindow: bestWindow,
+              currentBookings: dateUsage.total,
+              dailyCapacity: centre.daily_capacity,
+              remainingCapacity: remaining,
+              distanceKm: distance ? Math.round(distance * 10) / 10 : null,
+              localBonus: localBonus,
+              transportCost: Math.round(transportCost),
+              netBenefit: Math.round(financialScore)
+            };
+          }
         }
       }
     }
@@ -5747,6 +5852,72 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   }).catch(err => console.error('Notification failed:', err));
 
   return res.status(200).json({ booking: data });
+}
+
+export default withAuth(handler);
+
+
+================================================================================
+File: pages/api/centres/[id]/stats.js
+================================================================================
+
+import { supabaseAdmin } from '../../../../lib/supabaseAdmin';
+import { withAuth } from '../../../../lib/apiAuth';
+
+async function handler(req, res) {
+  if (req.method !== 'GET') return res.status(405).end();
+  
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: 'Centre ID is required' });
+
+  try {
+    // We only need farmer_id and status to compute stats
+    // Limit to recent 2000 to prevent Serverless Function OOM timeouts on large datasets
+    const { data: bookings, error } = await supabaseAdmin
+      .from('bookings')
+      .select('farmer_id, status, actual_weight_quintals')
+      .eq('centre_id', id)
+      .order('created_at', { ascending: false })
+      .limit(2000);
+
+    if (error) throw error;
+
+    // Compute stats
+    const uniqueFarmers = new Set();
+    let totalCompleted = 0;
+    let totalRejected = 0;
+    let totalVolume = 0;
+
+    bookings?.forEach(b => {
+      uniqueFarmers.add(b.farmer_id);
+      
+      if (['accepted', 'paid', 'rejected'].includes(b.status)) {
+        totalCompleted++;
+        if (b.status === 'rejected') {
+          totalRejected++;
+        }
+      }
+      
+      if (['weighed', 'quality_checked', 'accepted', 'paid'].includes(b.status) && b.actual_weight_quintals) {
+        totalVolume += parseFloat(b.actual_weight_quintals);
+      }
+    });
+
+    const rejectionRate = totalCompleted > 0 
+      ? Math.round((totalRejected / totalCompleted) * 100) 
+      : 0;
+
+    return res.status(200).json({
+      farmersServed: uniqueFarmers.size,
+      rejectionRate,
+      totalCompleted,
+      totalVolumeProcessed: Math.round(totalVolume)
+    });
+
+  } catch (err) {
+    console.error('Centre Stats API error:', err);
+    return res.status(500).json({ error: 'Failed to fetch centre stats' });
+  }
 }
 
 export default withAuth(handler);
@@ -6238,13 +6409,40 @@ export default function BookSlot() {
     }
   }, [router.query.commodityId]);
 
+  const [location, setLocation] = useState(null);
+  const [locating, setLocating] = useState(false);
+
+  const requestLocation = () => {
+    setLocating(true);
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      setLocating(false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      setLocating(false);
+    }, (err) => {
+      console.error(err);
+      alert('Could not get location. Ensure permissions are granted.');
+      setLocating(false);
+    });
+  };
+
   useEffect(() => {
-    // Fetch auto-suggestion
     const fetchSuggestion = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       try {
-        const res = await fetch('/api/bookings/suggest', {
+        const params = new URLSearchParams();
+        if (location) {
+          params.append('lat', location.lat);
+          params.append('lng', location.lng);
+        }
+        if (commodityId) params.append('commodityId', commodityId);
+        if (quantity) params.append('qty', quantity);
+
+        const res = await fetch(`/api/bookings/suggest?${params.toString()}`, {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
         if (res.ok) {
@@ -6253,8 +6451,10 @@ export default function BookSlot() {
         }
       } catch (e) { /* ignore */ }
     };
-    fetchSuggestion();
-  }, []);
+    
+    const tId = setTimeout(fetchSuggestion, 400);
+    return () => clearTimeout(tId);
+  }, [commodityId, quantity, location]);
 
   const applySuggestion = () => {
     if (!suggestion) return;
@@ -6278,6 +6478,44 @@ export default function BookSlot() {
   }, [centreId]);
 
 
+  const [centreStats, setCentreStats] = useState(null);
+  
+  // Fetch Centre Stats when centreId changes
+  useEffect(() => {
+    if (!centreId) {
+      setCentreStats(null);
+      return;
+    }
+    const fetchStats = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      try {
+        const res = await fetch(`/api/centres/${centreId}/stats`, {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        });
+        if (res.ok) {
+          const stats = await res.json();
+          
+          // If we have location, let's calculate distance on frontend
+          const selectedCentre = centres.find(c => c.id === centreId);
+          if (location && selectedCentre?.latitude) {
+            const R = 6371;
+            const dLat = (selectedCentre.latitude - location.lat) * Math.PI/180;
+            const dLon = (selectedCentre.longitude - location.lng) * Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + 
+                      Math.cos(location.lat*Math.PI/180)*Math.cos(selectedCentre.latitude*Math.PI/180) * 
+                      Math.sin(dLon/2)*Math.sin(dLon/2);
+            stats.distanceKm = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 10) / 10;
+          }
+          
+          setCentreStats(stats);
+        }
+      } catch (e) {
+        console.error('Failed to load centre stats', e);
+      }
+    };
+    fetchStats();
+  }, [centreId, location, centres]);
 
   // Fetch slot availability for next 4 days when centre is selected
   useEffect(() => {
@@ -6411,27 +6649,55 @@ export default function BookSlot() {
           </Link>
         </div>
 
-        {/* Auto-suggestion banner */}
-        {suggestion && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-5 shadow-xs">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">💡</span>
-              <p className="text-sm font-bold text-emerald-900">{t('suggestedSlot')}</p>
+        {/* Location & Auto-suggestion banner */}
+        <div className="mb-5 flex flex-col gap-3">
+          <button
+            onClick={requestLocation}
+            disabled={locating}
+            className="self-start text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1 transition-colors bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 hover:bg-gray-50 text-gray-700 dark:text-neutral-300 shadow-sm"
+          >
+            {locating ? '📍 Locating...' : (location ? '📍 Location Active (Calculates Transport)' : '📍 Use My Location (Find Closest/Best Deals)')}
+          </button>
+
+          {suggestion && (
+            <div className={`border rounded-2xl p-4 shadow-xs ${suggestion.netBenefit > 0 ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20' : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20'}`}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-base">💡</span>
+                <p className={`text-sm font-bold ${suggestion.netBenefit > 0 ? 'text-amber-900 dark:text-amber-300' : 'text-emerald-900 dark:text-emerald-300'}`}>
+                  {suggestion.netBenefit > 0 ? 'Smart Financial Suggestion' : 'Least Crowded Recommendation'}
+                </p>
+              </div>
+              
+              <p className={`text-xs ${suggestion.netBenefit > 0 && suggestion.distanceKm !== null ? 'text-amber-800 dark:text-amber-400' : 'text-emerald-800 dark:text-emerald-400'}`}>
+                {suggestion.netBenefit > 0 && suggestion.distanceKm !== null
+                  ? <>Drive {suggestion.distanceKm}km to <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus per quintal.</>
+                  : suggestion.netBenefit > 0 
+                  ? <>Slot at <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus!</>
+                  : <>Slot at <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>.</>}
+              </p>
+
+              {suggestion.netBenefit > 0 && (
+                <div className="mt-2 bg-white/60 dark:bg-black/20 rounded-lg p-2 text-[11px] text-amber-900 dark:text-amber-200 font-medium">
+                  Estimated Net Profit Increase: <strong className="text-emerald-600 dark:text-emerald-400">₹{suggestion.netBenefit.toLocaleString()}</strong> 
+                  {suggestion.distanceKm !== null && <span className="text-amber-700/70 block mt-0.5 text-[9px]">(Includes -₹{suggestion.transportCost.toLocaleString()} est. transport cost)</span>}
+                </div>
+              )}
+
+              {!suggestion.netBenefit && suggestion.distanceKm && (
+                <p className="text-[11px] text-emerald-600 mt-1 font-medium">
+                  📍 {suggestion.distanceKm} km away • ⚡ {suggestion.remainingCapacity} slots remaining
+                </p>
+              )}
+
+              <button
+                onClick={applySuggestion}
+                className={`mt-2.5 text-xs text-white px-3.5 py-1.5 rounded-lg font-semibold shadow-xs transition ${suggestion.netBenefit > 0 ? 'bg-amber-600 hover:bg-amber-700' : 'bg-emerald-700 hover:bg-emerald-800'}`}
+              >
+                Apply Recommended Slot
+              </button>
             </div>
-            <p className="text-xs text-emerald-800">
-              Least crowded slot: <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>
-            </p>
-            <p className="text-[11px] text-emerald-600 mt-1 font-medium">
-              ⚡ {suggestion.remainingCapacity} of {suggestion.dailyCapacity} slots remaining
-            </p>
-            <button
-              onClick={applySuggestion}
-              className="mt-2.5 text-xs bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-lg font-semibold shadow-xs transition"
-            >
-              Apply Recommended Slot
-            </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Main Booking Wizard Card */}
         <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
@@ -6508,8 +6774,42 @@ export default function BookSlot() {
                       {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
                     </option>
                   ))}
-                                </select>
+                </select>
                 
+                {centreStats && (
+                  <div className="mt-3 bg-slate-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-xl p-3 animate-fadeIn">
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Mandi Insights</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-gray-400">👨‍🌾</span>
+                          <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">Trusted By</span>
+                        </div>
+                        <p className="text-sm font-bold text-gray-900 dark:text-neutral-100">{centreStats.farmersServed}+ Farmers</p>
+                      </div>
+                      
+                      <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-gray-400">⚖️</span>
+                          <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">QC Strictness</span>
+                        </div>
+                        <p className={`text-sm font-bold ${centreStats.rejectionRate > 15 ? 'text-red-600' : 'text-emerald-600'}`}>
+                          {centreStats.rejectionRate}% Rejection
+                        </p>
+                      </div>
+                      
+                      {centreStats.distanceKm && (
+                        <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700 col-span-2">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-gray-400">📍</span>
+                            <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">Distance from you</span>
+                          </div>
+                          <p className="text-sm font-bold text-gray-900 dark:text-neutral-100">{centreStats.distanceKm} km away</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 {selectedComm && (
                   <div className="mt-3 space-y-2 animate-fadeIn">
                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
@@ -7391,23 +7691,40 @@ export default function FarmerDashboard() {
             </div>
 
             {/* Lifetime Procurement Stats */}
-            <div className="grid grid-cols-3 gap-2 pt-3 text-center">
-              <div>
-                <p className="text-[11px] text-emerald-200 font-medium">Total DBT Earned</p>
-                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 text-center">
+              <div className="border-b sm:border-b-0 sm:border-r border-emerald-700/60 pb-2 sm:pb-0">
+                <p className="text-[10px] text-emerald-200 font-medium">DBT EARNED</p>
+                <p className="text-lg font-extrabold text-white mt-0.5">
                   ₹{totalEarnings.toLocaleString()}
                 </p>
               </div>
-              <div className="border-x border-emerald-700/60">
-                <p className="text-[11px] text-emerald-200 font-medium">Procured Qty</p>
-                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
+              <div className="border-b sm:border-b-0 sm:border-r border-emerald-700/60 pb-2 sm:pb-0">
+                <p className="text-[10px] text-emerald-200 font-medium">PROCURED QTY</p>
+                <p className="text-lg font-extrabold text-white mt-0.5">
                   {totalQuintals.toLocaleString()} <span className="text-xs font-normal">q</span>
                 </p>
               </div>
-              <div>
-                <p className="text-[11px] text-emerald-200 font-medium">Active Tokens</p>
-                <p className="text-lg sm:text-xl font-extrabold text-white mt-0.5">
-                  {activeTokens}
+              <div className="border-r border-emerald-700/60 pt-2 sm:pt-0">
+                <p className="text-[10px] text-emerald-200 font-medium">QUALITY SCORE</p>
+                <p className="text-lg font-extrabold text-white mt-0.5 flex justify-center items-center gap-1">
+                  {(() => {
+                    const completed = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status)).length;
+                    const accepted = bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length;
+                    const ratio = completed > 0 ? Math.round((accepted / completed) * 100) : 100;
+                    return `${ratio}% ${ratio >= 90 ? '🏆' : (ratio < 50 ? '⚠️' : '👍')}`;
+                  })()}
+                </p>
+              </div>
+              <div className="pt-2 sm:pt-0">
+                <p className="text-[10px] text-emerald-200 font-medium">TOP CROP</p>
+                <p className="text-sm font-extrabold text-white mt-1.5 truncate px-1">
+                  {(() => {
+                    const counts = bookings.reduce((acc, b) => {
+                      if (b.commodities?.name) acc[b.commodities.name] = (acc[b.commodities.name] || 0) + 1;
+                      return acc;
+                    }, {});
+                    return Object.keys(counts).length > 0 ? Object.keys(counts).sort((a,b) => counts[b] - counts[a])[0] : 'N/A';
+                  })()}
                 </p>
               </div>
             </div>
@@ -11180,6 +11497,70 @@ BEGIN
         'queue_position', v_queue_position,
         'estimated_wait_minutes', v_wait_minutes
     );
+END;
+$$;
+
+
+================================================================================
+File: supabase_fixes_v3.sql
+================================================================================
+
+-- PHASE 3: FIXES FOR GEOLOCATION & DYNAMIC PRICING
+-- Run this in the Supabase SQL Editor
+
+-- =============================================================
+-- 1. ADD GEOLOCATION COORDINATES TO CENTRES AND PROFILES
+-- =============================================================
+ALTER TABLE centres ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE centres ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8);
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8);
+
+-- Seed some dummy coordinates for the centres (around Maharashtra / Pune area)
+-- to ensure distance calculation works immediately in the UI.
+UPDATE centres SET latitude = 18.5204 + (random() * 0.5 - 0.25), longitude = 73.8567 + (random() * 0.5 - 0.25) WHERE latitude IS NULL;
+
+-- =============================================================
+-- 2. ADD LOCAL BONUS PRICING TO CENTRE COMMODITIES
+-- =============================================================
+-- This allows specific mandis to offer a bonus over the standard MSP
+ALTER TABLE centre_commodities ADD COLUMN IF NOT EXISTS local_bonus_per_quintal DECIMAL(10, 2) DEFAULT 0.00;
+
+-- Seed random bonuses (e.g. 50, 100, 150) for testing the Smart Suggestion UI
+UPDATE centre_commodities 
+SET local_bonus_per_quintal = (floor(random() * 4) * 50) 
+WHERE local_bonus_per_quintal = 0.00 OR local_bonus_per_quintal IS NULL;
+
+-- =============================================================
+-- 3. HAVERSINE DISTANCE POSTGRES FUNCTION (OPTIONAL FAST COMPUTE)
+-- =============================================================
+-- Creates a function to calculate distance in Kilometers
+CREATE OR REPLACE FUNCTION calculate_distance(lat1 float, lon1 float, lat2 float, lon2 float)
+RETURNS float
+LANGUAGE plpgsql IMMUTABLE
+AS $$
+DECLARE
+    radius float = 6371; -- Earth radius in kilometers
+    dlat float;
+    dlon float;
+    a float;
+    c float;
+BEGIN
+    IF lat1 IS NULL OR lon1 IS NULL OR lat2 IS NULL OR lon2 IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    dlat = radians(lat2 - lat1);
+    dlon = radians(lon2 - lon1);
+    
+    a = sin(dlat/2) * sin(dlat/2) +
+        cos(radians(lat1)) * cos(radians(lat2)) *
+        sin(dlon/2) * sin(dlon/2);
+        
+    c = 2 * atan2(sqrt(a), sqrt(1-a));
+    
+    RETURN radius * c;
 END;
 $$;
 

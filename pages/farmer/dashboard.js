@@ -41,7 +41,7 @@ export default function FarmerDashboard() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const queueRaw = window.localStorage.getItem('offline_bookings_queue');
+      const queueRaw = window.localStorage.getItem('offline_booking_queue');
       if (queueRaw) {
         try {
           const parsed = JSON.parse(queueRaw);
@@ -52,7 +52,7 @@ export default function FarmerDashboard() {
       }
       
       const handleStorageChange = () => {
-        const q = window.localStorage.getItem('offline_bookings_queue');
+        const q = window.localStorage.getItem('offline_booking_queue');
         setOfflineQueueCount(q ? JSON.parse(q).length : 0);
       };
       
