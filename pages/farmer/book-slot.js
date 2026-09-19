@@ -108,6 +108,44 @@ export default function BookSlot() {
   }, [centreId]);
 
 
+  const [centreStats, setCentreStats] = useState(null);
+  
+  // Fetch Centre Stats when centreId changes
+  useEffect(() => {
+    if (!centreId) {
+      setCentreStats(null);
+      return;
+    }
+    const fetchStats = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      try {
+        const res = await fetch(`/api/centres/${centreId}/stats`, {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        });
+        if (res.ok) {
+          const stats = await res.json();
+          
+          // If we have location, let's calculate distance on frontend
+          const selectedCentre = centres.find(c => c.id === centreId);
+          if (location && selectedCentre?.latitude) {
+            const R = 6371;
+            const dLat = (selectedCentre.latitude - location.lat) * Math.PI/180;
+            const dLon = (selectedCentre.longitude - location.lng) * Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + 
+                      Math.cos(location.lat*Math.PI/180)*Math.cos(selectedCentre.latitude*Math.PI/180) * 
+                      Math.sin(dLon/2)*Math.sin(dLon/2);
+            stats.distanceKm = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 10) / 10;
+          }
+          
+          setCentreStats(stats);
+        }
+      } catch (e) {
+        console.error('Failed to load centre stats', e);
+      }
+    };
+    fetchStats();
+  }, [centreId, location, centres]);
 
   // Fetch slot availability for next 4 days when centre is selected
   useEffect(() => {
@@ -364,8 +402,42 @@ export default function BookSlot() {
                       {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
                     </option>
                   ))}
-                                </select>
+                </select>
                 
+                {centreStats && (
+                  <div className="mt-3 bg-slate-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-xl p-3 animate-fadeIn">
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Mandi Insights</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-gray-400">👨‍🌾</span>
+                          <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">Trusted By</span>
+                        </div>
+                        <p className="text-sm font-bold text-gray-900 dark:text-neutral-100">{centreStats.farmersServed}+ Farmers</p>
+                      </div>
+                      
+                      <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-gray-400">⚖️</span>
+                          <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">QC Strictness</span>
+                        </div>
+                        <p className={`text-sm font-bold ${centreStats.rejectionRate > 15 ? 'text-red-600' : 'text-emerald-600'}`}>
+                          {centreStats.rejectionRate}% Rejection
+                        </p>
+                      </div>
+                      
+                      {centreStats.distanceKm && (
+                        <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700 col-span-2">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-gray-400">📍</span>
+                            <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">Distance from you</span>
+                          </div>
+                          <p className="text-sm font-bold text-gray-900 dark:text-neutral-100">{centreStats.distanceKm} km away</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 {selectedComm && (
                   <div className="mt-3 space-y-2 animate-fadeIn">
                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
