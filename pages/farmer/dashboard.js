@@ -35,8 +35,36 @@ export default function FarmerDashboard() {
   const alertedRef = useRef(false);
   const router = useRouter();
   const channelRef = useRef(null);
+  const [offlineQueueCount, setOfflineQueueCount] = useState(0);
   const { t, language, changeLanguage } = useLanguage();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const queueRaw = window.localStorage.getItem('offline_bookings_queue');
+      if (queueRaw) {
+        try {
+          const parsed = JSON.parse(queueRaw);
+          setOfflineQueueCount(parsed.length);
+        } catch (e) {
+          setOfflineQueueCount(0);
+        }
+      }
+      
+      const handleStorageChange = () => {
+        const q = window.localStorage.getItem('offline_bookings_queue');
+        setOfflineQueueCount(q ? JSON.parse(q).length : 0);
+      };
+      
+      window.addEventListener('storage', handleStorageChange);
+      // Trigger sync logic if online
+      window.addEventListener('online', handleStorageChange);
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('online', handleStorageChange);
+      };
+    }
+  }, []);
 
   // Sync offline queue when online
   const trySyncOffline = async () => {
@@ -685,9 +713,9 @@ export default function FarmerDashboard() {
           </div>
         )}
 
-        {!loading && (typeof window !== "undefined" && window.localStorage.getItem("offline_bookings_queue") ? JSON.parse(window.localStorage.getItem("offline_bookings_queue")).length : 0) > 0 && (
+        {!loading && offlineQueueCount > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 text-sm">
-            📡 {typeof window !== "undefined" && window.localStorage.getItem("offline_bookings_queue") ? JSON.parse(window.localStorage.getItem("offline_bookings_queue")).length : 0} booking(s) queued offline — will sync when you reconnect.
+            📡 {offlineQueueCount} booking(s) queued offline — will sync when you reconnect.
           </div>
         )}
 

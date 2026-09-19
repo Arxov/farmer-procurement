@@ -179,7 +179,7 @@ async function legacyBooking(
   sendNotification({
     bookingId: booking.id,
     message: `Your slot is booked for ${date} (${slotWindow}). You are position ${position ?? '?'} in the queue.`,
-  });
+  }).catch(err => console.error('Notification failed:', err));
 
   return res.status(200).json({ booking });
 }
