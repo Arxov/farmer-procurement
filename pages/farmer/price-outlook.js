@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
 import LanguageToggle from '../../components/LanguageToggle';
 import { useLanguage } from '../../lib/i18n';
 import { getCropConfig } from '../../lib/cropIcons';
 
 export default function PriceOutlook() {
+  const supabase = useSupabaseClient();
   const [commodities, setCommodities] = useState([]);
   const [selectedCrop, setSelectedCrop] = useState('');
   const [loading, setLoading] = useState(true);

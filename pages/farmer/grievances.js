@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
 import LanguageToggle from '../../components/LanguageToggle';
@@ -21,6 +21,7 @@ const STATUS_COLORS = {
 };
 
 export default function GrievancesPage() {
+  const supabase = useSupabaseClient();
   const [bookings, setBookings] = useState([]);
   const [grievances, setGrievances] = useState([]);
   const [bookingId, setBookingId] = useState('');

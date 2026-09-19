@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../lib/supabaseClient';
+import { useUser } from '@clerk/nextjs';
+import { useSupabaseClient } from '../lib/supabaseClient';
 import { useLanguage } from '../lib/i18n';
 
 // First-time profile setup or profile edit
@@ -13,20 +14,22 @@ export default function Register() {
   const [error, setError] = useState('');
   const router = useRouter();
   const { t } = useLanguage();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
+    if (!isLoaded) return;
+    if (!isSignedIn) {
+      router.push('/');
+      return;
+    }
+
     const loadProfile = async () => {
       try {
-        const { data: userData } = await supabase.auth.getUser();
-        if (!userData?.user) {
-          router.push('/');
-          return;
-        }
-
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', userData.user.id)
+          .eq('id', user.id)
           .maybeSingle();
 
         if (profile) {
@@ -44,15 +47,14 @@ export default function Register() {
     };
 
     loadProfile();
-  }, []);
+  }, [isLoaded, isSignedIn, user, router, supabase]);
 
   const submit = async () => {
     setLoading(true);
     setError('');
     
     try {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) { router.push('/'); return; }
+      if (!isLoaded || !isSignedIn) { router.push('/'); return; }
 
       const parsedLand = land ? parseFloat(land) : null;
       if (parsedLand !== null && (Number.isNaN(parsedLand) || parsedLand < 0)) {
@@ -65,15 +67,16 @@ export default function Register() {
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', userData.user.id)
+        .eq('id', user.id)
         .maybeSingle();
 
       const role = existingProfile?.role || 'farmer';
+      const phoneNumber = user.primaryPhoneNumber?.phoneNumber || user.primaryEmailAddress?.emailAddress || '';
 
       const { error: upsertError } = await supabase.from('profiles').upsert({
-        id: userData.user.id,
+        id: user.id,
         full_name: fullName,
-        phone: userData.user.phone,
+        phone: phoneNumber,
         village,
         land_holding_acres: parsedLand,
         role,

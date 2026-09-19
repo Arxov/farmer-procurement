@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../lib/supabaseClient';
+import { useSupabaseClient } from '../lib/supabaseClient';
 import { Commodity } from '../types/database';
 
 export const commoditiesQueryKey = ['commodities'] as const;
 
-export async function fetchCommodities(): Promise<Commodity[]> {
+export async function fetchCommodities(supabase: any): Promise<Commodity[]> {
   const { data, error } = await supabase
     .from('commodities')
     .select('*')
@@ -15,9 +15,10 @@ export async function fetchCommodities(): Promise<Commodity[]> {
 }
 
 export function useCommodities() {
+  const supabase = useSupabaseClient();
   return useQuery({
     queryKey: commoditiesQueryKey,
-    queryFn: fetchCommodities,
+    queryFn: () => fetchCommodities(supabase),
     staleTime: 1000 * 60 * 10, // 10 mins cache
   });
 }

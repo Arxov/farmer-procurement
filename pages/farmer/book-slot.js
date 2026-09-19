@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import { addToOfflineQueue } from '../../lib/offlineQueue';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
@@ -17,6 +17,7 @@ const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00'
 const EMPTY_ARRAY = [];
 
 export default function BookSlot() {
+  const supabase = useSupabaseClient();
   const { data = EMPTY_ARRAY } = useCentres();
   const centres = data;
   const { data: commoditiesData = EMPTY_ARRAY } = useCommodities();

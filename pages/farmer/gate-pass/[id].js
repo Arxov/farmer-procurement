@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../../lib/supabaseClient';
+import { useSupabaseClient } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/i18n';
 
 export default function GatePassPage() {
+  const supabase = useSupabaseClient();
   const [gatePass, setGatePass] = useState(null);
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);

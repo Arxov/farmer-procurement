@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 
 const STATUS_COLORS = {
@@ -12,6 +12,7 @@ const STATUS_COLORS = {
 };
 
 export default function AdminPayments() {
+  const supabase = useSupabaseClient();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');

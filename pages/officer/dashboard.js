@@ -1,7 +1,8 @@
+import { useClerk } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../../lib/supabaseClient';
+import { useSupabaseClient } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import { BookingSkeleton, EmptyState } from '../../components/Skeleton';
 import { useToast } from '../../components/Toast';
@@ -20,6 +21,8 @@ const NEXT_STATUS = {
 const todayStr = () => new Date().toISOString().split('T')[0];
 
 export default function OfficerDashboard() {
+  const clerk = useClerk();
+  const supabase = useSupabaseClient();
   const [authorized, setAuthorized] = useState(false);
   const [activeId, setActiveId] = useState(null);
   const [actionData, setActionData] = useState({});
@@ -101,7 +104,7 @@ export default function OfficerDashboard() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await clerk.signOut();
     router.push('/');
   };
 

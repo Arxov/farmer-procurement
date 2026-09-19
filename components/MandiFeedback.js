@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { useSupabaseClient } from '../lib/supabaseClient';
 
 export default function MandiFeedback({ bookingId, centreName = 'Mandi Centre', existingRating = null }) {
+  const supabase = useSupabaseClient();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedTags, setSelectedTags] = useState([]);

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../lib/supabaseClient';
+import { useSupabaseClient } from '../lib/supabaseClient';
 import { BookingStatus } from '../types/database';
 
 export const bookingsQueryKeys = {
@@ -8,7 +8,7 @@ export const bookingsQueryKeys = {
   officer: (date?: string) => ['bookings', 'officer', date] as const,
 };
 
-export async function fetchFarmerBookings(farmerId?: string) {
+export async function fetchFarmerBookings(supabase: any, farmerId?: string) {
   if (!farmerId) return [];
   const { data, error } = await supabase
     .from('bookings')
@@ -21,15 +21,16 @@ export async function fetchFarmerBookings(farmerId?: string) {
 }
 
 export function useFarmerBookings(farmerId?: string) {
+  const supabase = useSupabaseClient();
   return useQuery({
     queryKey: bookingsQueryKeys.farmer(farmerId),
-    queryFn: () => fetchFarmerBookings(farmerId),
+    queryFn: () => fetchFarmerBookings(supabase, farmerId),
     enabled: Boolean(farmerId),
     staleTime: 1000 * 30, // 30s
   });
 }
 
-export async function fetchOfficerBookings(date: string) {
+export async function fetchOfficerBookings(supabase: any, date: string) {
   if (!date) return [];
   const { data, error } = await supabase
     .from('bookings')
@@ -42,9 +43,10 @@ export async function fetchOfficerBookings(date: string) {
 }
 
 export function useOfficerBookings(date: string) {
+  const supabase = useSupabaseClient();
   return useQuery({
     queryKey: bookingsQueryKeys.officer(date),
-    queryFn: () => fetchOfficerBookings(date),
+    queryFn: () => fetchOfficerBookings(supabase, date),
     enabled: Boolean(date),
     staleTime: 1000 * 30, // 30s
   });
