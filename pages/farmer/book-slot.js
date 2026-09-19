@@ -298,16 +298,18 @@ export default function BookSlot() {
                 </p>
               </div>
               
-              <p className={`text-xs ${suggestion.netBenefit > 0 ? 'text-amber-800 dark:text-amber-400' : 'text-emerald-800 dark:text-emerald-400'}`}>
-                {suggestion.netBenefit > 0 
+              <p className={`text-xs ${suggestion.netBenefit > 0 && suggestion.distanceKm !== null ? 'text-amber-800 dark:text-amber-400' : 'text-emerald-800 dark:text-emerald-400'}`}>
+                {suggestion.netBenefit > 0 && suggestion.distanceKm !== null
                   ? <>Drive {suggestion.distanceKm}km to <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus per quintal.</>
+                  : suggestion.netBenefit > 0 
+                  ? <>Slot at <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus!</>
                   : <>Slot at <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>.</>}
               </p>
 
               {suggestion.netBenefit > 0 && (
                 <div className="mt-2 bg-white/60 dark:bg-black/20 rounded-lg p-2 text-[11px] text-amber-900 dark:text-amber-200 font-medium">
                   Estimated Net Profit Increase: <strong className="text-emerald-600 dark:text-emerald-400">₹{suggestion.netBenefit.toLocaleString()}</strong> 
-                  <span className="text-amber-700/70 block mt-0.5 text-[9px]">(Includes -₹{suggestion.transportCost.toLocaleString()} est. transport cost)</span>
+                  {suggestion.distanceKm !== null && <span className="text-amber-700/70 block mt-0.5 text-[9px]">(Includes -₹{suggestion.transportCost.toLocaleString()} est. transport cost)</span>}
                 </div>
               )}
 

@@ -9,10 +9,13 @@ async function handler(req, res) {
 
   try {
     // We only need farmer_id and status to compute stats
+    // Limit to recent 2000 to prevent Serverless Function OOM timeouts on large datasets
     const { data: bookings, error } = await supabaseAdmin
       .from('bookings')
       .select('farmer_id, status, actual_weight_quintals')
-      .eq('centre_id', id);
+      .eq('centre_id', id)
+      .order('created_at', { ascending: false })
+      .limit(2000);
 
     if (error) throw error;
 
