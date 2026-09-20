@@ -351,66 +351,43 @@ export default function LoginPage() {
                         </p>
                       </div>
 
-                      {/* Point 3: Tactile Identity Pass Selectors */}
+                      {/* Point 3: Apple HIG Segmented Control for Role Selection */}
                       <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="text-[10px] font-extrabold tracking-wider text-slate-700 uppercase flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-bold text-slate-700 select-none">
                             {language === 'mr'
-                              ? 'त्वरित चाचणी ओळखपत्र:'
+                              ? 'भूमिका निवडा (Demo Access):'
                               : language === 'hi'
-                              ? 'त्वरित परीक्षण पहचान पत्र:'
-                              : 'Select Identity Pass:'}
+                              ? 'भूमिका चुनें (Demo Access):'
+                              : 'Select Role (Demo Access):'}
                           </label>
-                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            Demo Access
-                          </span>
                         </div>
 
-                        {/* 3 Identity Pass Cards (Protected from translation corruption) */}
-                        <div className="grid grid-cols-3 gap-2 notranslate" translate="no">
+                        {/* Unified Segmented Control Track */}
+                        <div
+                          className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200/80 select-none notranslate"
+                          translate="no"
+                          role="tablist"
+                          aria-label="Role selection"
+                        >
                           {Object.entries(CREDENTIAL_MAP).map(([phone, acc]) => {
                             const isSelected = cleanId === phone;
-
-                            // Role-specific theme styling
-                            let activeClasses = '';
-                            let badgeBg = '';
-                            if (acc.role === 'farmer') {
-                              activeClasses = isSelected
-                                ? 'bg-gradient-to-b from-emerald-50 to-emerald-100/70 border-[#0c5c36] text-[#063f23] ring-2 ring-[#0c5c36]/25 shadow-xs'
-                                : 'bg-slate-50/90 hover:bg-emerald-50/40 border-slate-200 text-slate-700';
-                              badgeBg = isSelected ? 'bg-emerald-700 text-white' : 'bg-slate-200/80 text-slate-600';
-                            } else if (acc.role === 'officer') {
-                              activeClasses = isSelected
-                                ? 'bg-gradient-to-b from-blue-50 to-blue-100/70 border-blue-700 text-blue-950 ring-2 ring-blue-700/25 shadow-xs'
-                                : 'bg-slate-50/90 hover:bg-blue-50/40 border-slate-200 text-slate-700';
-                              badgeBg = isSelected ? 'bg-blue-700 text-white' : 'bg-slate-200/80 text-slate-600';
-                            } else {
-                              activeClasses = isSelected
-                                ? 'bg-gradient-to-b from-slate-100 to-slate-200/80 border-slate-700 text-slate-950 ring-2 ring-slate-700/25 shadow-xs'
-                                : 'bg-slate-50/90 hover:bg-slate-100 border-slate-200 text-slate-700';
-                              badgeBg = isSelected ? 'bg-slate-700 text-white' : 'bg-slate-200/80 text-slate-600';
-                            }
-
                             return (
                               <button
                                 key={phone}
                                 id={`preset-${acc.role}`}
                                 type="button"
+                                role="tab"
+                                aria-selected={isSelected}
                                 onClick={() => handleSelectPreset(phone)}
-                                className={`relative p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 cursor-pointer ${activeClasses}`}
+                                className={`flex-1 py-2 px-2 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition-all duration-200 cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-white text-emerald-900 border border-emerald-900/10 shadow-xs scale-[1.01]'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                                }`}
                               >
-                                <div className="flex items-center justify-between w-full mb-1">
-                                  <span className="text-lg select-none">{acc.icon}</span>
-                                  <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${badgeBg}`}>
-                                    {acc.badge}
-                                  </span>
-                                </div>
-                                <div>
-                                  <div className="text-xs font-extrabold leading-tight">
-                                    {language === 'mr' ? acc.marathiRole : acc.title}
-                                  </div>
-                                </div>
+                                <span className="text-sm">{acc.icon}</span>
+                                <span>{language === 'mr' ? acc.marathiRole : acc.title}</span>
                               </button>
                             );
                           })}
@@ -427,11 +404,11 @@ export default function LoginPage() {
                         </div>
                       )}
 
-                      {/* Point 4: Smart Phone / Aadhaar Input Form */}
+                      {/* Point 4: Ergonomic Text Input with Clear Button */}
                       <form data-purpose="otp-login-form" method="POST" onSubmit={handleGenerateOtp}>
                         <div className="flex items-center justify-between mb-1.5">
                           <label
-                            className="block text-[10px] font-extrabold tracking-wider text-slate-700 uppercase"
+                            className="block text-xs font-bold text-slate-700"
                             htmlFor="phone-or-aadhaar"
                           >
                             {language === 'mr'
@@ -440,25 +417,25 @@ export default function LoginPage() {
                               ? 'मोबाइल या आधार नंबर'
                               : 'Mobile or Aadhaar Number'}
                           </label>
-                          <span className="text-[10px] font-semibold text-slate-500">
+                          <span className="text-xs font-semibold text-slate-500">
                             {isAadhaar
-                              ? (language === 'mr' ? '🪪 १२-अंकी आधार' : '12-Digit Aadhaar')
-                              : (language === 'mr' ? '📱 १०-अंकी मोबाईल' : '10-Digit Mobile')}
+                              ? (language === 'mr' ? '१२-अंकी आधार' : '12-Digit Aadhaar')
+                              : (language === 'mr' ? '१०-अंकी मोबाईल' : '10-Digit Mobile')}
                           </span>
                         </div>
 
-                        <div className="relative flex items-center rounded-xl border border-slate-300 bg-white focus-within:border-[#0c5c36] focus-within:ring-3 focus-within:ring-emerald-600/20 transition-all duration-200">
-                          {/* Prefix Badge without 'IN' */}
-                          <div className="pl-3.5 pr-2.5 py-3 flex items-center gap-1 text-xs font-bold text-slate-700 border-r border-slate-200 select-none bg-slate-50/80 rounded-l-xl">
+                        <div className="h-[50px] relative flex items-center rounded-xl border border-slate-300/90 bg-white focus-within:border-[#0c5c36] focus-within:ring-3 focus-within:ring-emerald-600/20 transition-all duration-200 shadow-2xs">
+                          {/* Prefix */}
+                          <div className="pl-3.5 pr-2.5 flex items-center gap-1 text-sm font-bold text-slate-800 border-r border-slate-200 select-none">
                             {isAadhaar ? (
-                              <span className="text-emerald-800 font-extrabold">UID</span>
+                              <span className="text-[#0c5c36] font-extrabold text-xs tracking-wider">UID</span>
                             ) : (
-                              <span className="font-extrabold text-slate-800">+91</span>
+                              <span>+91</span>
                             )}
                           </div>
 
                           <input
-                            className="w-full py-3.5 px-3 text-sm font-bold text-slate-900 bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-400 tracking-wider"
+                            className="w-full h-full px-3 text-sm font-bold text-slate-900 bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-400 tracking-wider"
                             id="phone-or-aadhaar"
                             inputMode="numeric"
                             name="identifier"
@@ -470,47 +447,71 @@ export default function LoginPage() {
                             onChange={handleIdentifierChange}
                           />
 
-                          {/* Dynamic UIDAI / Verified Indicator */}
-                          <div className="pr-3.5 select-none">
-                            {isAadhaar ? (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200 uppercase">
-                                UIDAI
-                              </span>
-                            ) : cleanId.length === 10 ? (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase">
-                                Mobile
-                              </span>
-                            ) : null}
-                          </div>
+                          {/* Clear Button (Apple HIG Pattern) */}
+                          {identifier && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIdentifier('');
+                                setError('');
+                              }}
+                              className="mr-2.5 w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                              title="Clear input"
+                              aria-label="Clear input"
+                            >
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
 
-                        {/* Format Preview Helper (without SMS OTP text) */}
-                        <div className="mt-1.5 text-[11px] text-slate-500">
+                        {/* Format Preview Helper */}
+                        <div className="mt-1.5 text-xs text-slate-500 flex items-center justify-between">
                           <span>
                             {language === 'mr' ? 'स्वरूप' : 'Format'}: <strong className="text-slate-700 font-mono">{formattedDisplay}</strong>
                           </span>
+                          <span className="text-[11px] text-slate-400">
+                            {cleanId.length === 10 ? '✓ Verified Mobile' : cleanId.length === 12 ? '✓ UIDAI Format' : ''}
+                          </span>
                         </div>
 
-                        {/* Gradient CTA Button */}
+                        {/* Apple HIG Tactile Primary Button */}
                         <button
                           id="submit-generate-otp"
                           disabled={loading}
-                          className="w-full mt-4 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#074b2a] via-[#0c5c36] to-[#0f7646] hover:from-[#053d22] hover:via-[#094d2c] hover:to-[#0c5c36] active:scale-[0.99] text-white text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/20 transition-all duration-150 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed notranslate"
+                          className="w-full h-[50px] mt-4 px-6 rounded-xl bg-[#0c5c36] hover:bg-[#08482a] active:scale-[0.985] text-white text-[15px] font-bold tracking-wide flex items-center justify-center gap-2 shadow-md shadow-emerald-950/20 transition-all duration-150 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed notranslate"
                           translate="no"
                           type="submit"
                         >
-                          <span className="text-sm font-bold">
-                            {loading
-                              ? (language === 'mr' ? 'ओटीपी पाठवत आहे...' : language === 'hi' ? 'ओटीपी भेजा जा रहा है...' : 'Sending OTP...')
-                              : (language === 'mr' ? 'ओटीपी मिळवा' : language === 'hi' ? 'ओटीपी प्राप्त करें' : 'Get Verification OTP')}
-                          </span>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
-                            <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          {loading ? (
+                            <>
+                              <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                              <span>
+                                {language === 'mr' ? 'ओटीपी पाठवत आहे...' : language === 'hi' ? 'ओटीपी भेजा जा रहा है...' : 'Sending OTP...'}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span>
+                                {language === 'mr' ? 'ओटीपी मिळवा' : language === 'hi' ? 'ओटीपी प्राप्त करें' : 'Get Verification OTP'}
+                              </span>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
+                                <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </>
+                          )}
                         </button>
 
-                        <p className="text-center text-[11px] text-slate-500 mt-2 font-medium">
-                          नोंदणीकृत क्रमांकावर ६-अंकी सुरक्षित OTP पाठवला जाईल
+                        <p className="text-center text-xs text-slate-500 mt-2.5 font-medium">
+                          {language === 'mr'
+                            ? 'नोंदणीकृत क्रमांकावर ६-अंकी सुरक्षित OTP पाठवला जाईल'
+                            : language === 'hi'
+                            ? 'पंजीकृत नंबर पर ६-अंकीय सुरक्षित OTP भेजा जाएगा'
+                            : 'A 6-digit secure OTP will be sent to your registered number'}
                         </p>
                       </form>
                     </>
@@ -561,12 +562,16 @@ export default function LoginPage() {
 
                       {/* Step 2 Form */}
                       <form onSubmit={handleVerifyOtp}>
-                        <label className="block text-[10px] font-extrabold tracking-wider text-slate-700 uppercase mb-2">
-                          ६-अंकी पडताळणी कोड / 6-Digit OTP Code
+                        <label className="block text-xs font-bold text-slate-700 mb-2 select-none">
+                          {language === 'mr'
+                            ? '६-अंकी पडताळणी कोड'
+                            : language === 'hi'
+                            ? '६-अंकीय सत्यापन कोड'
+                            : '6-Digit OTP Code'}
                         </label>
-                        <div className="relative flex items-center rounded-xl border-2 border-slate-300 bg-white focus-within:border-[#0c5c36] focus-within:ring-3 focus-within:ring-emerald-600/20 transition-all duration-200">
+                        <div className="h-[52px] relative flex items-center rounded-xl border border-slate-300/90 bg-white focus-within:border-[#0c5c36] focus-within:ring-3 focus-within:ring-emerald-600/20 transition-all duration-200 shadow-2xs">
                           <input
-                            className="w-full py-3.5 px-4 text-center text-xl font-black text-slate-900 tracking-[0.5em] bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-300 font-mono"
+                            className="w-full h-full text-center text-xl font-black text-slate-900 tracking-[0.5em] bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-300 font-mono"
                             id="otp-input"
                             inputMode="numeric"
                             maxLength={6}
@@ -582,16 +587,30 @@ export default function LoginPage() {
                         <button
                           id="submit-verify-otp"
                           disabled={loading}
-                          className="w-full mt-4 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#074b2a] via-[#0c5c36] to-[#0f7646] hover:from-[#053d22] hover:via-[#094d2c] hover:to-[#0c5c36] text-white text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/20 transition duration-150 transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed notranslate"
+                          className="w-full h-[50px] mt-4 px-6 rounded-xl bg-[#0c5c36] hover:bg-[#08482a] active:scale-[0.985] text-white text-[15px] font-bold tracking-wide flex items-center justify-center gap-2 shadow-md shadow-emerald-950/20 transition-all duration-150 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed notranslate"
                           translate="no"
                           type="submit"
                         >
-                          <span className="marathi-font font-bold">
-                            {loading ? 'पडताळणी चालू आहे... / Verifying...' : 'प्रवेश करा • Verify & Enter Mandi'}
-                          </span>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
-                            <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          {loading ? (
+                            <>
+                              <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                              <span>
+                                {language === 'mr' ? 'पडताळणी चालू आहे...' : language === 'hi' ? 'सत्यापन हो रहा है...' : 'Verifying...'}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span>
+                                {language === 'mr' ? 'प्रवेश करा • Verify & Enter Mandi' : language === 'hi' ? 'सत्यापित करें • Verify & Enter' : 'Verify & Enter Mandi'}
+                              </span>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
+                                <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </>
+                          )}
                         </button>
                       </form>
                     </>
@@ -638,47 +657,36 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Point 6: Polished Mandi Trust & Stats Highlights Strip */}
-            <div className="w-full max-w-[480px] mx-auto grid grid-cols-3 gap-2 text-center select-none mt-3 relative z-10" data-purpose="mandi-trust-strip">
+            {/* Point 6: Apple HIG Unified Trust & Stats Dock */}
+            <div
+              className="w-full max-w-[480px] mx-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-xl py-2.5 px-3 shadow-2xs mt-3 flex items-center justify-between text-center select-none notranslate relative z-10"
+              translate="no"
+              data-purpose="mandi-trust-strip"
+            >
               {/* Stat 1 */}
-              <div className="bg-white/85 backdrop-blur-md border border-emerald-900/10 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-black text-[#075330] tracking-tight">३०५+ APMC</span>
-                </div>
-                <div className="text-[10px] text-slate-600 font-semibold tracking-tight leading-tight marathi-font">
-                  सक्रिय बाजार समित्या
-                </div>
-                <div className="text-[9px] text-slate-400 font-medium leading-none">
-                  Live Mandis
+              <div className="flex-1 flex items-center justify-center gap-2 border-r border-slate-200/80 pr-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <div className="text-left">
+                  <div className="text-xs font-extrabold text-slate-800 leading-tight">३०५+ APMCs</div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">Live Mandis</div>
                 </div>
               </div>
 
               {/* Stat 2 */}
-              <div className="bg-white/85 backdrop-blur-md border border-emerald-900/10 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-center gap-1 mb-0.5">
-                  <span className="text-xs">🛡️</span>
-                  <span className="text-xs font-black text-[#075330] tracking-tight">१००% MSP</span>
-                </div>
-                <div className="text-[10px] text-slate-600 font-semibold tracking-tight leading-tight marathi-font">
-                  थेट हमीभाव खरेदी
-                </div>
-                <div className="text-[9px] text-slate-400 font-medium leading-none">
-                  Direct DBT Payout
+              <div className="flex-1 flex items-center justify-center gap-1.5 border-r border-slate-200/80 px-2">
+                <span className="text-xs">🛡️</span>
+                <div className="text-left">
+                  <div className="text-xs font-extrabold text-slate-800 leading-tight">१००% MSP</div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">Direct DBT</div>
                 </div>
               </div>
 
               {/* Stat 3 */}
-              <div className="bg-white/85 backdrop-blur-md border border-emerald-900/10 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-center gap-1 mb-0.5">
-                  <span className="text-xs">📞</span>
-                  <span className="text-xs font-black text-[#075330] tracking-tight">२४×७ मदत</span>
-                </div>
-                <div className="text-[10px] text-slate-600 font-semibold tracking-tight leading-tight marathi-font">
-                  टोल-फ्री सहाय्यता
-                </div>
-                <div className="text-[9px] text-slate-400 font-medium leading-none">
-                  Farmer Support
+              <div className="flex-1 flex items-center justify-center gap-1.5 pl-2">
+                <span className="text-xs">📞</span>
+                <div className="text-left">
+                  <div className="text-xs font-extrabold text-slate-800 leading-tight">२४×७ Support</div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">Toll-Free</div>
                 </div>
               </div>
             </div>
