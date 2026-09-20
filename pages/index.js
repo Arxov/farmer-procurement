@@ -43,6 +43,7 @@ const CREDENTIAL_MAP = {
     title: 'Farmer',
     badge: 'Farmer',
     marathiRole: 'शेतकरी',
+    hindiRole: 'किसान',
     themeColor: 'emerald',
   },
   '9422088990': {
@@ -52,6 +53,7 @@ const CREDENTIAL_MAP = {
     title: 'Officer',
     badge: 'Officer',
     marathiRole: 'कृषी अधिकारी',
+    hindiRole: 'कृषि अधिकारी',
     themeColor: 'blue',
   },
   '0202555123': {
@@ -61,6 +63,7 @@ const CREDENTIAL_MAP = {
     title: 'Administrator',
     badge: 'Admin',
     marathiRole: 'प्रशासक',
+    hindiRole: 'प्रशासक',
     themeColor: 'slate',
   },
 };
@@ -431,7 +434,7 @@ export default function LoginPage() {
                                   <span className={`transition-all duration-150 ${isSelected ? 'text-emerald-700 scale-105' : 'text-slate-400'}`}>
                                     {renderRoleIcon(acc.role, isSelected)}
                                   </span>
-                                  <span>{language === 'mr' ? acc.marathiRole : acc.title}</span>
+                                  <span>{language === 'mr' ? acc.marathiRole : language === 'hi' ? acc.hindiRole : acc.title}</span>
                                 </button>
                               );
                             })}
@@ -463,8 +466,8 @@ export default function LoginPage() {
                                 </label>
                                 <span className="text-xs font-semibold text-slate-500">
                                   {isAadhaar
-                                    ? (language === 'mr' ? '१२-अंकी आधार' : '12-Digit Aadhaar')
-                                    : (language === 'mr' ? '१०-अंकी मोबाईल' : '10-Digit Mobile')}
+                                    ? (language === 'mr' ? '१२-अंकी आधार' : language === 'hi' ? '१२-अंकीय आधार' : '12-Digit Aadhaar')
+                                    : (language === 'mr' ? '१०-अंकी मोबाईल' : language === 'hi' ? '१०-अंकीय मोबाइल' : '10-Digit Mobile')}
                                 </span>
                               </div>
 
@@ -500,8 +503,8 @@ export default function LoginPage() {
                                       setError('');
                                     }}
                                     className="mr-2.5 w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                                    title="Clear input"
-                                    aria-label="Clear input"
+                                    title={language === 'mr' ? 'हटवा' : language === 'hi' ? 'साफ़ करें' : 'Clear input'}
+                                    aria-label={language === 'mr' ? 'हटवा' : language === 'hi' ? 'साफ़ करें' : 'Clear input'}
                                   >
                                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -513,10 +516,14 @@ export default function LoginPage() {
                               {/* Format Preview Helper */}
                               <div className="mt-1.5 text-xs text-slate-500 flex items-center justify-between">
                                 <span>
-                                  {language === 'mr' ? 'स्वरूप' : 'Format'}: <strong className="text-slate-700 font-mono">{formattedDisplay}</strong>
+                                  {language === 'mr' ? 'स्वरूप' : language === 'hi' ? 'प्रारूप' : 'Format'}: <strong className="text-slate-700 font-mono">{formattedDisplay}</strong>
                                 </span>
                                 <span className="text-[11px] text-slate-400">
-                                  {cleanId.length === 10 ? '✓ Verified Mobile' : cleanId.length === 12 ? '✓ UIDAI Format' : ''}
+                                  {cleanId.length === 10
+                                    ? (language === 'mr' ? '✓ वैध मोबाईल' : language === 'hi' ? '✓ मान्य मोबाइल' : '✓ Verified Mobile')
+                                    : cleanId.length === 12
+                                    ? (language === 'mr' ? '✓ UIDAI आधार' : language === 'hi' ? '✓ UIDAI आधार' : '✓ UIDAI Format')
+                                    : ''}
                                 </span>
                               </div>
 
@@ -570,22 +577,32 @@ export default function LoginPage() {
                             {/* Step 2: OTP Verification */}
                             <div className="flex items-center justify-between mb-2">
                               <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 uppercase tracking-wide">
-                                Step 2 of 2 • पडताळणी
+                                {language === 'mr'
+                                  ? 'चरण २ पैकी २ • पडताळणी'
+                                  : language === 'hi'
+                                  ? 'चरण २ / २ • सत्यापन'
+                                  : 'Step 2 of 2 • Verification'}
                               </span>
                               <button
+                                id="btn-back-to-step1"
                                 type="button"
                                 onClick={() => setStep(1)}
                                 className="text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:underline cursor-pointer flex items-center gap-1"
                               >
-                                &larr; <span>Change Number / क्रमांक बदला</span>
+                                &larr; <span>{language === 'mr' ? 'क्रमांक बदला' : language === 'hi' ? 'नंबर बदलें' : 'Change Number'}</span>
                               </button>
                             </div>
 
                             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug marathi-font">
-                              सत्यापन कोड प्रविष्ट करा
+                              {language === 'mr'
+                                ? 'सत्यापन कोड प्रविष्ट करा'
+                                : language === 'hi'
+                                ? 'सत्यापन कोड दर्ज करें'
+                                : 'Enter Verification Code'}
                             </h2>
                             <p className="text-xs text-slate-500 mt-1 mb-3 leading-relaxed">
-                              OTP sent to <span className="font-bold text-slate-800">+91 {identifier}</span>
+                              {language === 'mr' ? 'येथे OTP पाठवला:' : language === 'hi' ? 'यहाँ OTP भेजा गया:' : 'OTP sent to'}{' '}
+                              <span className="font-bold text-slate-800">+91 {identifier}</span>
                             </p>
 
                             {/* Demo OTP Helper with clean SVG */}
@@ -595,7 +612,7 @@ export default function LoginPage() {
                             >
                               <div className="flex items-center gap-1.5">
                                 <span className="text-amber-800 font-medium">
-                                  {language === 'mr' ? 'चाचणी OTP कोड:' : 'Demo OTP:'}
+                                  {language === 'mr' ? 'चाचणी OTP कोड:' : language === 'hi' ? 'डेमो OTP कोड:' : 'Demo OTP:'}
                                 </span>
                                 <strong className="font-mono text-amber-950 font-black tracking-wider bg-amber-100/90 px-2 py-0.5 rounded border border-amber-200">
                                   123456
@@ -611,7 +628,7 @@ export default function LoginPage() {
                                 <svg className="w-3 h-3 text-amber-800" viewBox="0 0 24 24" fill="currentColor">
                                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                                 </svg>
-                                <span>Autofill OTP</span>
+                                <span>{language === 'mr' ? 'OTP भरा' : language === 'hi' ? 'OTP भरें' : 'Autofill OTP'}</span>
                               </button>
                             </div>
 
@@ -723,14 +740,14 @@ export default function LoginPage() {
                           fillRule="evenodd"
                         />
                       </svg>
-                      <span>२५६-बिट सुरक्षित डेटा (AES)</span>
+                      <span>{language === 'mr' ? '२५६-बिट सुरक्षित डेटा (AES)' : language === 'hi' ? '२५६-बिट सुरक्षित डेटा (AES)' : '256-Bit Encrypted Data (AES)'}</span>
                     </div>
                     <div className="h-3 w-[1px] bg-slate-200" />
                     <div className="flex items-center gap-1.5">
                       <svg className="w-3.5 h-3.5 text-emerald-700" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
                       </svg>
-                      <span>UIDAI ई-केवायसी सुरक्षित</span>
+                      <span>{language === 'mr' ? 'UIDAI ई-केवायसी सुरक्षित' : language === 'hi' ? 'UIDAI ई-केवाईसी सुरक्षित' : 'UIDAI e-KYC Secured'}</span>
                     </div>
                   </div>
 
@@ -740,14 +757,14 @@ export default function LoginPage() {
                       href="/farmer/guidelines"
                       className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
                     >
-                      मंडी मार्गदर्शक तत्त्वे &rarr;
+                      {language === 'mr' ? 'मंडी मार्गदर्शक तत्त्वे' : language === 'hi' ? 'मंडी दिशानिर्देश' : 'Mandi Guidelines'} &rarr;
                     </Link>
                     <span className="text-slate-300">•</span>
                     <Link
                       href="/demo/ivr"
                       className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
                     >
-                      IVR व्हॉइस डेमो &rarr;
+                      {language === 'mr' ? 'IVR व्हॉइस डेमो' : language === 'hi' ? 'IVR वॉइस डेमो' : 'IVR Voice Demo'} &rarr;
                     </Link>
                   </div>
                 </div>
@@ -767,8 +784,12 @@ export default function LoginPage() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                 </span>
                 <div className="text-left">
-                  <div className="text-xs font-extrabold text-slate-800 leading-tight">३०५+ APMCs</div>
-                  <div className="text-[11px] text-slate-500 font-medium leading-tight">Live Mandis</div>
+                  <div className="text-xs font-extrabold text-slate-800 leading-tight">
+                    {language === 'mr' ? '३०५+ APMCs' : language === 'hi' ? '३०५+ APMCs' : '305+ APMCs'}
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
+                    {language === 'mr' ? 'थेट मंडई' : language === 'hi' ? 'सक्रिय मंडियां' : 'Live Mandis'}
+                  </div>
                 </div>
               </div>
 
@@ -781,8 +802,12 @@ export default function LoginPage() {
                   </svg>
                 </span>
                 <div className="text-left">
-                  <div className="text-xs font-extrabold text-slate-800 leading-tight">१००% MSP</div>
-                  <div className="text-[11px] text-slate-500 font-medium leading-tight">Direct DBT</div>
+                  <div className="text-xs font-extrabold text-slate-800 leading-tight">
+                    {language === 'mr' ? '१००% MSP' : language === 'hi' ? '१००% MSP' : '100% MSP'}
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
+                    {language === 'mr' ? 'थेट बँक जमा' : language === 'hi' ? 'सीधा DBT भुगतान' : 'Direct DBT'}
+                  </div>
                 </div>
               </div>
 
@@ -794,8 +819,12 @@ export default function LoginPage() {
                   </svg>
                 </span>
                 <div className="text-left">
-                  <div className="text-xs font-extrabold text-slate-800 leading-tight">२४×७ Support</div>
-                  <div className="text-[11px] text-slate-500 font-medium leading-tight">Toll-Free</div>
+                  <div className="text-xs font-extrabold text-slate-800 leading-tight">
+                    {language === 'mr' ? '२४×७ Support' : language === 'hi' ? '२४×७ सहायता' : '24×7 Support'}
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
+                    {language === 'mr' ? 'टोल-फ्री' : language === 'hi' ? 'टोल-फ्री' : 'Toll-Free'}
+                  </div>
                 </div>
               </div>
             </div>
