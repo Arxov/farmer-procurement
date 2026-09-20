@@ -186,11 +186,11 @@ export default function LoginPage() {
             className="lg:w-[55%] w-full relative flex flex-col justify-between overflow-hidden bg-[#074728]"
             data-purpose="hero-marketing-panel"
           >
-            <div className="w-full h-full min-h-[420px] lg:min-h-screen flex items-center justify-center relative">
+            <div className="w-full h-full min-h-[420px] lg:min-h-screen flex items-center justify-center relative bg-[#074728]">
               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFT8e1eafyS0kkD_i9b-hbmXjGhUdvfc0UjOsak5-FMGxfFGmcK4cexeFGWurUcXjV_uT9hjMbtMgkBwnqOK62Ir5yVwleuCE050gX1fFZxEmV1GnJPPD0OtfTwBkDUAJxfPwKPl20HA9rl5Jtl_2ycvrOz8PvZhF1deWpbyXVZqHUrWl-Bb9Dwh5JPXtDfSuzxQyFcJ2SO95zNMBvg6YI5894znFIxxqdyS5tSf2LHO1JvixE7qZEFkdfUVyux55M"
+                src="/images/hero-farmer.webp"
                 alt="शेतकऱ्यांसाठी डिजिटल बाजारपेठ - Kisan Setu"
-                className="w-full h-full object-cover object-center block"
+                className="w-full h-full object-cover object-center block select-none"
               />
             </div>
           </section>
@@ -218,7 +218,7 @@ export default function LoginPage() {
             <header className="flex items-center justify-between w-full pt-1 pb-3 z-20 gap-3" data-purpose="top-header">
               <div className="flex items-center gap-2 text-xs font-semibold text-emerald-900 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-emerald-900/10 shadow-2xs select-none">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] text-emerald-800 font-bold tracking-tight">Digital Mandi Portal</span>
+                <span className="text-[11px] text-emerald-800 font-bold tracking-tight notranslate" translate="no">Digital Mandi Portal</span>
               </div>
               <LanguageToggle />
             </header>
@@ -279,10 +279,12 @@ export default function LoginPage() {
                     <span className="block text-xs sm:text-[13px] font-semibold text-slate-700 leading-tight">for a Better</span>
                     <span className="block text-xs font-bold text-[#075330] leading-tight">Tomorrow</span>
                   </div>
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-100/80 border border-emerald-200/80 flex items-center justify-center shadow-xs">
-                    <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-emerald-700 -rotate-12" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17 3.5c-4.5 0-8.5 3-10 7.5-.5 1.5-.7 3.2-.7 5 0 .7.6 1.3 1.3 3.5 0 7-1.5 9.4-4 2.5-2.5 3.5-6 3.5-9.3 0-.3-.2-.5-.5-.5z" />
-                    </svg>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 border border-emerald-300/80 flex items-center justify-center shadow-xs p-1 select-none">
+                    <img
+                      src="/images/agriculture-leaf.webp"
+                      alt="Agriculture for a Better Tomorrow"
+                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-200"
+                    />
                   </div>
                 </div>
               </div>

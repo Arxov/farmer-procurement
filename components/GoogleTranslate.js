@@ -49,12 +49,43 @@ const GoogleTranslate = () => {
       <div id="google_translate_element" style={{ display: 'none' }}></div>
       <style jsx global>{`
         /* Hide the ugly Google Translate top banner */
-        .skiptranslate > iframe.skiptranslate {
+        .skiptranslate > iframe.skiptranslate,
+        iframe.goog-te-banner-frame {
           display: none !important;
           visibility: hidden !important;
         }
         body {
           top: 0px !important;
+        }
+
+        /* Completely remove Google Translate tooltip, balloon, and "Rate this translation" review popup */
+        #goog-gt-tt,
+        #goog-gt-vt,
+        .goog-te-balloon-frame,
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+        .VIpgJd-ZVi9od-vH1Gmf,
+        .VIpgJd-yAWdn-mAdDbd,
+        div[class*="VIpgJd-ZVi9od"],
+        div[id*="goog-gt-"],
+        div[class*="goog-te-balloon"] {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+          height: 0 !important;
+          width: 0 !important;
+          position: absolute !important;
+          left: -9999px !important;
+          top: -9999px !important;
+          z-index: -9999 !important;
+        }
+
+        /* Remove ugly hover highlight background on translated text */
+        .goog-text-highlight {
+          background: transparent !important;
+          box-shadow: none !important;
         }
       `}</style>
     </>
