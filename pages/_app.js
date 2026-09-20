@@ -42,13 +42,13 @@ export default function App({ Component, pageProps }) {
           </Head>
           <ThemeToggle />
           <OfflineBanner />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.main
               key={router.asPath}
-              initial={{ opacity: 0, y: 6 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
             >
               <ErrorBoundary>
                 <Component {...pageProps} />

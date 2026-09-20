@@ -13,5 +13,9 @@
 # claude
 .claude/
 
+# codex & test coverage
+.codex/
+coverage/
+
 # vercel
 .vercel
