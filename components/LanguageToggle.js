@@ -10,7 +10,7 @@ export default function LanguageToggle() {
   ];
 
   return (
-    <div className="inline-flex items-center bg-white/95 dark:bg-neutral-800/95 backdrop-blur-md p-1 rounded-full border border-emerald-900/10 dark:border-white/10 shadow-xs hover:shadow-md transition-all duration-200 select-none">
+    <div className="inline-flex items-center bg-white/95 dark:bg-neutral-800/95 backdrop-blur-md p-1 rounded-full border border-emerald-900/10 dark:border-white/10 shadow-xs hover:shadow-md transition-all duration-200 select-none notranslate" translate="no">
       <div className="pl-2 pr-1 flex items-center text-emerald-700 dark:text-emerald-400">
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="9" />

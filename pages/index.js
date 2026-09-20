@@ -12,25 +12,31 @@ const CREDENTIAL_MAP = {
     email: 'farmer@demo.com',
     role: 'farmer',
     name: 'Ramesh Patil',
-    title: 'Farmer Portal',
+    title: 'Farmer',
     badge: 'Farmer',
+    marathiRole: 'शेतकरी',
     icon: '🌾',
+    themeColor: 'emerald',
   },
   '9422088990': {
     email: 'officer@demo.com',
     role: 'officer',
     name: 'APMC Officer Desk',
-    title: 'APMC Mandi Desk',
+    title: 'Officer',
     badge: 'Officer',
+    marathiRole: 'कृषी अधिकारी',
     icon: '🏢',
+    themeColor: 'blue',
   },
   '0202555123': {
     email: 'admin@demo.com',
     role: 'admin',
     name: 'National Admin HQ',
-    title: 'National Command Center',
+    title: 'Administrator',
     badge: 'Admin',
+    marathiRole: 'प्रशासक',
     icon: '🏛️',
+    themeColor: 'slate',
   },
 };
 
@@ -161,6 +167,17 @@ export default function LoginPage() {
     setUserProfile(null);
   };
 
+  // Formatting helpers for phone & Aadhaar
+  const cleanId = identifier.replace(/\D/g, '');
+  const isAadhaar = cleanId.length === 12;
+  const activePreset = CREDENTIAL_MAP[cleanId] || CREDENTIAL_MAP['9822100011'];
+
+  const formattedDisplay = isAadhaar
+    ? `${cleanId.slice(0, 4)} ${cleanId.slice(4, 8)} ${cleanId.slice(8, 12)}`
+    : cleanId.length === 10
+    ? `${cleanId.slice(0, 5)} ${cleanId.slice(5, 10)}`
+    : cleanId;
+
   return (
     <>
       <Head>
@@ -171,22 +188,23 @@ export default function LoginPage() {
             font-family: 'Mukta', sans-serif;
           }
           .custom-shadow {
-            box-shadow: 0 16px 36px -6px rgba(4, 46, 26, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 40px -12px rgba(4, 46, 26, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.05);
           }
         `}</style>
       </Head>
 
       <div className="min-h-screen w-full bg-[#f0f5f2] flex flex-col overflow-x-hidden text-slate-800 antialiased selection:bg-emerald-600 selection:text-white font-['Plus_Jakarta_Sans',sans-serif]">
-        {/* Main outer layout container simulating 16:10 / desktop aspect ratio matching reference */}
+        {/* Main outer layout container */}
         <main className="w-full min-h-screen bg-white overflow-hidden flex flex-col lg:flex-row relative flex-1">
 
           {/* BEGIN: LeftHeroSection */}
-          {/* Left 58% Area: High visual agricultural imagery with typography & highlight badges */}
+          {/* Left 52% Area: High-resolution official agricultural master artwork */}
           <section
-            className="lg:w-[55%] w-full relative flex flex-col justify-between overflow-hidden bg-[#074728]"
+            className="lg:w-[50%] xl:w-[52%] w-full relative flex flex-col justify-between overflow-hidden bg-[#074728]"
             data-purpose="hero-marketing-panel"
           >
-            <div className="w-full h-full min-h-[420px] lg:min-h-screen flex items-center justify-center relative bg-[#074728]">
+            {/* Background Master Art */}
+            <div className="w-full h-full min-h-[440px] lg:min-h-screen flex items-center justify-center relative bg-[#074728]">
               <img
                 src="/images/hero-farmer.webp"
                 alt="शेतकऱ्यांसाठी डिजिटल बाजारपेठ - Kisan Setu"
@@ -197,28 +215,23 @@ export default function LoginPage() {
           {/* END: LeftHeroSection */}
 
           {/* BEGIN: RightAuthSection */}
-          {/* Right 42% Area: Government emblems, Authentication Card, Security Badges & Footer Navigation */}
+          {/* Right 48% Area: Government Emblems, Tactile Identity Passes, Smart Form, Trust Strip */}
           <section
-            className="lg:w-[45%] w-full bg-gradient-to-br from-[#fbfdfc] via-[#f1f8f4] to-[#e7f4ed] flex flex-col justify-between p-6 sm:p-8 lg:p-10 xl:p-12 relative overflow-y-auto"
+            className="lg:w-[50%] xl:w-[48%] w-full bg-gradient-to-br from-[#fbfdfc] via-[#f1f8f4] to-[#e7f4ed] flex flex-col justify-between p-4 sm:p-5 lg:p-6 xl:p-8 relative overflow-y-auto"
             data-purpose="auth-interaction-panel"
           >
-            {/* Ambient Background Glows & Organic Accents */}
+            {/* Ambient Background Glows */}
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-200/25 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-200/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-100/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 right-0 pointer-events-none opacity-[0.07] transform translate-x-8 translate-y-8">
-              <svg className="w-80 h-80 text-emerald-800" fill="currentColor" viewBox="0 0 200 200">
-                <path d="M40 180 C40 180 60 120 120 90 C180 60 200 10 200 10 C200 10 180 70 120 100 C60 130 40 180 40 180 Z" />
-                <path d="M120 90 C90 70 85 40 85 40 C85 40 105 60 130 80 Z" />
-                <path d="M140 60 C120 45 118 20 118 20 C118 20 135 35 150 50 Z" />
-              </svg>
-            </div>
 
             {/* Top Bar: Official Mandi Badge & Language Switcher */}
-            <header className="flex items-center justify-between w-full pt-1 pb-3 z-20 gap-3" data-purpose="top-header">
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-900 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-emerald-900/10 shadow-2xs select-none">
+            <header className="flex items-center justify-between w-full pt-0 pb-1.5 z-20 gap-3" data-purpose="top-header">
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-900 bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-emerald-900/10 shadow-2xs select-none">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] text-emerald-800 font-bold tracking-tight notranslate" translate="no">Digital Mandi Portal</span>
+                <span className="text-[11px] text-emerald-800 font-bold tracking-tight notranslate" translate="no">
+                  Digital Mandi Portal • अधिकृत पोर्टल
+                </span>
               </div>
               <LanguageToggle />
             </header>
@@ -250,16 +263,21 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Center Authentication Card */}
-            <div className="w-full max-w-[480px] mx-auto my-auto relative z-10 py-2" data-purpose="login-card-container">
-              {/* Government of Maharashtra & Agriculture Header - Positioned Centered Above Login Box */}
-              <div className="flex items-center justify-center gap-4 sm:gap-6 mb-4 sm:mb-5 select-none" data-purpose="govt-mandi-branding">
+            {/* Center Authentication Card Container */}
+            <div className="w-full max-w-[480px] mx-auto my-auto relative z-10 py-0.5" data-purpose="login-card-container">
+
+              {/* Point 1: Unified Government Masthead (Protected from translation) */}
+              <div
+                className="flex items-center justify-center gap-4 sm:gap-6 mb-2.5 sm:mb-3 select-none notranslate"
+                translate="no"
+                data-purpose="govt-mandi-branding"
+              >
                 {/* Seal of Maharashtra & Governance Title */}
                 <div className="flex flex-col items-center text-center">
                   <img
                     src="/images/maharashtra-seal.webp"
                     alt="महाराष्ट्र राज्य मुद्रा"
-                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain mb-1 drop-shadow-sm hover:scale-105 transition-transform duration-200"
+                    className="w-11 h-11 sm:w-13 sm:h-13 object-contain mb-1 drop-shadow-sm hover:scale-105 transition-transform duration-200"
                   />
                   <div className="text-xs sm:text-[13px] font-extrabold text-slate-800 tracking-tight leading-tight uppercase marathi-font">
                     महाराष्ट्र शासन
@@ -269,8 +287,8 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* Elegant Divider */}
-                <div className="h-12 sm:h-14 w-[1.5px] bg-gradient-to-b from-transparent via-slate-300 to-transparent" />
+                {/* Elegant Vertical Divider */}
+                <div className="h-11 sm:h-13 w-[1.5px] bg-gradient-to-b from-transparent via-slate-300 to-transparent" />
 
                 {/* Agriculture for a Better Tomorrow */}
                 <div className="flex items-center gap-2 sm:gap-2.5">
@@ -289,65 +307,110 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* Login Card */}
               <div className="bg-white rounded-2xl custom-shadow overflow-hidden border border-slate-100">
 
-                {/* Card Top Brand Bar */}
-                <div className="bg-[#074728] px-6 py-4 flex items-center justify-between text-white">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                {/* Card Top Brand Bar: Impressive Kisan Setu Title */}
+                <div className="bg-gradient-to-r from-[#042817] via-[#08522d] to-[#042817] px-6 py-3.5 flex items-center justify-center text-white border-b border-emerald-500/20 shadow-xs select-none">
+                  <div className="flex items-center gap-3 notranslate" translate="no">
+                    <div className="w-8 h-8 rounded-full bg-white/15 border border-white/25 flex items-center justify-center shadow-inner text-emerald-200">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 3L2 8v2h20V8L12 3zm-7 7v9h2v-9H5zm4 0v9h2v-9H9zm6 0v9h2v-9h-2zm4 0v9h2v-9h-2zM2 20v2h20v-2H2z" />
                       </svg>
                     </div>
-                    <div>
-                      <h3 className="text-base font-extrabold tracking-tight leading-tight">Kisan Setu</h3>
-                      <p className="text-[9px] font-semibold text-emerald-100 tracking-wider uppercase leading-none">
-                        Govt. of Maharashtra
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg sm:text-xl font-black tracking-wide text-white uppercase drop-shadow-xs">
+                        Kisan Setu
+                      </h3>
+                      <span className="text-emerald-300 font-extrabold text-sm sm:text-base marathi-font">
+                        • किसान सेतू
+                      </span>
                     </div>
-                  </div>
-                  <div className="px-2.5 py-1 rounded-md bg-white/15 border border-white/20 text-[10px] font-bold tracking-wider uppercase text-emerald-100">
-                    e-Gov Portal
                   </div>
                 </div>
 
                 {/* Card Body */}
-                <div className="p-6 sm:p-8">
+                <div className="p-4 sm:p-5">
                   {step === 1 ? (
                     <>
-                      <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-snug">
-                        {language === 'mr' ? 'मंडी प्रवेशासाठी लॉगिन करा' : language === 'hi' ? 'मंडी प्रवेश के लिए लॉगिन करें' : 'Login to Access Mandi'}
-                      </h2>
-                      <p className="text-xs text-slate-500 mt-1.5 mb-5 leading-relaxed">
-                        {language === 'mr'
-                          ? 'पुढे जाण्यासाठी आपला नोंदणीकृत मोबाइल किंवा आधार क्रमांक प्रविष्ट करा.'
-                          : language === 'hi'
-                          ? 'आगे बढ़ने के लिए अपना पंजीकृत मोबाइल या आधार नंबर दर्ज करें।'
-                          : 'Enter your registered mobile or Aadhaar number to proceed.'}
-                      </p>
-
-                      {/* Quick Role Selection Chips */}
+                      {/* Clean Mandi Login Header (Protected from mistranslation) */}
                       <div className="mb-4">
-                        <label className="block text-[10px] font-bold tracking-wider text-slate-500 uppercase mb-1.5">
-                          Quick Demo Accounts:
-                        </label>
-                        <div className="grid grid-cols-3 gap-1.5">
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug notranslate" translate="no">
+                          {language === 'mr'
+                            ? 'मंडी प्रवेश लॉगिन'
+                            : language === 'hi'
+                            ? 'मंडी प्रवेश लॉगिन'
+                            : 'Mandi Login'}
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                          {language === 'mr'
+                            ? 'पुढे जाण्यासाठी आपला नोंदणीकृत मोबाइल किंवा आधार क्रमांक प्रविष्ट करा.'
+                            : language === 'hi'
+                            ? 'आगे बढ़ने के लिए अपना पंजीकृत मोबाइल या आधार नंबर दर्ज करें।'
+                            : 'Enter your registered mobile or Aadhaar number to proceed.'}
+                        </p>
+                      </div>
+
+                      {/* Point 3: Tactile Identity Pass Selectors */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-[10px] font-extrabold tracking-wider text-slate-700 uppercase flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                            {language === 'mr'
+                              ? 'त्वरित चाचणी ओळखपत्र:'
+                              : language === 'hi'
+                              ? 'त्वरित परीक्षण पहचान पत्र:'
+                              : 'Select Identity Pass:'}
+                          </label>
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            Demo Access
+                          </span>
+                        </div>
+
+                        {/* 3 Identity Pass Cards (Protected from translation corruption) */}
+                        <div className="grid grid-cols-3 gap-2 notranslate" translate="no">
                           {Object.entries(CREDENTIAL_MAP).map(([phone, acc]) => {
-                            const isSelected = identifier === phone;
+                            const isSelected = cleanId === phone;
+
+                            // Role-specific theme styling
+                            let activeClasses = '';
+                            let badgeBg = '';
+                            if (acc.role === 'farmer') {
+                              activeClasses = isSelected
+                                ? 'bg-gradient-to-b from-emerald-50 to-emerald-100/70 border-[#0c5c36] text-[#063f23] ring-2 ring-[#0c5c36]/25 shadow-xs'
+                                : 'bg-slate-50/90 hover:bg-emerald-50/40 border-slate-200 text-slate-700';
+                              badgeBg = isSelected ? 'bg-emerald-700 text-white' : 'bg-slate-200/80 text-slate-600';
+                            } else if (acc.role === 'officer') {
+                              activeClasses = isSelected
+                                ? 'bg-gradient-to-b from-blue-50 to-blue-100/70 border-blue-700 text-blue-950 ring-2 ring-blue-700/25 shadow-xs'
+                                : 'bg-slate-50/90 hover:bg-blue-50/40 border-slate-200 text-slate-700';
+                              badgeBg = isSelected ? 'bg-blue-700 text-white' : 'bg-slate-200/80 text-slate-600';
+                            } else {
+                              activeClasses = isSelected
+                                ? 'bg-gradient-to-b from-slate-100 to-slate-200/80 border-slate-700 text-slate-950 ring-2 ring-slate-700/25 shadow-xs'
+                                : 'bg-slate-50/90 hover:bg-slate-100 border-slate-200 text-slate-700';
+                              badgeBg = isSelected ? 'bg-slate-700 text-white' : 'bg-slate-200/80 text-slate-600';
+                            }
+
                             return (
                               <button
                                 key={phone}
                                 id={`preset-${acc.role}`}
                                 type="button"
                                 onClick={() => handleSelectPreset(phone)}
-                                className={`text-[11px] py-1.5 px-2 rounded-lg border font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                                  isSelected
-                                    ? 'bg-emerald-50 border-emerald-600 text-emerald-900 ring-1 ring-emerald-600'
-                                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
-                                }`}
+                                className={`relative p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 cursor-pointer ${activeClasses}`}
                               >
-                                <span>{acc.icon}</span>
-                                <span>{acc.badge}</span>
+                                <div className="flex items-center justify-between w-full mb-1">
+                                  <span className="text-lg select-none">{acc.icon}</span>
+                                  <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${badgeBg}`}>
+                                    {acc.badge}
+                                  </span>
+                                </div>
+                                <div>
+                                  <div className="text-xs font-extrabold leading-tight">
+                                    {language === 'mr' ? acc.marathiRole : acc.title}
+                                  </div>
+                                </div>
                               </button>
                             );
                           })}
@@ -356,79 +419,134 @@ export default function LoginPage() {
 
                       {/* Error display */}
                       {error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium">
-                          {error}
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium flex items-center gap-2">
+                          <svg className="w-4 h-4 shrink-0 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          <span>{error}</span>
                         </div>
                       )}
 
-                      {/* Step 1 Form */}
+                      {/* Point 4: Smart Phone / Aadhaar Input Form */}
                       <form data-purpose="otp-login-form" method="POST" onSubmit={handleGenerateOtp}>
-                        <label
-                          className="block text-[10px] font-extrabold tracking-wider text-slate-700 uppercase mb-2"
-                          htmlFor="phone-or-aadhaar"
-                        >
-                          Mobile / Aadhaar Number
-                        </label>
-                        <div className="relative flex items-center rounded-xl border border-slate-300 bg-white focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20 transition-all duration-200">
-                          <div className="pl-4 pr-1 text-sm font-semibold text-slate-500 select-none">+91</div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label
+                            className="block text-[10px] font-extrabold tracking-wider text-slate-700 uppercase"
+                            htmlFor="phone-or-aadhaar"
+                          >
+                            {language === 'mr'
+                              ? 'मोबाईल किंवा आधार क्रमांक'
+                              : language === 'hi'
+                              ? 'मोबाइल या आधार नंबर'
+                              : 'Mobile or Aadhaar Number'}
+                          </label>
+                          <span className="text-[10px] font-semibold text-slate-500">
+                            {isAadhaar
+                              ? (language === 'mr' ? '🪪 १२-अंकी आधार' : '12-Digit Aadhaar')
+                              : (language === 'mr' ? '📱 १०-अंकी मोबाईल' : '10-Digit Mobile')}
+                          </span>
+                        </div>
+
+                        <div className="relative flex items-center rounded-xl border border-slate-300 bg-white focus-within:border-[#0c5c36] focus-within:ring-3 focus-within:ring-emerald-600/20 transition-all duration-200">
+                          {/* Prefix Badge without 'IN' */}
+                          <div className="pl-3.5 pr-2.5 py-3 flex items-center gap-1 text-xs font-bold text-slate-700 border-r border-slate-200 select-none bg-slate-50/80 rounded-l-xl">
+                            {isAadhaar ? (
+                              <span className="text-emerald-800 font-extrabold">UID</span>
+                            ) : (
+                              <span className="font-extrabold text-slate-800">+91</span>
+                            )}
+                          </div>
+
                           <input
-                            className="w-full py-3.5 pr-4 pl-1 text-sm font-bold text-slate-800 bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-400 tracking-wide"
+                            className="w-full py-3.5 px-3 text-sm font-bold text-slate-900 bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-400 tracking-wider"
                             id="phone-or-aadhaar"
                             inputMode="numeric"
                             name="identifier"
                             pattern="[0-9]*"
-                            placeholder="Enter 10-digit number"
+                            placeholder={isAadhaar ? "1234 5678 9012" : "98221 00011"}
                             required
                             type="text"
                             value={identifier}
                             onChange={handleIdentifierChange}
                           />
+
+                          {/* Dynamic UIDAI / Verified Indicator */}
+                          <div className="pr-3.5 select-none">
+                            {isAadhaar ? (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200 uppercase">
+                                UIDAI
+                              </span>
+                            ) : cleanId.length === 10 ? (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase">
+                                Mobile
+                              </span>
+                            ) : null}
+                          </div>
                         </div>
 
+                        {/* Format Preview Helper (without SMS OTP text) */}
+                        <div className="mt-1.5 text-[11px] text-slate-500">
+                          <span>
+                            {language === 'mr' ? 'स्वरूप' : 'Format'}: <strong className="text-slate-700 font-mono">{formattedDisplay}</strong>
+                          </span>
+                        </div>
+
+                        {/* Gradient CTA Button */}
                         <button
                           id="submit-generate-otp"
                           disabled={loading}
-                          className="w-full mt-4 py-3.5 px-6 rounded-xl bg-[#0c5c36] hover:bg-[#094d2c] active:bg-[#063b21] text-white text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20 transition duration-150 transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="w-full mt-4 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#074b2a] via-[#0c5c36] to-[#0f7646] hover:from-[#053d22] hover:via-[#094d2c] hover:to-[#0c5c36] active:scale-[0.99] text-white text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/20 transition-all duration-150 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed notranslate"
+                          translate="no"
                           type="submit"
                         >
-                          <span>{loading ? 'Sending OTP...' : 'Generate OTP'}</span>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                          <span className="text-sm font-bold">
+                            {loading
+                              ? (language === 'mr' ? 'ओटीपी पाठवत आहे...' : language === 'hi' ? 'ओटीपी भेजा जा रहा है...' : 'Sending OTP...')
+                              : (language === 'mr' ? 'ओटीपी मिळवा' : language === 'hi' ? 'ओटीपी प्राप्त करें' : 'Get Verification OTP')}
+                          </span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
                             <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </button>
+
+                        <p className="text-center text-[11px] text-slate-500 mt-2 font-medium">
+                          नोंदणीकृत क्रमांकावर ६-अंकी सुरक्षित OTP पाठवला जाईल
+                        </p>
                       </form>
                     </>
                   ) : (
                     <>
                       {/* Step 2: OTP Verification */}
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-wide">
-                          Step 2 of 2
+                        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 uppercase tracking-wide">
+                          Step 2 of 2 • पडताळणी
                         </span>
                         <button
                           type="button"
                           onClick={() => setStep(1)}
-                          className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 hover:underline cursor-pointer"
+                          className="text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:underline cursor-pointer flex items-center gap-1"
                         >
-                          &larr; Change Number
+                          &larr; <span>Change Number / क्रमांक बदला</span>
                         </button>
                       </div>
 
-                      <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-snug">
-                        Enter Verification Code
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug marathi-font">
+                        सत्यापन कोड प्रविष्ट करा
                       </h2>
-                      <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
+                      <p className="text-xs text-slate-500 mt-1 mb-3 leading-relaxed">
                         OTP sent to <span className="font-bold text-slate-800">+91 {identifier}</span>
                       </p>
 
                       {/* Demo OTP Helper */}
                       <div className="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-900">
-                        <span>Demo OTP is: <strong>123456</strong></span>
+                        <div>
+                          <span>चाचणी OTP कोड: <strong className="font-mono text-amber-950 font-bold">123456</strong></span>
+                        </div>
                         <button
                           id="btn-autofill-otp"
                           type="button"
                           onClick={() => setOtp('123456')}
-                          className="px-2 py-1 bg-amber-200/70 hover:bg-amber-300 text-amber-900 font-bold rounded-lg transition-colors cursor-pointer text-[11px]"
+                          className="px-2.5 py-1 bg-amber-200/80 hover:bg-amber-300 text-amber-900 font-extrabold rounded-lg transition-colors cursor-pointer text-[11px] shadow-2xs"
                         >
                           ⚡ Autofill OTP
                         </button>
@@ -444,11 +562,11 @@ export default function LoginPage() {
                       {/* Step 2 Form */}
                       <form onSubmit={handleVerifyOtp}>
                         <label className="block text-[10px] font-extrabold tracking-wider text-slate-700 uppercase mb-2">
-                          6-Digit OTP Code
+                          ६-अंकी पडताळणी कोड / 6-Digit OTP Code
                         </label>
-                        <div className="relative flex items-center rounded-xl border border-slate-300 bg-white focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20 transition-all duration-200">
+                        <div className="relative flex items-center rounded-xl border-2 border-slate-300 bg-white focus-within:border-[#0c5c36] focus-within:ring-3 focus-within:ring-emerald-600/20 transition-all duration-200">
                           <input
-                            className="w-full py-3.5 px-4 text-center text-lg font-black text-slate-900 tracking-[0.4em] bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-300"
+                            className="w-full py-3.5 px-4 text-center text-xl font-black text-slate-900 tracking-[0.5em] bg-transparent border-0 focus:ring-0 focus:outline-none placeholder-slate-300 font-mono"
                             id="otp-input"
                             inputMode="numeric"
                             maxLength={6}
@@ -464,11 +582,14 @@ export default function LoginPage() {
                         <button
                           id="submit-verify-otp"
                           disabled={loading}
-                          className="w-full mt-4 py-3.5 px-6 rounded-xl bg-[#0c5c36] hover:bg-[#094d2c] active:bg-[#063b21] text-white text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20 transition duration-150 transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="w-full mt-4 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#074b2a] via-[#0c5c36] to-[#0f7646] hover:from-[#053d22] hover:via-[#094d2c] hover:to-[#0c5c36] text-white text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/20 transition duration-150 transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed notranslate"
+                          translate="no"
                           type="submit"
                         >
-                          <span>{loading ? 'Verifying...' : 'Verify & Enter Mandi'}</span>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                          <span className="marathi-font font-bold">
+                            {loading ? 'पडताळणी चालू आहे... / Verifying...' : 'प्रवेश करा • Verify & Enter Mandi'}
+                          </span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
                             <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </button>
@@ -477,7 +598,7 @@ export default function LoginPage() {
                   )}
 
                   {/* Security & Verification Badges */}
-                  <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-around text-[11px] text-slate-600 font-medium">
+                  <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-around text-[11px] text-slate-600 font-medium">
                     <div className="flex items-center gap-1.5">
                       <svg className="w-3.5 h-3.5 text-emerald-700" fill="currentColor" viewBox="0 0 20 20">
                         <path
@@ -486,62 +607,91 @@ export default function LoginPage() {
                           fillRule="evenodd"
                         />
                       </svg>
-                      <span>256-bit AES Encryption</span>
+                      <span>२५६-बिट सुरक्षित डेटा (AES)</span>
                     </div>
                     <div className="h-3 w-[1px] bg-slate-200" />
                     <div className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4 text-emerald-700" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M3 4h18v16H3V4zm2 2v12h14V6H5zm3 3h3v3H8V9zm0 5h3v1H8v-1zm5-5h3v1h-3V9zm0 3h3v3h-3v-3z" />
+                      <svg className="w-3.5 h-3.5 text-emerald-700" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
                       </svg>
-                      <span>UIDAI e-KYC Verified</span>
+                      <span>UIDAI ई-केवायसी सुरक्षित</span>
                     </div>
                   </div>
 
                   {/* Working Navigation Links */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center gap-4 text-xs font-semibold text-slate-500">
+                  <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-center gap-4 text-xs font-semibold text-slate-500">
                     <Link
                       href="/farmer/guidelines"
                       className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
                     >
-                      Mandi Guidelines &rarr;
+                      मंडी मार्गदर्शक तत्त्वे &rarr;
                     </Link>
                     <span className="text-slate-300">•</span>
                     <Link
                       href="/demo/ivr"
                       className="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors"
                     >
-                      IVR Voice Demo &rarr;
+                      IVR व्हॉइस डेमो &rarr;
                     </Link>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Mandi Trust & Stats Highlights Strip */}
-            <div className="w-full max-w-[480px] mx-auto grid grid-cols-3 gap-2 text-center select-none mt-4 relative z-10" data-purpose="mandi-trust-strip">
-              <div className="bg-white/80 backdrop-blur-xs border border-emerald-900/8 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="text-[11px] font-black text-[#075330]">०१२३+</div>
-                <div className="text-[10px] text-slate-500 font-semibold tracking-tight">APMC Mandis</div>
+            {/* Point 6: Polished Mandi Trust & Stats Highlights Strip */}
+            <div className="w-full max-w-[480px] mx-auto grid grid-cols-3 gap-2 text-center select-none mt-3 relative z-10" data-purpose="mandi-trust-strip">
+              {/* Stat 1 */}
+              <div className="bg-white/85 backdrop-blur-md border border-emerald-900/10 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
+                <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-black text-[#075330] tracking-tight">३०५+ APMC</span>
+                </div>
+                <div className="text-[10px] text-slate-600 font-semibold tracking-tight leading-tight marathi-font">
+                  सक्रिय बाजार समित्या
+                </div>
+                <div className="text-[9px] text-slate-400 font-medium leading-none">
+                  Live Mandis
+                </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-xs border border-emerald-900/8 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="text-[11px] font-black text-[#075330]">MSP Direct</div>
-                <div className="text-[10px] text-slate-500 font-semibold tracking-tight">Direct Payout</div>
+
+              {/* Stat 2 */}
+              <div className="bg-white/85 backdrop-blur-md border border-emerald-900/10 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <span className="text-xs">🛡️</span>
+                  <span className="text-xs font-black text-[#075330] tracking-tight">१००% MSP</span>
+                </div>
+                <div className="text-[10px] text-slate-600 font-semibold tracking-tight leading-tight marathi-font">
+                  थेट हमीभाव खरेदी
+                </div>
+                <div className="text-[9px] text-slate-400 font-medium leading-none">
+                  Direct DBT Payout
+                </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-xs border border-emerald-900/8 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="text-[11px] font-black text-[#075330]">24×7</div>
-                <div className="text-[10px] text-slate-500 font-semibold tracking-tight">Helpline</div>
+
+              {/* Stat 3 */}
+              <div className="bg-white/85 backdrop-blur-md border border-emerald-900/10 rounded-xl p-2.5 shadow-2xs hover:shadow-xs transition-shadow">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <span className="text-xs">📞</span>
+                  <span className="text-xs font-black text-[#075330] tracking-tight">२४×७ मदत</span>
+                </div>
+                <div className="text-[10px] text-slate-600 font-semibold tracking-tight leading-tight marathi-font">
+                  टोल-फ्री सहाय्यता
+                </div>
+                <div className="text-[9px] text-slate-400 font-medium leading-none">
+                  Farmer Support
+                </div>
               </div>
             </div>
 
-            {/* Official Government Footer */}
-            <footer className="text-center pt-3 pb-1 relative z-10" data-purpose="footer-links">
-              <p className="text-[11px] font-bold text-slate-600 tracking-tight">
-                महाराष्ट्र राज्य कृषी पणन मंडळ (MSAMB)
+            {/* Official Government Footer (Protected from translation duplication) */}
+            <footer className="text-center pt-3 pb-1 relative z-10 select-none notranslate" translate="no" data-purpose="footer-links">
+              <p className="text-[11px] font-bold text-slate-700 tracking-tight marathi-font">
+                महाराष्ट्र राज्य कृषी पणन मंडळ (MSAMB), पुणे • महाराष्ट्र शासन
               </p>
               <p className="text-[10px] font-medium text-slate-500 mt-0.5">
-                Digital Agriculture • Transparent Markets • Prosperous Farmers
+                Maharashtra State Agricultural Marketing Board • Government of Maharashtra
               </p>
-              <div className="w-10 h-1 bg-[#0c5c36] rounded-full mx-auto mt-2 opacity-70" />
+              <div className="w-10 h-1 bg-[#0c5c36] rounded-full mx-auto mt-2 opacity-75" />
             </footer>
           </section>
           {/* END: RightAuthSection */}
