@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { supabase } from '../../lib/supabaseClient';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
-import LanguageToggle from '../../components/LanguageToggle';
 import { useLanguage } from '../../lib/i18n';
 import { getCropConfig } from '../../lib/cropIcons';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import Link from 'next/link';
 
 export default function PriceOutlook() {
   const [commodities, setCommodities] = useState([]);
@@ -26,7 +28,6 @@ export default function PriceOutlook() {
   const msp = crop ? Number(crop.msp_rate_per_quintal) : 0;
 
   // Generate mock 14-day trend based on the crop's MSP to make it look realistic
-  // We simulate a dip in prices during harvest (oversupply)
   const generateTrend = (basePrice) => {
     const data = [];
     let currentPrice = basePrice * 0.95; // start 5% below MSP
@@ -41,7 +42,6 @@ export default function PriceOutlook() {
         price: Math.round(currentPrice),
         type: 'historical'
       });
-      // slight daily variation
       currentPrice += (Math.random() * 40 - 20); 
     }
     
@@ -53,11 +53,10 @@ export default function PriceOutlook() {
     });
     
     // Forecast next 7 days
-    let trend = Math.random() > 0.5 ? 1 : -1; // 50% chance of uptrend
+    let trend = Math.random() > 0.5 ? 1 : -1;
     for (let i = 1; i <= 7; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() + i);
-      // simulate recovery towards MSP or further dip
       currentPrice += trend * (Math.random() * 25 + 5);
       data.push({
         date: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
@@ -80,171 +79,121 @@ export default function PriceOutlook() {
   const targetPrice = chartData[chartData.length - 1]?.price || 0;
   const isUptrend = targetPrice > currentPrice;
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full" /></div>;
+  if (loading) return <div className="min-h-screen bg-[var(--chassis)] flex items-center justify-center font-bold text-slate-500 uppercase tracking-widest"><div className="animate-spin w-6 h-6 border-4 border-slate-500 border-t-transparent rounded-full mr-3" /> INITIALIZING TELEMETRY...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 dark:bg-neutral-900">
+    <div className="min-h-screen bg-[var(--chassis)] pb-24 font-sans selection:bg-emerald-500/30">
       <Head>
-        <title>Price Outlook | Kisan Setu</title>
+        <title>Market Telemetry | Kisan Setu</title>
       </Head>
 
-      <div className="bg-green-700 text-white px-4 py-6 rounded-b-3xl shadow-sm relative">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">{language === 'hi' ? 'मूल्य पूर्वानुमान' : 'Price Outlook'}</h1>
-            <p className="text-green-100 text-sm">{language === 'hi' ? 'एआई-आधारित 14-दिवसीय मंडी मूल्य प्रवृत्तियां' : 'AI-driven 14-day mandi price trends'}</p>
-          </div>
-          <LanguageToggle />
-        </div>
-      </div>
-
-      <div className="px-4 mt-6 max-w-lg mx-auto space-y-4">
+      <div className="max-w-lg mx-auto px-4 pt-8 space-y-6">
         
-        {/* Selector */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-neutral-700">
-          <label className="block text-xs font-bold text-gray-700 dark:text-neutral-300 mb-2">Select Commodity</label>
-          <select 
-            value={selectedCrop} 
-            onChange={(e) => setSelectedCrop(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-green-500 focus:border-green-500 block p-3 dark:bg-neutral-900 dark:border-neutral-700 dark:text-white"
-          >
-            {commodities.map(c => (
-              <option key={c.id} value={c.id}>{getCropConfig(c.name).icon} {c.name}</option>
-            ))}
-          </select>
+        {/* Navigation Breadcrumb */}
+        <div>
+          <Link href="/farmer/dashboard" className="text-emerald-700 text-xs font-bold uppercase tracking-wider hover:text-emerald-800 transition">
+            &larr; Dashboard
+          </Link>
         </div>
 
-        {/* Forecast Card */}
+        {/* Hardware Select Panel */}
+        <Card elevated={true} withScrews={true} className="bg-[#e8ecef] p-4 border border-white/50 shadow-floating">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">COMMODITY TELEMETRY RADAR</span>
+            <span className="text-[9px] font-bold text-slate-400 bg-white/50 px-2 py-0.5 rounded shadow-recessed inset-0 animate-pulse">LIVE SYS</span>
+          </div>
+          <div className="bg-[var(--chassis)] p-1 rounded-xl shadow-recessed border border-white/60">
+            <select 
+              value={selectedCrop} 
+              onChange={(e) => setSelectedCrop(e.target.value)}
+              className="w-full bg-transparent border-0 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700 uppercase tracking-wide"
+            >
+              {commodities.map(c => (
+                <option key={c.id} value={c.id}>{getCropConfig(c.name).icon} {c.name.toUpperCase()} (MSP: ₹{c.msp_rate_per_quintal})</option>
+              ))}
+            </select>
+          </div>
+        </Card>
+
+        {/* Forecast CRT Screen */}
         {chartData.length > 0 && (
-          <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 overflow-hidden">
-            <div className={`p-4 border-b border-gray-100 dark:border-neutral-700 flex justify-between items-center ${isUptrend ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}>
+          <Card elevated={true} withScrews={true} className="bg-[#2d3436] p-4 border-2 border-slate-700 shadow-recessed relative overflow-hidden">
+            
+            {/* Screen Glare */}
+            <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none rounded-t-xl" />
+            
+            {/* Status LED Bar */}
+            <div className={`mb-6 p-3 rounded-lg border-2 flex justify-between items-center ${isUptrend ? 'bg-emerald-900/40 border-emerald-500 shadow-[inset_0_0_15px_rgba(16,185,129,0.3),0_0_10px_rgba(16,185,129,0.2)]' : 'bg-red-900/40 border-red-500 shadow-[inset_0_0_15px_rgba(239,68,68,0.3),0_0_10px_rgba(239,68,68,0.2)]'}`}>
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">AI Recommendation</p>
-                <p className={`text-xl font-black ${isUptrend ? 'text-blue-700 dark:text-blue-400' : 'text-red-700 dark:text-red-400'}`}>
-                  {isUptrend ? 'HOLD FOR 7 DAYS' : 'SELL IMMEDIATELY'}
+                <p className={`text-[10px] font-black tracking-widest uppercase ${isUptrend ? 'text-emerald-500' : 'text-red-500'}`}>SYS AI DIRECTIVE</p>
+                <p className={`text-xl font-black uppercase tracking-tighter mt-1 ${isUptrend ? 'text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]' : 'text-red-400 drop-shadow-[0_0_5px_rgba(248,113,113,0.8)]'}`}>
+                  {isUptrend ? 'HOLD FOR 7 DAYS' : 'LIQUIDATE IMMEDIATELY'}
                 </p>
               </div>
+              <div className="flex gap-1">
+                <div className={`w-3 h-3 rounded-full ${isUptrend ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-red-900'}`} />
+                <div className={`w-3 h-3 rounded-full ${!isUptrend ? 'bg-red-500 shadow-[0_0_8px_#ef4444] animate-pulse' : 'bg-emerald-900'}`} />
+              </div>
+            </div>
+
+            {/* Readouts */}
+            <div className="flex justify-between items-end mb-4 px-1">
+              <div>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">SPOT RATE (T-0)</p>
+                <p className="text-xl font-mono font-black text-slate-200 mt-0.5 tracking-tight">₹{currentPrice}/Q</p>
+              </div>
               <div className="text-right">
-                <span className="text-3xl">{isUptrend ? '📈' : '📉'}</span>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">FCAST (T+7)</p>
+                <p className="text-xl font-mono font-black text-slate-200 mt-0.5 tracking-tight">₹{targetPrice}/Q</p>
               </div>
             </div>
 
-            <div className="p-4 space-y-4">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-xs text-gray-500">Current Market</p>
-                  <p className="text-lg font-bold">₹{currentPrice}/q</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">7-Day Forecast</p>
-                  <p className="text-lg font-bold">₹{targetPrice}/q</p>
-                </div>
-              </div>
+            {/* Hardware Bar Chart */}
+            <div className="h-40 border-b-2 border-l-2 border-slate-600/50 pb-1 pl-1 flex items-end gap-1 relative">
+              {/* Grid Lines */}
+              <div className="absolute top-1/4 left-0 right-0 border-b border-slate-700/50 pointer-events-none" />
+              <div className="absolute top-2/4 left-0 right-0 border-b border-slate-700/50 pointer-events-none" />
+              <div className="absolute top-3/4 left-0 right-0 border-b border-slate-700/50 pointer-events-none" />
 
-              {/* Simple CSS Bar Chart */}
-              <div className="pt-4 border-t border-gray-100 dark:border-neutral-700">
-                <div className="flex items-end justify-between h-32 gap-1">
-                  {chartData.map((d, i) => {
-                    const min = Math.min(...chartData.map(c => c.price)) * 0.95;
-                    const max = Math.max(...chartData.map(c => c.price)) * 1.05;
-                    const heightPct = ((d.price - min) / (max - min)) * 100;
-                    
-                    return (
-                      <div key={i} className="flex flex-col items-center flex-1 group relative">
-                        {/* Tooltip */}
-                        <div className="absolute -top-8 bg-gray-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10 pointer-events-none">
-                          ₹{d.price}
-                        </div>
-                        
-                        <div 
-                          className={`w-full rounded-t-sm transition-all duration-500 ${
-                            d.type === 'historical' ? 'bg-gray-300 dark:bg-neutral-600' : 
-                            d.type === 'current' ? 'bg-gray-800 dark:bg-gray-200' : 
-                            'bg-blue-400 dark:bg-blue-500 opacity-60'
-                          }`}
-                          style={{ height: `${heightPct}%` }}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex justify-between mt-2 text-[10px] text-gray-400 font-medium">
-                  <span>-7 Days</span>
-                  <span className="text-gray-800 dark:text-neutral-200">Today</span>
-                  <span>+7 Days</span>
-                </div>
-              </div>
+              {chartData.map((d, i) => {
+                const min = Math.min(...chartData.map(c => c.price)) * 0.95;
+                const max = Math.max(...chartData.map(c => c.price)) * 1.05;
+                const heightPct = Math.max(5, ((d.price - min) / (max - min)) * 100);
+                
+                const isToday = d.type === 'current';
+                const isPast = d.type === 'historical';
+                
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center justify-end h-full group relative">
+                    <div className="absolute -top-6 bg-slate-800 text-emerald-400 font-mono text-[9px] py-1 px-1.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-20 border border-emerald-500/30 pointer-events-none shadow-floating">
+                      ₹{d.price}
+                    </div>
+                    <div 
+                      className={`w-full rounded-t-sm transition-all duration-500 border-t-2 relative overflow-hidden ${
+                        isPast ? 'bg-slate-600/60 border-slate-500' : 
+                        isToday ? 'bg-amber-500/80 border-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.4)] z-10' : 
+                        'bg-blue-500/60 border-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
+                      }`}
+                      style={{ height: `${heightPct}%` }}
+                    >
+                      {/* scanline effect */}
+                      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:100%_4px] opacity-20 pointer-events-none" />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
             
-            {/* AI ADVISORY CARDS (Phase 2) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border-t border-gray-100 dark:border-neutral-800">
-              
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-500 rounded-xl p-4 relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] font-black px-2 py-1 rounded-bl-lg uppercase tracking-wider">
-                  ⭐ Recommended Outlook
-                </div>
-                <h4 className="text-emerald-800 dark:text-emerald-200 font-bold flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  Wait 3 to 5 Days
-                </h4>
-                <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80 mt-1 mb-3">Supply dip in neighboring agricultural clusters creates short-term price surge.</p>
-                
-                <div className="text-2xl font-black text-emerald-700 dark:text-emerald-300">
-                  ₹{Math.round(msp * 1.08).toLocaleString()} - ₹{Math.round(msp * 1.12).toLocaleString()} <span className="text-xs font-medium text-emerald-600/70">/qtl</span>
-                </div>
-                <p className="text-[10px] font-bold text-emerald-600 mt-1 mb-4">+₹110/qtl estimated upside against today's spot rate</p>
-                
-                <div className="space-y-1.5 pt-3 border-t border-emerald-200 dark:border-emerald-800/50">
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-emerald-700/70 dark:text-emerald-400/70">Downside Risk (P10):</span>
-                    <span className="font-bold text-emerald-800 dark:text-emerald-200">₹{Math.round(msp * 1.02).toLocaleString()}/qtl</span>
-                  </div>
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-emerald-700/70 dark:text-emerald-400/70">Confidence Level:</span>
-                    <span className="font-bold text-emerald-800 dark:text-emerald-200">74% Medium-High</span>
-                  </div>
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-emerald-700/70 dark:text-emerald-400/70">Storage Spoilage Penalty:</span>
-                    <span className="font-bold text-red-600 dark:text-red-400">-2.0% (Breaker stage)</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl p-4">
-                <h4 className="text-gray-800 dark:text-neutral-200 font-bold flex items-center gap-2">
-                  <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                  Sell Now (Today)
-                </h4>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1 mb-3">Immediate spot liquidation at nearest APMC. Eliminates post-harvest spoilage.</p>
-                
-                <div className="text-2xl font-black text-gray-900 dark:text-white">
-                  ₹{Math.round(msp * 1.01).toLocaleString()} - ₹{Math.round(msp * 1.03).toLocaleString()} <span className="text-xs font-medium text-gray-400">/qtl</span>
-                </div>
-                <p className="text-[10px] font-bold text-gray-500 mt-1 mb-4">Current spot benchmark rate</p>
-                
-                <div className="space-y-1.5 pt-3 border-t border-gray-100 dark:border-neutral-700">
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-gray-500">Downside Risk (P10):</span>
-                    <span className="font-bold text-gray-700 dark:text-neutral-300">₹{Math.round(msp * 0.98).toLocaleString()}/qtl</span>
-                  </div>
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-gray-500">Perishability Exposure:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">0% (Zero holding loss)</span>
-                  </div>
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-gray-500">Payout Timeline:</span>
-                    <span className="font-bold text-gray-700 dark:text-neutral-300">Same-day settlement</span>
-                  </div>
-                </div>
-              </div>
-
+            <div className="flex justify-between mt-3 px-1 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+              <span>T-7D</span>
+              <span className="text-amber-500">T-0 (TODAY)</span>
+              <span>T+7D</span>
             </div>
 
-            <div className="bg-gray-50 dark:bg-neutral-900 p-3 text-xs text-gray-500 dark:text-neutral-400 border-t border-gray-100 dark:border-neutral-700">
-              <span className="font-bold text-gray-700 dark:text-neutral-300">Disclaimer:</span> This is a machine-learning based estimate derived from historical Agmarknet data. Actual prices may vary due to local weather and demand.
+            <div className="mt-5 pt-3 border-t border-slate-700/60 text-center font-mono font-bold text-[8px] text-slate-600 tracking-widest uppercase">
+              ML PREDICTION ENGINE V2.4 • AGMARKNET SECURE FEED
             </div>
-          </div>
+          </Card>
         )}
 
       </div>

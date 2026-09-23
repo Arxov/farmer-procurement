@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
+import AdminLayout from '../../components/AdminLayout';
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -57,14 +58,7 @@ export default function AdminPayments() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><p>{t('loading')}</p></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-4 py-10">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <Link href="/admin/dashboard" className="text-green-700 text-sm">&larr; Dashboard</Link>
-            <h1 className="text-xl font-bold mt-1">Payment Management</h1>
-          </div>
-        </div>
+    <AdminLayout title="Payment Disbursement" subtitle="Manage farmer payouts and view DBT status">
 
         {/* Summary */}
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -149,7 +143,6 @@ export default function AdminPayments() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

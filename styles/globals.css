@@ -1,7 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --chassis: #f8fafc; /* slate-50 */
+    --panel: #ffffff;
+    --muted: #f1f5f9; /* slate-100 */
+    --text-primary: #0f172a; /* slate-900 */
+    --text-muted: #64748b; /* slate-500 */
+    --accent: #059669; /* emerald-600 */
+    --accent-hover: #047857; /* emerald-700 */
+    
+    /* Neumorphic Shadow Colors */
+    --shadow-light: #ffffff;
+    --shadow-dark: #cbd5e1; /* slate-300 */
+    
+    /* Elevations */
+    --shadow-card: 6px 6px 16px var(--shadow-dark), -6px -6px 16px var(--shadow-light);
+    --shadow-floating: 10px 10px 24px var(--shadow-dark), -10px -10px 24px var(--shadow-light), inset 1px 1px 0px rgba(255,255,255,0.7);
+    --shadow-pressed: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    --shadow-recessed: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+    --shadow-glow: 0 0 12px 2px rgba(5, 150, 105, 0.4);
+    
+    /* Physics */
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--chassis);
+  color: var(--text-primary);
+  /* Optional: subtle noise texture over the chassis */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 html.dark body {
@@ -9,9 +40,7 @@ html.dark body {
   color: #f1f5f9;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 @keyframes fadeIn {
   from {

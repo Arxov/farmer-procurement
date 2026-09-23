@@ -11,6 +11,9 @@ import { useCentres } from '../../hooks/useCentres';
 import { useCommodities } from '../../hooks/useCommodities';
 import confetti from 'canvas-confetti';
 import LanguageToggle from '../../components/LanguageToggle';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
 
 const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 
@@ -262,7 +265,7 @@ export default function BookSlot() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 px-4 pt-8 pb-28 sm:pb-10">
+    <div className="min-h-screen bg-[var(--chassis)] px-4 pt-8 pb-28 sm:pb-10">
       <div className="max-w-lg mx-auto">
         {/* Navigation Breadcrumb */}
         <div className="mb-4">
@@ -273,13 +276,14 @@ export default function BookSlot() {
 
         {/* Location & Auto-suggestion banner */}
         <div className="mb-5 flex flex-col gap-3">
-          <button
+          <Button
             onClick={requestLocation}
             disabled={locating}
-            className="self-start text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1 transition-colors bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 hover:bg-gray-50 text-gray-700 dark:text-neutral-300 shadow-sm"
+            variant="secondary"
+            className="self-start text-xs font-semibold flex items-center gap-1"
           >
             {locating ? '📍 Locating...' : (location ? '📍 Location Active (Calculates Transport)' : '📍 Use My Location (Find Closest/Best Deals)')}
-          </button>
+          </Button>
 
           {suggestion && (
             <div className={`border rounded-2xl p-4 shadow-xs ${suggestion.netBenefit > 0 ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20' : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20'}`}>
@@ -322,7 +326,7 @@ export default function BookSlot() {
         </div>
 
         {/* Main Booking Wizard Card */}
-        <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
+        <Card className="p-6 sm:p-8 border-0" withScrews={true} withVents={true}>
           <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5 flex justify-between items-start">
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
@@ -345,12 +349,12 @@ export default function BookSlot() {
                     if (s.num < step) setStep(s.num);
                   }}
                   disabled={s.num > step}
-                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition ${
+                  className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-300 ${
                     step === s.num
-                      ? 'bg-green-700 text-white shadow-sm ring-2 ring-green-100'
+                      ? 'bg-emerald-600 text-white shadow-floating ring-2 ring-emerald-200'
                       : step > s.num
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
-                      : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 cursor-not-allowed'
+                      ? 'bg-[var(--chassis)] text-emerald-800 shadow-recessed cursor-pointer'
+                      : 'bg-[var(--chassis)] shadow-recessed text-slate-400 opacity-60 cursor-not-allowed'
                   }`}
                 >
                   <span>{step > s.num ? '✓' : s.icon}</span>
@@ -359,8 +363,8 @@ export default function BookSlot() {
                 </button>
                 {idx < 2 && (
                   <div
-                    className={`flex-1 h-0.5 mx-2 transition-colors ${
-                      step > s.num ? 'bg-green-600' : 'bg-gray-200'
+                    className={`flex-1 h-1.5 mx-2 rounded-full transition-colors ${
+                      step > s.num ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-[var(--chassis)] shadow-recessed'
                     }`}
                   />
 
@@ -386,7 +390,7 @@ export default function BookSlot() {
                   1. {t('procurementCentre')} *
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="w-full bg-[var(--chassis)] shadow-[var(--shadow-recessed),0_0_0_1px_rgba(255,255,255,0.8)] border-0 rounded-xl px-3.5 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700"
                   value={centreId}
                   onChange={e => { setCentreId(e.target.value); setError(''); }}
                 >
@@ -490,7 +494,7 @@ export default function BookSlot() {
                   2. {t('commodity')} *
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="w-full bg-[var(--chassis)] shadow-[var(--shadow-recessed),0_0_0_1px_rgba(255,255,255,0.8)] border-0 rounded-xl px-3.5 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700"
                   value={commodityId}
                   onChange={e => { setcommodityId(e.target.value); setError(''); }}
                 >
@@ -526,7 +530,7 @@ export default function BookSlot() {
                 )}
               </div>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   if (!centreId || !commodityId) {
@@ -536,10 +540,11 @@ export default function BookSlot() {
                   setError('');
                   setStep(2);
                 }}
-                className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
+                variant="primary"
+                className="w-full mt-4"
               >
                 Next: Choose date & Time Slot &rarr;
-              </button>
+              </Button>
             </div>
           )}
 
@@ -624,7 +629,7 @@ export default function BookSlot() {
                   <>
                   <input
                     type="date"
-                    className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none mb-2"
+                    className="w-full bg-[var(--chassis)] shadow-[var(--shadow-recessed),0_0_0_1px_rgba(255,255,255,0.8)] border-0 rounded-xl px-3.5 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700 mb-2"
                     value={date}
                     onChange={e =>
  { setDate(e.target.value); setError(''); }}
@@ -650,7 +655,7 @@ export default function BookSlot() {
                   {t('timeWindow')} *
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="w-full bg-[var(--chassis)] shadow-[var(--shadow-recessed),0_0_0_1px_rgba(255,255,255,0.8)] border-0 rounded-xl px-3.5 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700"
                   value={slotWindow}
                   onChange={e => setSlotWindow(e.target.value)}
                 >
@@ -660,14 +665,15 @@ export default function BookSlot() {
               </div>
 
               <div className="flex gap-3 mt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => { setError(''); setStep(1); }}
-                  className="flex-1 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 text-gray-700 dark:text-neutral-300 rounded-xl py-3 font-semibold text-sm transition"
+                  variant="ghost"
+                  className="flex-1"
                 >
                   &larr; Back
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => {
                     if (!date || !slotWindow) {
@@ -677,10 +683,11 @@ export default function BookSlot() {
                     setError('');
                     setStep(3);
                   }}
-                  className="flex-1 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition"
+                  variant="primary"
+                  className="flex-1"
                 >
                   Next: Quantity & Review &rarr;
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -692,12 +699,11 @@ export default function BookSlot() {
                 <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
                   {t('expectedQuantity')} (Quintals)
                 </label>
-                <input
+                <Input
                   type="number"
                   min="0.1"
                   step="0.1"
                   placeholder="e.g. 25"
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
                   value={quantity}
                   onChange={e => setQuantity(e.target.value)}
                 />
@@ -748,18 +754,20 @@ export default function BookSlot() {
               </div>
 
               <div className="flex gap-3 mt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => { setError(''); setStep(2); }}
-                  className="flex-1 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 text-gray-700 dark:text-neutral-300 rounded-xl py-3 font-semibold text-sm transition"
+                  variant="ghost"
+                  className="flex-1"
                 >
                   &larr; Back
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={submit}
                   disabled={loading}
-                  className="flex-1 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  variant="primary"
+                  className="flex-1"
                 >
                   {loading ? (
                     <>
@@ -769,11 +777,11 @@ export default function BookSlot() {
                   ) : (
                     <span>Confirm Booking →</span>
                   )}
-                </button>
+                </Button>
               </div>
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       <FarmerBottomNav />

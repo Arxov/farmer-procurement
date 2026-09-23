@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
+import AdminLayout from '../../components/AdminLayout';
 
 export default function AdminCentres() {
   const [centres, setCentres] = useState([]);
@@ -80,15 +81,10 @@ export default function AdminCentres() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><p>{t('loading')}</p></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-4 py-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <Link href="/admin/dashboard" className="text-green-700 text-sm">&larr; Dashboard</Link>
-            <h1 className="text-xl font-bold mt-1">Centre Management</h1>
-          </div>
-          <button onClick={startNew} className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">+ Add Centre</button>
-        </div>
+    <AdminLayout title="Centre Management" subtitle="Manage APMC Mandi hubs, districts, and daily capacities">
+      <div className="flex justify-end mb-6">
+        <button onClick={startNew} className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:bg-emerald-700 transition">+ Add Centre</button>
+      </div>
 
         {/* Add/Edit Form */}
         {editing && (
@@ -155,7 +151,6 @@ export default function AdminCentres() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

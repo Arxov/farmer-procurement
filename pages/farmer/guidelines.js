@@ -2,140 +2,152 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../../lib/i18n';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
-import LanguageToggle from '../../components/LanguageToggle';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 
 export default function Guidelines() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('general');
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 px-4 pt-8 pb-28 sm:pb-10">
-      <div className="max-w-lg mx-auto">
+    <div className="min-h-screen bg-[var(--chassis)] px-4 pt-8 pb-28 sm:pb-10 font-sans selection:bg-emerald-500/30">
+      <div className="max-w-lg mx-auto space-y-6">
         {/* Navigation Breadcrumb */}
-        <div className="mb-4">
-          <Link href="/farmer/dashboard" className="text-green-800 text-sm font-medium hover:underline inline-flex items-center gap-1">
-            &larr; {t('back', 'Back to Dashboard')} 
+        <div>
+          <Link href="/farmer/dashboard" className="text-emerald-700 text-xs font-bold uppercase tracking-wider hover:text-emerald-800 transition">
+            &larr; Dashboard
           </Link>
         </div>
 
-        <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
-          <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5 flex justify-between items-start">
+        {/* Hardware Binder / Manual Panel */}
+        <Card elevated={true} withScrews={true} className="bg-[#e8ecef] p-4 border border-white/50 shadow-floating relative">
+          
+          <div className="mb-6 border-b-2 border-slate-300 pb-3 flex justify-between items-end">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Farmer Guidelines & Advisories</h1>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">Crop Quality Precautions and Market Trends</p>
+              <h1 className="text-lg font-black text-slate-800 uppercase tracking-tight">System Manual</h1>
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Vol. 4: Protocols & Procedures</p>
             </div>
-            <LanguageToggle />
+            <div className="text-[9px] font-mono font-bold text-slate-400 border border-slate-300 px-1.5 py-0.5 rounded">
+              REV: 2.1
+            </div>
           </div>
 
-          <div className="flex border-b border-gray-200 dark:border-neutral-700 mb-5">
-            <button
+          {/* Hardware Toggle Switch for Tabs */}
+          <div className="bg-[var(--chassis)] p-1.5 rounded-xl shadow-recessed border border-white/60 mb-6 flex gap-1 relative overflow-hidden">
+            <Button
+              variant={activeTab === 'general' ? 'primary' : 'secondary'}
               onClick={() => setActiveTab('general')}
-              className={`pb-2 px-1 flex-1 text-sm font-semibold transition-colors ${activeTab === 'general' ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 text-[9px] py-2 h-auto ${activeTab === 'general' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.4)] text-amber-950' : 'bg-transparent border-transparent shadow-none'}`}
             >
-              General Setup
-            </button>
-            <button
+              PROTOCOLS
+            </Button>
+            <Button
+              variant={activeTab === 'crops' ? 'primary' : 'secondary'}
               onClick={() => setActiveTab('crops')}
-              className={`pb-2 px-1 flex-1 text-sm font-semibold transition-colors ${activeTab === 'crops' ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 text-[9px] py-2 h-auto ${activeTab === 'crops' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.4)] text-amber-950' : 'bg-transparent border-transparent shadow-none'}`}
             >
-              Crop Precautions
-            </button>
-            <button
+              QUALITY STDS
+            </Button>
+            <Button
+              variant={activeTab === 'market' ? 'primary' : 'secondary'}
               onClick={() => setActiveTab('market')}
-              className={`pb-2 px-1 flex-1 text-sm font-semibold transition-colors ${activeTab === 'market' ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 text-[9px] py-2 h-auto ${activeTab === 'market' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.4)] text-amber-950' : 'bg-transparent border-transparent shadow-none'}`}
             >
-              Market Demand
-            </button>
+              MARKET DATA
+            </Button>
           </div>
 
-          {activeTab === 'general' && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                <h3 className="text-emerald-800 dark:text-emerald-300 font-bold mb-2 flex items-center gap-2">
-                  <span>📄</span> Required Documents
-                </h3>
-                <ul className="list-disc pl-5 text-sm text-emerald-700 dark:text-emerald-400 space-y-1">
-                  <li>Aadhaar Card (Linked with Mobile Number)</li>
-                  <li>Bank Passbook (For Direct Benefit Transfer)</li>
-                  <li>Land Records (7/12 Extract or equivalent)</li>
-                  <li>Appointment Slip (Digital Token or Printed)</li>
-                </ul>
-              </div>
+          <div className="bg-[#f8fafc] rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_1px_0_rgba(255,255,255,1)] border border-slate-300 p-4 min-h-[300px]">
+            {activeTab === 'general' && (
+              <div className="space-y-5 animate-fadeIn">
+                <div>
+                  <h3 className="text-[10px] text-slate-500 font-black mb-2 uppercase tracking-widest border-b-2 border-slate-200 pb-1">
+                    SECTION 1: REQ. DOCUMENTS
+                  </h3>
+                  <ul className="list-disc pl-4 text-xs font-bold text-slate-700 space-y-2 uppercase">
+                    <li>AADHAAR CARD (MOBILE LINKED)</li>
+                    <li>BANK PASSBOOK (DBT COMPLIANT)</li>
+                    <li>LAND RECORDS (7/12 EXTRACT)</li>
+                    <li>BOOKING TOKEN (DIGITAL OR PRINT)</li>
+                  </ul>
+                </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
-                <h3 className="text-blue-800 dark:text-blue-300 font-bold mb-2 flex items-center gap-2">
-                  <span>⚖️</span> Weighbridge Process
-                </h3>
-                <ol className="list-decimal pl-5 text-sm text-blue-700 dark:text-blue-400 space-y-1">
-                  <li>Arrive at the centre strictly during your allotted time window.</li>
-                  <li>Proceed to the digital weighbridge for initial weighing of the loaded vehicle.</li>
-                  <li>After unloading, the empty vehicle will be weighed again to calculate net weight.</li>
-                  <li>Ensure you collect the final weighment slip from the operator.</li>
-                </ol>
+                <div>
+                  <h3 className="text-[10px] text-slate-500 font-black mb-2 uppercase tracking-widest border-b-2 border-slate-200 pb-1">
+                    SECTION 2: WEIGHBRIDGE SOP
+                  </h3>
+                  <ol className="list-decimal pl-4 text-xs font-bold text-slate-700 space-y-2 uppercase">
+                    <li>ARRIVE STRICTLY DURING ALLOTTED TIME SLOT.</li>
+                    <li>PROCEED TO DIGITAL WEIGHBRIDGE FOR GROSS WEIGHT.</li>
+                    <li>AFTER UNLOADING, TARE WEIGHT IS RECORDED.</li>
+                    <li>COLLECT PHYSICAL WEIGHMENT SLIP FROM OPERATOR.</li>
+                  </ol>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {activeTab === 'crops' && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800">
-                <h3 className="text-amber-800 dark:text-amber-300 font-bold mb-1 flex items-center gap-2">
-                  <span>🌾</span> Wheat & Paddy (Cereals)
-                </h3>
-                <p className="text-sm text-amber-700 dark:text-amber-400 mb-2">
-                  <strong>Moisture standard: &le; 14%</strong>
+            {activeTab === 'crops' && (
+              <div className="space-y-5 animate-fadeIn">
+                <div>
+                  <div className="flex justify-between items-center border-b-2 border-amber-200 pb-1 mb-2">
+                    <h3 className="text-[10px] text-amber-800 font-black uppercase tracking-widest">
+                      WHEAT & PADDY (CEREALS)
+                    </h3>
+                    <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-black border border-amber-200">MAX MOISTURE: 14%</span>
+                  </div>
+                  <ul className="list-disc pl-4 text-xs font-bold text-slate-700 space-y-2 uppercase">
+                    <li>SUN-DRY HARVEST &ge;48 HRS BEFORE PACKING.</li>
+                    <li>REMOVE CHAFF & DUST VIA SIEVING.</li>
+                    <li>DO NOT HARVEST POST-RAINFALL.</li>
+                    <li>TARP COVERS MANDATORY DURING TRANSIT.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center border-b-2 border-emerald-200 pb-1 mb-2">
+                    <h3 className="text-[10px] text-emerald-800 font-black uppercase tracking-widest">
+                      SOYABEAN & PULSES
+                    </h3>
+                    <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-black border border-emerald-200">MAX MOISTURE: 12%</span>
+                  </div>
+                  <ul className="list-disc pl-4 text-xs font-bold text-slate-700 space-y-2 uppercase">
+                    <li>PODS MUST BE 100% DRY. MOISTURE = FUNGUS = REJECTION.</li>
+                    <li>NO MIXING OF OLD STOCK WITH FRESH HARVEST.</li>
+                    <li>VENTILATED GUNNY BAGS ONLY. NO PLASTIC.</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'market' && (
+              <div className="space-y-5 animate-fadeIn">
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest leading-relaxed mb-4 p-2 bg-slate-100 rounded border border-slate-200">
+                  SYSTEM ADVISORIES UPDATED VIA LIVE AGMARKNET FEED. DATA IS PREDICTIVE.
                 </p>
-                <ul className="list-disc pl-5 text-sm text-amber-700 dark:text-amber-400 space-y-1">
-                  <li>Sun-dry the harvest for at least 48 hours before packing.</li>
-                  <li>Remove chaff, dust, and foreign matter using proper sieving.</li>
-                  <li>Do not harvest immediately after rainfall. Wait for dry conditions.</li>
-                  <li>Cover your transport vehicles with tarpaulin to prevent moisture absorption during transit.</li>
-                </ul>
+
+                <div className="bg-red-50 p-3 rounded-lg border border-red-200 shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)]">
+                  <h3 className="text-[10px] text-red-800 font-black mb-1 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                    WARN: WHEAT OVERSUPPLY
+                  </h3>
+                  <p className="text-xs font-bold text-red-900/80 uppercase leading-relaxed mt-2">
+                    HEAVY ARRIVALS DETECTED IN LOCAL MANDIS. WAIT TIMES EXTENDED. QUALITY CHECKS STRICT. BOOK SLOTS &ge;3 DAYS IN ADVANCE.
+                  </p>
+                </div>
+
+                <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200 shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)]">
+                  <h3 className="text-[10px] text-emerald-800 font-black mb-1 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    DEMAND SURGE: TUR (PULSES)
+                  </h3>
+                  <p className="text-xs font-bold text-emerald-900/80 uppercase leading-relaxed mt-2">
+                    OPEN MARKET RATES EXCEEDING MSP LOCALLY. EVALUATE SPOT MARKET BIDS BEFORE GOVERNMENT PROCUREMENT LOG-IN.
+                  </p>
+                </div>
               </div>
-
-              <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl border border-orange-200 dark:border-orange-800">
-                <h3 className="text-orange-800 dark:text-orange-300 font-bold mb-1 flex items-center gap-2">
-                  <span>🌱</span> Soyabean & Pulses
-                </h3>
-                <p className="text-sm text-orange-700 dark:text-orange-400 mb-2">
-                  <strong>Moisture standard: &le; 12%</strong>
-                </p>
-                <ul className="list-disc pl-5 text-sm text-orange-700 dark:text-orange-400 space-y-1">
-                  <li>Ensure pods are completely dry. High moisture leads to fungus and rejection.</li>
-                  <li>Avoid mixing different grades or old stock with fresh harvest.</li>
-                  <li>Store in well-ventilated gunny bags, not plastic bags.</li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'market' && (
-            <div className="space-y-4 animate-fadeIn">
-              <p className="text-sm text-gray-600 dark:text-neutral-400 mb-4">
-                These advisories are updated based on current market arrivals, regional abundance, and demand patterns.
-              </p>
-
-              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-200 dark:border-red-800">
-                <h3 className="text-red-800 dark:text-red-300 font-bold mb-1 flex items-center gap-2">
-                  <span>📉</span> Abundance Warning: Wheat
-                </h3>
-                <p className="text-sm text-red-700 dark:text-red-400">
-                  Wheat is currently in <strong>Oversupply</strong> in the local mandis. Due to heavy arrivals, wait times are higher than usual and quality checks are strictly enforced. We recommend booking slots at least 3 days in advance and ensuring your crop is completely dry.
-                </p>
-              </div>
-
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-200 dark:border-green-800">
-                <h3 className="text-green-800 dark:text-green-300 font-bold mb-1 flex items-center gap-2">
-                  <span>📈</span> High Demand: Pulses (Tur/Arhar)
-                </h3>
-                <p className="text-sm text-green-700 dark:text-green-400">
-                  Tur is currently in <strong>High Demand</strong>. Open market prices are trending higher than the Minimum Support Price (MSP) in several regions. You may want to check local market rates before committing to government procurement.
-                </p>
-              </div>
-            </div>
-          )}
-
-        </div>
+            )}
+          </div>
+        </Card>
       </div>
       <FarmerBottomNav />
     </div>

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
+import AdminLayout from '../../components/AdminLayout';
 
 const ROLE_COLORS = {
   farmer: 'bg-green-100 text-green-800',
@@ -54,15 +55,7 @@ export default function AdminUsers() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><p>{t('loading')}</p></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-4 py-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <Link href="/admin/dashboard" className="text-green-700 text-sm">&larr; Dashboard</Link>
-            <h1 className="text-xl font-bold mt-1">User & Role Management</h1>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-neutral-400">{users.length} registered users</p>
-        </div>
+    <AdminLayout title="User & Role Management" subtitle={`${users.length} registered system users`}>
 
         {/* Filter */}
         <div className="flex gap-2 mb-6">
@@ -122,7 +115,6 @@ export default function AdminUsers() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

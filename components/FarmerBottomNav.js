@@ -22,23 +22,23 @@ export default function FarmerBottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-neutral-800/95 backdrop-blur-md border-t border-gray-200 dark:border-neutral-700 py-1 px-4 sm:hidden shadow-lg print:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--chassis)] border-t border-white/50 py-2 px-4 sm:hidden shadow-[0_-4px_12px_rgba(0,0,0,0.05)] print:hidden"
       data-bottom-nav="true"
     >
-      <div className="flex justify-around items-center max-w-md mx-auto">
+      <div className="flex justify-around items-center max-w-md mx-auto gap-2">
         {navItems.map(item => {
           const isActive = router.pathname === item.href;
           return (
-            <motion.div key={item.href} whileTap={{ scale: 0.9 }}>
+            <motion.div key={item.href} whileTap={{ scale: 0.95 }} className="flex-1 flex justify-center">
               <Link
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-green-600 ${
-                  isActive ? 'text-green-700 font-bold bg-green-50/70' : 'text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100'
+                className={`flex flex-col items-center justify-center w-full min-h-[48px] py-1.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-150 focus:outline-none ${
+                  isActive ? 'text-emerald-700 bg-[#e0e5ec] shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.7)]' : 'text-slate-500 bg-[var(--chassis)] shadow-[4px_4px_8px_rgba(163,177,198,0.4),-4px_-4px_8px_rgba(255,255,255,0.7)] hover:text-emerald-600'
                 }`}
               >
-                <span className="text-xl" aria-hidden="true">{item.icon}</span>
-                <span className="text-[10px] mt-0.5">{item.label}</span>
+                <span className="text-xl mb-1" aria-hidden="true">{item.icon}</span>
+                <span className="text-[9px]">{item.label}</span>
               </Link>
             </motion.div>
           );
@@ -46,24 +46,24 @@ export default function FarmerBottomNav() {
 
         {/* Language quick switcher */}
         <motion.button
-          whileTap={{ scale: 0.9 }}
+          whileTap={{ scale: 0.95 }}
           onClick={toggleLanguage}
           aria-label="Switch Language"
-          className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+          className="flex-1 flex flex-col items-center justify-center min-h-[48px] py-1.5 px-2 rounded-xl text-xs text-slate-500 bg-[var(--chassis)] shadow-[4px_4px_8px_rgba(163,177,198,0.4),-4px_-4px_8px_rgba(255,255,255,0.7)] hover:text-emerald-600 focus:outline-none font-bold uppercase tracking-wider transition-all duration-150 active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.7)]"
         >
-          <span className="text-xl" aria-hidden="true">🌐</span>
-          <span className="text-[10px] mt-0.5 font-medium">{language === 'hi' ? 'English' : 'हिंदी'}</span>
+          <span className="text-xl mb-1" aria-hidden="true">🌐</span>
+          <span className="text-[9px]">{language === 'hi' ? 'EN' : 'HI'}</span>
         </motion.button>
 
         {/* Quick Logout */}
         <motion.button
-          whileTap={{ scale: 0.9 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleLogout}
           aria-label="Sign out"
-          className="flex flex-col items-center justify-center min-h-[48px] min-w-[56px] py-1 px-2 rounded-xl text-xs text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="flex-1 flex flex-col items-center justify-center min-h-[48px] py-1.5 px-2 rounded-xl text-xs text-slate-500 bg-[var(--chassis)] shadow-[4px_4px_8px_rgba(163,177,198,0.4),-4px_-4px_8px_rgba(255,255,255,0.7)] hover:text-red-600 focus:outline-none font-bold uppercase tracking-wider transition-all duration-150 active:shadow-[inset_4px_4px_8px_rgba(163,177,198,0.6),inset_-4px_-4px_8px_rgba(255,255,255,0.7)]"
         >
-          <span className="text-xl" aria-hidden="true">🚪</span>
-          <span className="text-[10px] mt-0.5">Logout</span>
+          <span className="text-xl mb-1" aria-hidden="true">🚪</span>
+          <span className="text-[9px]">EXIT</span>
         </motion.button>
       </div>
     </nav>

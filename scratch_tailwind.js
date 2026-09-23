@@ -1,4 +1,6 @@
-/** @type {import('tailwindcss').Config} */
+const fs = require('fs');
+
+const tailwindConfig = \/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
   content: [
@@ -31,3 +33,8 @@ module.exports = {
   },
   plugins: [],
 };
+\;
+
+fs.writeFileSync('tailwind.config.js', tailwindConfig);
+console.log('tailwind.config.js updated');
+

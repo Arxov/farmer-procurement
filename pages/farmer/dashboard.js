@@ -1,5 +1,5 @@
 import { playQueueChime, triggerQueueHaptic } from '../../lib/audioAlert';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -22,8 +22,11 @@ import KisanMitraWidget from '../../components/KisanMitraWidget';
 import { useFarmerBookings, bookingsQueryKeys } from '../../hooks/useBookings';
 import { useCommodities } from '../../hooks/useCommodities';
 import { useQueryClient } from '@tanstack/react-query';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 
 export default function FarmerDashboard() {
+  const [activeTab, setActiveTab] = useState('bookings');
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const queryClient = useQueryClient();
@@ -53,8 +56,6 @@ export default function FarmerDashboard() {
       window.addEventListener('storage', handleStorageChange);
       window.addEventListener('online', handleStorageChange);
       
-      // Since IndexedDB doesn't trigger 'storage' events reliably across tabs without a BroadcastChannel,
-      // we'll poll it briefly or just rely on focus/online events
       window.addEventListener('focus', handleStorageChange);
       
       return () => {
@@ -65,7 +66,6 @@ export default function FarmerDashboard() {
     }
   }, []);
 
-  // Sync offline queue when online
   const trySyncOffline = async () => {
     const queue = await getOfflineQueue();
     if (queue.length === 0) return;
@@ -81,7 +81,7 @@ export default function FarmerDashboard() {
   useEffect(() => {
     let cancelled = false;
 
-        const init = async () => {
+    const init = async () => {
       try {
         const { data, error } = await supabase.auth.getUser();
         if (error) throw error;
@@ -130,7 +130,7 @@ export default function FarmerDashboard() {
       window.removeEventListener('online', handleOnline);
       if (channelRef.current) { supabase.removeChannel(channelRef.current); channelRef.current = null; }
     };
-  }, [queryClient, refetchBookings]); // Removed router to prevent re-running init on hash changes
+  }, [queryClient, refetchBookings]);
 
   const handleRefresh = async () => {
     try {
@@ -147,12 +147,10 @@ export default function FarmerDashboard() {
     router.push('/');
   };
 
-
   const today = new Date().toISOString().split('T')[0];
   const upcoming = useMemo(() => bookings.filter(b => b.slot_date >= today && !['paid', 'cancelled', 'rejected'].includes(b.status)), [bookings, today]);
   const past = useMemo(() => bookings.filter(b => b.slot_date < today || ['paid', 'cancelled', 'rejected'].includes(b.status)), [bookings, today]);
 
-  // Audio and Haptic queue turn alarm
   useEffect(() => {
     const hasLeaveNow = upcoming.some(b => {
       const q = b.queue_entries?.[0];
@@ -171,7 +169,6 @@ export default function FarmerDashboard() {
     }
   }, [upcoming, audioAlerts, showToast]);
 
-  // Kisan Passbook stats
   const totalEarnings = bookings.reduce((sum, b) => {
     const p = b.payments?.[0];
     return p ? sum + (Number(p.amount) || 0) : sum;
@@ -183,8 +180,6 @@ export default function FarmerDashboard() {
     }
     return sum;
   }, 0);
-
-  const activeTokens = bookings.filter(b => ['booked', 'checked_in'].includes(b.status)).length;
 
   const getStatusColor = (status) => {
     const colors = {
@@ -222,7 +217,6 @@ export default function FarmerDashboard() {
 
     return (
       <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={b.id} id={`booking-${b.id}`} className={`bg-white dark:bg-neutral-800 rounded-xl shadow p-4 ${getBorderColor(b.status)} ${isLeaveNow ? 'ring-2 ring-orange-400' : ''}`}>
-        {/* Rejection Alert Box */}
         {b.status === 'rejected' && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
             <p className="font-bold text-red-800 text-sm">❌ Booking Rejected by Centre</p>
@@ -235,7 +229,6 @@ export default function FarmerDashboard() {
           </div>
         )}
 
-        {/* Leave Now Alert */}
         {isLeaveNow && (
           <div className="bg-orange-50 border border-orange-300 rounded-lg p-3 mb-3 flex items-center gap-2">
             <span className="text-2xl">🚨</span>
@@ -274,68 +267,9 @@ export default function FarmerDashboard() {
           </div>
         )}
 
-        {/* 6-Stage Visual Procurement Stepper */}
-        {!['cancelled', 'rejected'].includes(b.status) && (
-          <div className="mt-4 mb-3 pt-3 border-t border-gray-100 dark:border-neutral-700">
-            <div className="flex items-center justify-between relative">
-              {/* Connecting Background Line */}
-              <div className="absolute left-3 right-3 top-3 -translate-y-1/2 h-0.5 bg-gray-200 -z-0" />
-              {/* Connecting Active Progress Line */}
-              {(() => {
-                const steps = ['booked', 'checked_in', 'weighed', 'quality_checked', 'accepted', 'paid'];
-                const currentIndex = steps.indexOf(b.status);
-                const pct = currentIndex > 0 ? (currentIndex / (steps.length - 1)) * 100 : 0;
-                return (
-                  <div
-                    className="absolute left-3 top-3 -translate-y-1/2 h-0.5 bg-green-600 transition-all duration-500 -z-0"
-                    style={{ width: `calc(${pct}% * 0.92)` }}
-                  />
-                );
-              })()}
-
-              {[
-                { id: 'booked', label: 'Booked', icon: '📝' },
-                { id: 'checked_in', label: 'Checked In', icon: '📍' },
-                { id: 'weighed', label: 'Weighed', icon: '⚖️' },
-                { id: 'quality_checked', label: 'Quality', icon: '🔍' },
-                { id: 'accepted', label: 'Accepted', icon: '✅' },
-                { id: 'paid', label: 'Paid', icon: '💰' },
-              ].map((step, idx) => {
-                const steps = ['booked', 'checked_in', 'weighed', 'quality_checked', 'accepted', 'paid'];
-                const currentIndex = steps.indexOf(b.status);
-                const isCompleted = currentIndex > idx;
-                const isCurrent = currentIndex === idx;
-
-                return (
-                  <div key={step.id} className="flex flex-col items-center z-10">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                        isCompleted
-                          ? 'bg-green-600 text-white shadow-sm'
-                          : isCurrent
-                          ? 'bg-white dark:bg-neutral-800 border-2 border-green-600 text-green-700 shadow-md ring-2 ring-green-100'
-                          : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 border border-gray-200 dark:border-neutral-700'
-                      }`}
-                    >
-                      {isCompleted ? '✓' : idx + 1}
-                    </div>
-                    <span
-                      className={`text-[10px] mt-1 font-medium text-center whitespace-nowrap ${
-                        isCurrent
-                          ? 'text-green-700 font-bold'
-                          : isCompleted
-                          ? 'text-gray-700 dark:text-neutral-300'
-                          : 'text-gray-400'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <div className="mt-4 mb-3 pt-3 border-t border-slate-200">
+          <BookingStepper status={b.status} />
+        </div>
 
         {b.actual_weight_quintals && (
           <p className="text-sm mt-2 text-gray-600 dark:text-neutral-400">⚖️ Actual weight: <strong>{b.actual_weight_quintals}q</strong>
@@ -345,7 +279,6 @@ export default function FarmerDashboard() {
 
         {b.payments?.[0] && (
           <div className="mt-4 border border-emerald-100 dark:border-emerald-900/30 rounded-xl overflow-hidden">
-            {/* Phase 3: Fintech Trust & Traceability */}
             <div className="bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 border-b border-emerald-100 dark:border-emerald-900/30 flex justify-between items-center">
               <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -399,15 +332,11 @@ export default function FarmerDashboard() {
             </div>
           </div>
         )}
-        
-        {/* Legacy block removed */}
 
-        {/* 5-Star Mandi Feedback for Completed/Accepted Procurements */}
         {['accepted', 'paid'].includes(b.status) && (
           <MandiFeedback bookingId={b.id} centreName={b.centres?.name || 'Mandi Centre'} />
         )}
 
-        {/* Action links */}
         <div className="flex gap-2.5 mt-3 flex-wrap items-center">
           {['booked', 'checked_in'].includes(b.status) && (
             <Link href={`/farmer/token/${b.id}`} className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg hover:bg-emerald-100 transition inline-flex items-center gap-1">
@@ -422,11 +351,10 @@ export default function FarmerDashboard() {
               rel="noopener noreferrer"
               className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg hover:bg-green-100 transition inline-flex items-center gap-1"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
               Share WhatsApp
             </a>
           )}
-{b.gate_passes?.[0] && (
+          {b.gate_passes?.[0] && (
             <Link href={`/farmer/gate-pass/${b.id}`} className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg hover:bg-green-100 transition inline-flex items-center gap-1">
               📄 Official Gate Pass &rarr;
             </Link>
@@ -465,306 +393,344 @@ export default function FarmerDashboard() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-4 pt-10 pb-28 sm:pb-10 animate-fadeIn">
+      <div className="min-h-screen bg-[var(--chassis)] px-4 pt-10 pb-28 sm:pb-10 animate-fadeIn font-sans">
         <div className="max-w-2xl mx-auto">
           
           {/* Trust Badges & Language Toggle */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-xl border border-emerald-100 dark:border-emerald-800">
             <div className="flex gap-2 text-[9px] sm:text-[10px] font-bold">
               <span className="flex items-center gap-1 text-emerald-700 bg-emerald-100/50 px-2 py-1 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> FCI APMC Grid Sync</span>
-              <span className="flex items-center gap-1 text-blue-700 bg-blue-100/50 px-2 py-1 rounded-full"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg> UIDAI Zero-Trust Verified</span>
+              <span className="flex items-center gap-1 text-blue-700 bg-blue-100/50 px-2 py-1 rounded-full">UIDAI Zero-Trust Verified</span>
             </div>
             
             <LanguageToggle />
           </div>
           
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold">{t('myBookings')}</h1>
+            <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">System Dashboard</h1>
             <div className="flex gap-2 items-center flex-wrap justify-end">
               <button
                 type="button"
                 onClick={() => setAudioAlerts(!audioAlerts)}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1 ${
-                  audioAlerts ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-neutral-400 border-gray-200 dark:border-neutral-700'
+                className={`px-2.5 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-wider border transition flex items-center gap-1 shadow-card active:shadow-pressed active:translate-y-[2px] ${
+                  audioAlerts ? 'bg-[#f8fafc] text-slate-700 border-slate-300' : 'bg-slate-200 text-slate-400 border-slate-300 shadow-recessed'
                 }`}
                 title={audioAlerts ? 'Audio alert enabled for your queue turn' : 'Audio alert muted'}
                 aria-label={audioAlerts ? 'Mute queue audio alerts' : 'Enable queue audio alerts'}
               >
                 <span>{audioAlerts ? '🔔' : '🔕'}</span>
-                <span className="hidden sm:inline">{audioAlerts ? 'Alerts On' : 'Alerts Muted'}</span>
+                <span className="hidden sm:inline">{audioAlerts ? 'ALERTS ON' : 'MUTED'}</span>
               </button>
               <VoiceAssistance profile={profile} bookings={bookings} commodities={commodities} />
               <NotificationBell bookings={bookings} />
-              <Link href="/ivr-demo" className="bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-amber-700">🎙️ IVR</Link>
-              <Link href="/farmer/book-slot" className="bg-green-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-green-800">{t('bookSlot')}</Link>
-              <Link href="/farmer/grievances" className="bg-yellow-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-yellow-700">{t('viewGrievances')}</Link>
-              <button onClick={handleLogout} className="bg-gray-200 text-gray-700 dark:text-neutral-300 px-3 py-1.5 rounded-xl text-xs font-medium hover:bg-gray-300">{t('logout')}</button>
+              <button onClick={handleLogout} className="bg-[#f8fafc] text-slate-600 border border-slate-300 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider shadow-card active:shadow-pressed active:translate-y-[2px]">LOGOUT</button>
             </div>
           </div>
 
-        {/* Kisan Passbook Profile Card */}
-        {profile && (
-          <div className="bg-gradient-to-r from-emerald-800 to-green-900 rounded-2xl shadow-lg p-5 text-white mb-6">
-            <div className="flex flex-wrap justify-between items-start gap-2 border-b border-emerald-700/60 pb-3">
+          {/* Hardware Toggle Switch for Views */}
+          <div className="bg-[#e8ecef] p-1.5 rounded-xl shadow-recessed border border-white/60 mb-6 flex gap-1 relative overflow-hidden">
+            <Button
+              variant={activeTab === 'bookings' ? 'primary' : 'secondary'}
+              onClick={() => setActiveTab('bookings')}
+              className={`flex-1 text-[10px] py-2 h-auto rounded-lg transition-all ${activeTab === 'bookings' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.4)] text-amber-950 font-black' : 'bg-transparent border-transparent shadow-none text-slate-500 font-bold hover:bg-white/40'}`}
+            >
+              OPERATIONS
+            </Button>
+            <Button
+              variant={activeTab === 'market' ? 'primary' : 'secondary'}
+              onClick={() => setActiveTab('market')}
+              className={`flex-1 text-[10px] py-2 h-auto rounded-lg transition-all ${activeTab === 'market' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.4)] text-amber-950 font-black' : 'bg-transparent border-transparent shadow-none text-slate-500 font-bold hover:bg-white/40'}`}
+            >
+              TELEMETRY
+            </Button>
+            <Button
+              variant={activeTab === 'passbook' ? 'primary' : 'secondary'}
+              onClick={() => setActiveTab('passbook')}
+              className={`flex-1 text-[10px] py-2 h-auto rounded-lg transition-all ${activeTab === 'passbook' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.4)] text-amber-950 font-black' : 'bg-transparent border-transparent shadow-none text-slate-500 font-bold hover:bg-white/40'}`}
+            >
+              LEDGER
+            </Button>
+          </div>
+
+          {loading && (
+            <div className="space-y-4">
+              <BookingSkeleton />
+              <BookingSkeleton />
+            </div>
+          )}
+
+          {syncMessage && (
+            <div className="bg-emerald-100 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-lg mb-4 text-[10px] font-bold uppercase tracking-wider shadow-card">
+              {syncMessage}
+            </div>
+          )}
+
+          {!loading && offlineQueueCount > 0 && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-4 text-[10px] font-bold uppercase tracking-wider shadow-card">
+              📡 {offlineQueueCount} LOG(S) QUEUED OFFLINE — PENDING SYNC.
+            </div>
+          )}
+
+          {/* =======================
+              OPERATIONS VIEW
+              ======================= */}
+          {activeTab === 'bookings' && !loading && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              
+              {/* Quick Tools */}
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider bg-emerald-700/80 px-2 py-0.5 rounded text-emerald-100">
-                  Kisan Passbook
-                </span>
-                <h2 className="text-lg font-bold mt-1">{profile.full_name || 'Kisan Mitra'}</h2>
-                <p className="text-xs text-emerald-200">
-                  📱 {profile.phone || '-'} • 📍 {profile.village || 'APMC Region'}
-                  {profile.land_holding_acres ? ` • 🌾 ${profile.land_holding_acres} Acres` : ''}
-                </p>
-              </div>
-              <div className="bg-emerald-700/60 border border-emerald-500/40 rounded-full px-3 py-1 flex items-center gap-1.5 text-xs text-emerald-100">
-                <span>🛡️</span>
-                <span className="font-semibold">Aadhaar eKYC Verified</span>
-              </div>
-            </div>
-
-            {/* Lifetime Procurement Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 text-center">
-              <div className="border-b sm:border-b-0 sm:border-r border-emerald-700/60 pb-2 sm:pb-0">
-                <p className="text-[10px] text-emerald-200 font-medium">DBT EARNED</p>
-                <p className="text-lg font-extrabold text-white mt-0.5">
-                  ₹{totalEarnings.toLocaleString()}
-                </p>
-              </div>
-              <div className="border-b sm:border-b-0 sm:border-r border-emerald-700/60 pb-2 sm:pb-0">
-                <p className="text-[10px] text-emerald-200 font-medium">PROCURED QTY</p>
-                <p className="text-lg font-extrabold text-white mt-0.5">
-                  {totalQuintals.toLocaleString()} <span className="text-xs font-normal">q</span>
-                </p>
-              </div>
-              <div className="border-r border-emerald-700/60 pt-2 sm:pt-0">
-                <p className="text-[10px] text-emerald-200 font-medium">QUALITY SCORE</p>
-                <p className="text-lg font-extrabold text-white mt-0.5 flex justify-center items-center gap-1">
-                  {(() => {
-                    const completed = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status)).length;
-                    const accepted = bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length;
-                    const ratio = completed > 0 ? Math.round((accepted / completed) * 100) : 100;
-                    return `${ratio}% ${ratio >= 90 ? '🏆' : (ratio < 50 ? '⚠️' : '👍')}`;
-                  })()}
-                </p>
-              </div>
-              <div className="pt-2 sm:pt-0">
-                <p className="text-[10px] text-emerald-200 font-medium">TOP CROP</p>
-                <p className="text-sm font-extrabold text-white mt-1.5 truncate px-1">
-                  {(() => {
-                    const counts = bookings.reduce((acc, b) => {
-                      if (b.commodities?.name) acc[b.commodities.name] = (acc[b.commodities.name] || 0) + 1;
-                      return acc;
-                    }, {});
-                    return Object.keys(counts).length > 0 ? Object.keys(counts).sort((a,b) => counts[b] - counts[a])[0] : 'N/A';
-                  })()}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Live MSP Rate Board */}
-        {commodities.length > 0 && (
-          <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-4 mb-6">
-            <div className="flex justify-between items-center mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-base">🌾</span>
-                <h3 className="text-xs font-bold text-gray-800 dark:text-neutral-200 uppercase tracking-wider">
-                  Live Govt. MSP Rates (2026 Season)
-                </h3>
-              </div>
-              <span className="text-[10px] text-gray-400 font-medium">Updated Daily by CACP</span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              {commodities.map(c => (
-                <div key={c.id} className="bg-slate-50 dark:bg-neutral-950 border border-gray-100 dark:border-neutral-700 rounded-xl p-2.5 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <CropBadge name={c.name} size="xs" />
-                      {c.season && (
-                        <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
-                          {c.season}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm font-extrabold text-green-700 mt-1">
-                      ₹{Number(c.msp_rate_per_quintal).toLocaleString()} <span className="text-[10px] font-normal text-gray-500 dark:text-neutral-400">/q</span>
-                    </p>
-                  </div>
-                  <Link
-                    href={`/farmer/book-slot?commodityId=${c.id}`}
-                    className="mt-2 text-[10px] text-center font-semibold text-green-700 hover:text-green-800 bg-white dark:bg-neutral-800 border border-green-200 rounded-lg py-1 shadow-2xs hover:bg-green-50 transition"
-                  >
-                    Book Slot &rarr;
+                <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">HARDWARE MODULES</h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <Link href="/farmer/net-calculator" className="bg-[#f8fafc] p-3 rounded-xl shadow-card active:shadow-pressed active:translate-y-[2px] border border-slate-300 flex flex-col items-center justify-center text-center gap-2 transition-all duration-150">
+                    <span className="text-2xl drop-shadow-sm">🧮</span>
+                    <span className="text-[9px] font-black text-slate-600 leading-tight uppercase tracking-widest">NET CALC</span>
+                  </Link>
+                  <Link href="/farmer/price-outlook" className="bg-[#f8fafc] p-3 rounded-xl shadow-card active:shadow-pressed active:translate-y-[2px] border border-slate-300 flex flex-col items-center justify-center text-center gap-2 transition-all duration-150">
+                    <span className="text-2xl drop-shadow-sm">📈</span>
+                    <span className="text-[9px] font-black text-slate-600 leading-tight uppercase tracking-widest">RADAR</span>
+                  </Link>
+                  <Link href="/farmer/guidelines" className="bg-[#f8fafc] p-3 rounded-xl shadow-card active:shadow-pressed active:translate-y-[2px] border border-slate-300 flex flex-col items-center justify-center text-center gap-2 transition-all duration-150">
+                    <span className="text-2xl drop-shadow-sm">📖</span>
+                    <span className="text-[9px] font-black text-slate-600 leading-tight uppercase tracking-widest">MANUAL</span>
                   </Link>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 3-Day Mandi Weather & Moisture Precaution Advisory */}
-        
-        
-        {/* Seasonal Advisory */}
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 mb-4 border border-amber-200 dark:border-amber-800">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl mt-0.5">🌾</span>
-            <div>
-              <p className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1">Seasonal Advisory</p>
-              <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                {new Date().getMonth() >= 9 || new Date().getMonth() <= 0
-                  ? 'Kharif procurement season is active. Soyabean, Paddy, Cotton, and Tur are currently being procured at your nearby mandis.'
-                  : new Date().getMonth() >= 2 && new Date().getMonth() <= 4
-                  ? 'Rabi procurement season is active. Wheat, Gram, Jowar, and Onion are currently being procured at your nearby mandis.'
-                  : 'Off-season period. Limited procurement is underway. Check guidelines for next season preparation tips.'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Market Intelligence & Quality Analytics Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 p-4 mb-4">
-          <h3 className="text-sm font-bold text-gray-800 dark:text-neutral-200 mb-3 flex items-center gap-2">
-            📊 {t('appName') === 'Kisan Setu' ? 'Market & Quality Analytics' : 'बाज़ार जानकारी'}
-          </h3>
-          
-          {/* Acceptance Ratio */}
-          {(() => {
-            const finished = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status));
-            const accepted = finished.filter(b => ['accepted', 'paid'].includes(b.status)).length;
-            const ratio = finished.length > 0 ? Math.round((accepted / finished.length) * 100) : 100;
-            return (
-              <div className="mb-4 bg-gray-50 dark:bg-neutral-900 rounded-xl p-3 border border-gray-100 dark:border-neutral-700">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs font-semibold text-gray-700 dark:text-neutral-300">Your Crop Acceptance Ratio</span>
-                  <span className={`text-sm font-bold ${ratio >= 90 ? 'text-green-600' : ratio >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
-                    {ratio}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
-                  <div className={`h-full rounded-full ${ratio >= 90 ? 'bg-green-500' : ratio >= 70 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${ratio}%` }} />
-                </div>
-                <p className="text-[10px] text-gray-500 dark:text-neutral-400 mt-1.5">
-                  {ratio >= 90 ? 'Excellent! Your moisture control is perfect.' : 'Keep moisture below 14% to improve your acceptance rate.'}
-                </p>
               </div>
-            );
-          })()}
 
-          <div className="space-y-3">
-            <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-gray-100 dark:border-neutral-700 pb-1">Live Price & Climate Impact</h4>
-            {commodities.slice(0, 5).map(c => {
-              const isWheatPaddy = c.name.toLowerCase().includes('wheat') || c.name.toLowerCase().includes('paddy');
-              const demandStatus = c.demand_status || 'normal';
-              const marketAdvisory = c.market_advisory;
-              const mockMarketPrice = Math.round(c.msp_rate_per_quintal * (demandStatus === 'high' ? 1.08 : demandStatus === 'oversupply' ? 0.95 : 1.02));
-              const aboveMsp = mockMarketPrice >= c.msp_rate_per_quintal;
-              const diff = Math.round(((mockMarketPrice - c.msp_rate_per_quintal) / c.msp_rate_per_quintal) * 100);
+              <div className="flex justify-between items-center mb-2 mt-4">
+                <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">ACTIVE LOGS</h2>
+                <Link href="/farmer/book-slot" className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider shadow-[0_2px_0_#047857] active:translate-y-[2px] active:shadow-none hover:bg-emerald-500 transition-all">
+                  + NEW SLOT
+                </Link>
+              </div>
+
+              {bookings.length === 0 && (
+                <Card elevated={true} className="p-8 text-center bg-[#f8fafc] border border-slate-300">
+                  <span className="text-4xl mb-3 block">🌾</span>
+                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-1">NO LOGS DETECTED</h3>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4">You haven't booked any procurement slots.</p>
+                  <Link href="/farmer/book-slot" className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-[0_3px_0_#047857] active:translate-y-[3px] active:shadow-none hover:bg-emerald-500 transition-all inline-block">
+                    INITIALIZE BOOKING
+                  </Link>
+                </Card>
+              )}
+
+              {upcoming.length > 0 && (
+                <div className="space-y-4">
+                  {upcoming.map(renderBookingCard)}
+                </div>
+              )}
+
+              {past.length > 0 && (
+                <>
+                  <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-6 border-b-2 border-slate-300 pb-1">ARCHIVED LOGS</h2>
+                  <div className="space-y-3 opacity-80 mt-3">
+                    {past.map(renderBookingCard)}
+                  </div>
+                </>
+              )}
+            </motion.div>
+          )}
+
+          {/* =======================
+              TELEMETRY VIEW
+              ======================= */}
+          {activeTab === 'market' && !loading && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
               
-              return (
-                <div key={c.id} className="py-2 border-b border-gray-50 dark:border-neutral-700 last:border-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-700 dark:text-neutral-300 flex items-center gap-1">
-                      {c.name}
-                      {demandStatus === 'high' && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-100 text-green-700 uppercase">High Demand</span>}
-                      {demandStatus === 'oversupply' && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-100 text-red-700 uppercase">Oversupply</span>}
+              {/* Seasonal Advisory */}
+              <Card elevated={false} withScrews={false} className="bg-amber-100/50 border border-amber-300 p-4 shadow-recessed relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-8 h-8 bg-amber-400 rounded-bl-full flex items-center justify-center shadow-inner opacity-40">
+                  <span className="text-amber-900 font-bold -mt-2 -mr-2 text-xs">!</span>
+                </div>
+                <div className="flex items-start gap-3 relative z-10">
+                  <div>
+                    <p className="text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 border-b-2 border-amber-300/50 pb-0.5 inline-block">SEASONAL ADVISORY</p>
+                    <p className="text-[11px] font-bold text-amber-900 uppercase leading-relaxed mt-1">
+                      {new Date().getMonth() >= 9 || new Date().getMonth() <= 0
+                        ? 'KHARIF PROCUREMENT SEASON IS ACTIVE. SOYABEAN, PADDY, COTTON, AND TUR ARE CURRENTLY BEING PROCURED AT YOUR NEARBY MANDIS.'
+                        : new Date().getMonth() >= 2 && new Date().getMonth() <= 4
+                        ? 'RABI PROCUREMENT SEASON IS ACTIVE. WHEAT, GRAM, JOWAR, AND ONION ARE CURRENTLY BEING PROCURED AT YOUR NEARBY MANDIS.'
+                        : 'OFF-SEASON PERIOD. LIMITED PROCUREMENT IS UNDERWAY. CHECK GUIDELINES FOR NEXT SEASON PREPARATION TIPS.'}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Live MSP Rate Board */}
+              {commodities.length > 0 && (
+                <Card className="p-4 border border-white/50" withScrews={true} withVents={true}>
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                      LIVE GOVT. MSP RATES
+                    </h3>
+                    <span className="text-[8px] bg-red-100 text-red-800 border border-red-300 font-bold px-1.5 py-0.5 rounded shadow-[inset_0_1px_1px_rgba(0,0,0,0.1)] flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> LIVE
                     </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 dark:text-neutral-400">MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}</span>
-                      <span className={`text-xs font-bold ${aboveMsp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                        Mkt: ₹{Number(mockMarketPrice).toLocaleString()}
-                      </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {commodities.map(c => (
+                      <div key={c.id} className="bg-[var(--chassis)] border border-white/60 shadow-recessed rounded-xl p-3 flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-start mb-2 border-b border-slate-300/50 pb-1">
+                            <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest truncate max-w-[80%]">{c.name}</span>
+                            <span className="text-base leading-none">🌾</span>
+                          </div>
+                          <div className="bg-[#9ea79a] shadow-[inset_0_2px_5px_rgba(0,0,0,0.4),0_1px_0_rgba(255,255,255,1)] p-2 rounded border-2 border-[#8b9588] text-center">
+                            <p className="text-[8px] text-slate-800/60 font-black uppercase tracking-widest mb-0.5">RATE/QTL</p>
+                            <p className="text-lg font-mono font-black text-slate-900 tracking-tighter leading-none">
+                              ₹{Number(c.msp_rate_per_quintal).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        <Link
+                          href={`/farmer/book-slot?commodityId=${c.id}`}
+                          className="mt-3 text-[9px] text-center font-black text-emerald-800 uppercase tracking-widest bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-300 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_2px_rgba(0,0,0,0.1)] py-1.5 transition-colors"
+                        >
+                          BOOK &rarr;
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+              {/* Market Intelligence & Quality Analytics Card */}
+              <Card className="border border-white/50 p-4" withScrews={true}>
+                <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-4">
+                  MARKET & QUALITY ANALYTICS
+                </h3>
+                
+                {/* Acceptance Ratio */}
+                {(() => {
+                  const finished = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status));
+                  const accepted = finished.filter(b => ['accepted', 'paid'].includes(b.status)).length;
+                  const ratio = finished.length > 0 ? Math.round((accepted / finished.length) * 100) : 100;
+                  return (
+                    <div className="mb-5 bg-[var(--chassis)] shadow-recessed rounded-xl p-3 border border-white/60">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">LIFETIME ACCEPTANCE RATIO</span>
+                        <span className={`text-sm font-mono font-black ${ratio >= 90 ? 'text-emerald-600' : ratio >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
+                          {ratio}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-300 rounded-full h-2 shadow-inner overflow-hidden border border-slate-400">
+                        <div className={`h-full border-r border-white/40 ${ratio >= 90 ? 'bg-emerald-500' : ratio >= 70 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${ratio}%` }} />
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div className="space-y-4">
+                  <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b-2 border-slate-200 pb-1">LIVE COMMODITY SPREADS</h4>
+                  {commodities.slice(0, 5).map(c => {
+                    const demandStatus = c.demand_status || 'normal';
+                    const marketAdvisory = c.market_advisory;
+                    const mockMarketPrice = Math.round(c.msp_rate_per_quintal * (demandStatus === 'high' ? 1.08 : demandStatus === 'oversupply' ? 0.95 : 1.02));
+                    const aboveMsp = mockMarketPrice >= c.msp_rate_per_quintal;
+                    
+                    return (
+                      <div key={c.id} className="bg-white border border-slate-300 rounded-lg p-2.5 shadow-[0_2px_5px_rgba(0,0,0,0.05)]">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
+                            {c.name}
+                            {demandStatus === 'high' && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase shadow-sm">HIGH DEMAND</span>}
+                            {demandStatus === 'oversupply' && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-100 text-red-800 border border-red-300 uppercase shadow-sm">OVERSUPPLY</span>}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          <div className="bg-[#f8fafc] shadow-recessed p-1.5 border border-slate-200 rounded text-center">
+                            <p className="text-[8px] text-slate-500 font-bold uppercase">GOVT MSP</p>
+                            <p className="text-xs font-mono font-black text-slate-700">₹{Number(c.msp_rate_per_quintal).toLocaleString()}</p>
+                          </div>
+                          <div className="bg-[#f8fafc] shadow-recessed p-1.5 border border-slate-200 rounded text-center">
+                            <p className="text-[8px] text-slate-500 font-bold uppercase">OPEN MKT</p>
+                            <p className={`text-xs font-mono font-black ${aboveMsp ? 'text-emerald-600' : 'text-red-600'}`}>₹{Number(mockMarketPrice).toLocaleString()}</p>
+                          </div>
+                        </div>
+                        
+                        {marketAdvisory && (
+                          <p className="text-[9px] font-bold text-amber-800 bg-amber-100/50 border border-amber-200 p-1.5 rounded uppercase">
+                            ⚠️ {marketAdvisory}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+
+              <WeatherAdvisory district={profile?.village || 'Regional Mandi Hub'} />
+
+            </motion.div>
+          )}
+
+          {/* =======================
+              LEDGER VIEW (PROFILE)
+              ======================= */}
+          {activeTab === 'passbook' && !loading && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              {/* Kisan Passbook Profile Card */}
+              {profile && (
+                <Card elevated={true} withScrews={true} className="bg-[#e8ecef] p-4 border border-white/50 shadow-floating">
+                  <div className="flex justify-between items-center mb-3">
+                    <h2 className="text-[11px] font-black text-slate-600 uppercase tracking-widest border-b-2 border-slate-300 pb-1">Kisan Passbook Identity</h2>
+                    <div className="bg-emerald-100 border border-emerald-300 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] rounded px-2 py-0.5 flex items-center gap-1.5 text-[9px] text-emerald-800 font-bold uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981] animate-pulse" /> UIDAI VERIFIED
                     </div>
                   </div>
-                  
-                  {marketAdvisory && (
-                    <p className="text-[10px] text-amber-700 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/10 p-1.5 rounded mt-1">
-                      💡 {marketAdvisory}
-                    </p>
-                  )}
-                  {isWheatPaddy && !marketAdvisory && (
-                    <p className="text-[10px] text-blue-700 dark:text-blue-500 bg-blue-50 dark:bg-blue-900/10 p-1.5 rounded mt-1">
-                      🌧️ Climate Alert: Expected rains in 3 days. Dry completely before booking.
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
-        <WeatherAdvisory district={profile?.village || 'Regional Mandi Hub'} />
+                  <div className="bg-[#2d3436] p-4 rounded-xl shadow-[inset_0_3px_10px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.8)] border border-slate-900 mb-2 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                    
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-black text-emerald-400 tracking-tight drop-shadow-[0_0_5px_rgba(52,211,153,0.4)] uppercase">{profile.full_name || 'KISAN MITRA'}</h3>
+                        <p className="text-[10px] text-emerald-600/80 font-mono font-bold mt-1 uppercase tracking-widest">
+                          MOB: {profile.phone || '-'} • LOC: {profile.village || 'APMC HUB'}
+                        </p>
+                      </div>
+                    </div>
 
-        {/* Quick Tools */}
-        <div className="mt-4">
-          <h2 className="text-sm font-bold text-gray-700 dark:text-neutral-300 mb-3">{t('quickTools', 'Quick Tools')}</h2>
-          <div className="grid grid-cols-3 gap-3">
-            <Link href="/farmer/net-calculator" className="bg-white dark:bg-neutral-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-700 flex flex-col items-center justify-center text-center gap-2 hover:bg-green-50 dark:hover:bg-neutral-700 transition">
-              <span className="text-2xl">🧮</span>
-              <span className="text-[10px] font-bold text-gray-700 dark:text-neutral-200 leading-tight">Net Calc</span>
-            </Link>
-            <Link href="/farmer/price-outlook" className="bg-white dark:bg-neutral-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-700 flex flex-col items-center justify-center text-center gap-2 hover:bg-green-50 dark:hover:bg-neutral-700 transition">
-              <span className="text-2xl">📈</span>
-              <span className="text-[10px] font-bold text-gray-700 dark:text-neutral-200 leading-tight">Price Trend</span>
-            </Link>
-            <Link href="/farmer/guidelines" className="bg-white dark:bg-neutral-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-700 flex flex-col items-center justify-center text-center gap-2 hover:bg-green-50 dark:hover:bg-neutral-700 transition">
-              <span className="text-2xl">📖</span>
-              <span className="text-[10px] font-bold text-gray-700 dark:text-neutral-200 leading-tight">Guidelines</span>
-            </Link>
-          </div>
-        </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t-2 border-dashed border-emerald-900/50">
+                      <div>
+                        <p className="text-[9px] text-emerald-700 font-black tracking-widest uppercase">LIFETIME DBT</p>
+                        <p className="text-xl font-mono font-black text-emerald-400 tracking-tight mt-0.5">₹{totalEarnings.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-emerald-700 font-black tracking-widest uppercase">CROP VOL</p>
+                        <p className="text-xl font-mono font-black text-emerald-400 tracking-tight mt-0.5">{totalQuintals.toLocaleString()} <span className="text-xs">Q</span></p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-emerald-700 font-black tracking-widest uppercase">QUALITY IDX</p>
+                        <p className="text-xl font-mono font-black text-emerald-400 tracking-tight mt-0.5">
+                          {(() => {
+                            const completed = bookings.filter(b => ['accepted', 'paid', 'rejected'].includes(b.status)).length;
+                            const accepted = bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length;
+                            return completed > 0 ? Math.round((accepted / completed) * 100) : 100;
+                          })()}%
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-emerald-700 font-black tracking-widest uppercase">PRI. COMMODITY</p>
+                        <p className="text-sm font-mono font-black text-emerald-400 tracking-tight mt-2 truncate">
+                          {(() => {
+                            const counts = bookings.reduce((acc, b) => {
+                              if (b.commodities?.name) acc[b.commodities.name] = (acc[b.commodities.name] || 0) + 1;
+                              return acc;
+                            }, {});
+                            return Object.keys(counts).length > 0 ? Object.keys(counts).sort((a,b) => counts[b] - counts[a])[0].toUpperCase() : 'N/A';
+                          })()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </motion.div>
+          )}
 
-
-        {loading && (
-          <div className="space-y-4">
-            <BookingSkeleton />
-            <BookingSkeleton />
-          </div>
-        )}
-
-        {syncMessage && (
-          <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg mb-4 text-sm">
-            {syncMessage}
-          </div>
-        )}
-
-        {!loading && offlineQueueCount > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 text-sm">
-            📡 {offlineQueueCount} booking(s) queued offline — will sync when you reconnect.
-          </div>
-        )}
-
-        {!loading && bookings.length === 0 && (
-          <EmptyState
-            icon="🌾"
-            title="No Bookings Yet"
-            description="You haven't booked any procurement slots. Choose a centre and book your first slot easily."
-            actionText="Book a Slot Now"
-            onAction={() => router.push('/farmer/book-slot')}
-          />
-        )}
-
-        {/* Upcoming Bookings */}
-        {upcoming.length > 0 && (
-          <>
-            <h2 className="text-md font-semibold text-gray-700 dark:text-neutral-300 mb-3">📅 Upcoming</h2>
-            <div className="space-y-4 mb-8">
-              {upcoming.map(renderBookingCard)}
-            </div>
-          </>
-        )}
-
-        {/* Past Bookings */}
-        {past.length > 0 && (
-          <>
-            <h2 className="text-md font-semibold text-gray-500 dark:text-neutral-400 mb-3">📋 Past / Completed</h2>
-            <div className="space-y-3 opacity-80">
-              {past.map(renderBookingCard)}
-            </div>
-          </>
-        )}
         </div>
         <InstallPwaBanner />
         <FarmerBottomNav />
@@ -773,10 +739,3 @@ export default function FarmerDashboard() {
     </PullToRefresh>
   );
 }
-
-
-
-
-
-
-

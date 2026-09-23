@@ -30,8 +30,23 @@ export default function OfficerDashboard() {
   const router = useRouter();
   const { t } = useLanguage();
   const { showToast } = useToast();
+  const [isDark, setIsDark] = useState(false);
 
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
 
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -292,126 +307,276 @@ export default function OfficerDashboard() {
 
   return (
     <PullToRefresh onRefresh={() => load(selectedDate)}>
-      <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-4 py-10 animate-fadeIn">
-        <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">{t('todaysQueue')}</h1>
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={e => { setSelectedDate(e.target.value); load(e.target.value); }}
-              className="border rounded-lg px-3 py-2 text-sm"
-            />
-            <button onClick={handleLogout} className="bg-gray-200 text-gray-700 dark:text-neutral-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300">{t('logout')}</button>
-          </div>
-        </div>
-
-        {/* Counter Board */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-blue-500">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">Total Scheduled</p>
-            <p className="text-xl font-bold text-gray-800 dark:text-neutral-200 mt-1">{bookings.length}</p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-yellow-500">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">Checked In</p>
-            <p className="text-xl font-bold text-yellow-600 mt-1">
-              {bookings.filter(b => b.status === 'checked_in').length}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-purple-500">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">In Inspection</p>
-            <p className="text-xl font-bold text-purple-600 mt-1">
-              {bookings.filter(b => ['weighed', 'quality_checked'].includes(b.status)).length}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm p-3 border-t-2 border-green-600">
-            <p className="text-xs font-medium text-gray-500 dark:text-neutral-400">Accepted</p>
-            <p className="text-xl font-bold text-green-600 mt-1">
-              {bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length}
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {loading && (
-            <>
-              <BookingSkeleton />
-              <BookingSkeleton />
-              <BookingSkeleton />
-            </>
-          )}
-
-          {!loading && bookings.map(b => (
-            <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={b.id} className="bg-white dark:bg-neutral-800 rounded-xl shadow p-4 border-l-4 border-l-green-600">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <p className="font-bold text-gray-900 dark:text-neutral-100">{b.profiles?.full_name}</p>
-                    <CropBadge name={b.commodities?.name} size="xs" />
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-neutral-400">{b.slot_window} - {b.profiles?.phone}</p>
-                  <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full capitalize inline-block mt-1">{(b.status ?? '').replace(/_/g, ' ')}</span>
-                  {b.actual_weight_quintals && <span className="text-xs text-gray-500 dark:text-neutral-400 ml-2">Weight: {b.actual_weight_quintals}q</span>}
-                  {b.quality_grade && <span className="text-xs text-gray-500 dark:text-neutral-400 ml-2">Grade: {b.quality_grade}</span>}
-                </div>
-                <div className="flex gap-2">
-                  {NEXT_STATUS[b.status] && activeId !== b.id && (
-                    <button
-                      onClick={() => NEXT_STATUS[b.status] === 'checked_in' ? advance(b) : startAction(b)}
-                      disabled={actionLoading}
-                      className="bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
-                    >
-                      {t('markAs')} {NEXT_STATUS[b.status].replace(/_/g, ' ')}
-                    </button>
-                  )}
-                  {!['rejected', 'cancelled', 'paid', 'accepted'].includes(b.status) && activeId !== b.id && (
-                    <button
-                      onClick={async () => {
-                        const reason = prompt('Rejection reason:');
-                        if (!reason) return;
-                        try {
-                          const { data: { session } } = await supabase.auth.getSession();
-                          if (!session?.access_token) {
-                            showToast('Session expired. Please log in again.', 'error');
-                            router.push('/');
-                            return;
-                          }
-                          const res = await fetch(`/api/bookings/${b.id}/status`, {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-                            body: JSON.stringify({ status: 'rejected', quality_notes: `Rejected: ${reason}` }),
-                          });
-                          if (res.ok) {
-                            showToast('Booking rejected', 'info');
-                          } else {
-                            showToast('Failed to reject booking', 'error');
-                          }
-                          await load();
-                        } catch (err) {
-                          showToast('Network error: Could not reach server.', 'error');
-                        }
-                      }}
-                      className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
-                    >
-                      Reject
-                    </button>
-                  )}
-                </div>
+      <div className="min-h-screen bg-[#F9FAFB] dark:bg-[#111111] font-sans text-gray-900 dark:text-neutral-100 flex flex-col items-center pb-12 transition-colors duration-300">
+        
+        {/* Sleek Top Navigation */}
+        <header className="w-full bg-white/80 dark:bg-[#1A1A1A]/80 backdrop-blur-md border-b border-gray-200 dark:border-neutral-800 sticky top-0 z-50">
+          <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🌾</span>
+              <h1 className="text-lg font-semibold tracking-tight">Quality Officer Portal</h1>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={e => { setSelectedDate(e.target.value); load(e.target.value); }}
+                  className="bg-gray-100/50 dark:bg-neutral-800/50 border border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-neutral-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium transition-all cursor-pointer"
+                />
               </div>
-              {activeId === b.id && renderActionInputs(b)}
-            </motion.div>
-          ))}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors text-gray-500 dark:text-neutral-400"
+                aria-label="Toggle Dark Mode"
+              >
+                {isDark ? '☀️' : '🌙'}
+              </button>
+              <button 
+                onClick={handleLogout} 
+                className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </header>
 
-          {!loading && bookings.length === 0 && (
-            <EmptyState
-              icon="📋"
-              title="No Bookings For This Date"
-              description="There are no farmers scheduled for procurement on this date. You can select another date using the date picker above."
-            />
-          )}
-        </div>
-      </div>
+        <main className="max-w-5xl w-full px-4 mt-8">
+          
+          {/* Minimal KPI Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {[
+              { label: 'Total Scheduled', val: bookings.length, color: 'text-gray-900 dark:text-white', dot: 'bg-gray-400' },
+              { label: 'Checked In', val: bookings.filter(b => b.status === 'checked_in').length, color: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500' },
+              { label: 'In Inspection', val: bookings.filter(b => ['weighed', 'quality_checked'].includes(b.status)).length, color: 'text-blue-600 dark:text-blue-400', dot: 'bg-blue-500' },
+              { label: 'Accepted', val: bookings.filter(b => ['accepted', 'paid'].includes(b.status)).length, color: 'text-emerald-600 dark:text-emerald-400', dot: 'bg-emerald-500' }
+            ].map((stat, i) => (
+              <div key={i} className="bg-white dark:bg-[#1A1A1A] rounded-2xl p-5 border border-gray-200 dark:border-neutral-800 shadow-sm transition-transform hover:-translate-y-0.5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-2 h-2 rounded-full ${stat.dot}`}></span>
+                  <p className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wide">{stat.label}</p>
+                </div>
+                <p className={`text-3xl font-light tracking-tight ${stat.color}`}>
+                  {stat.val}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-between items-end mb-4">
+            <h2 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">Active Queue</h2>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">Processing {bookings.length} farmers today</p>
+          </div>
+
+          {/* Clean List View */}
+          <div className="space-y-4">
+            {loading && (
+              <div className="py-12 flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+              </div>
+            )}
+
+            {!loading && bookings.map(b => (
+              <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={b.id} className={`bg-white dark:bg-[#1A1A1A] rounded-2xl border ${activeId === b.id ? 'border-emerald-500/50 shadow-md ring-4 ring-emerald-500/10' : 'border-gray-200 dark:border-neutral-800 shadow-sm'} overflow-hidden transition-all`}>
+                <div className="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  
+                  {/* Farmer Details */}
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-3">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">{b.profiles?.full_name}</h3>
+                        <span className="text-xs font-medium text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">
+                          {b.slot_window}
+                        </span>
+                      </div>
+                      <span className={`text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                        b.status === 'accepted' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-900/20 dark:border-emerald-800/50' : 
+                        b.status === 'rejected' ? 'text-red-700 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-900/20 dark:border-red-800/50' : 
+                        b.status === 'weighed' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-800/50' :
+                        'text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-900/20 dark:border-amber-800/50'
+                      }`}>
+                        {b.status.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-neutral-400">
+                      <span className="flex items-center gap-1.5"><span className="text-gray-400">ID:</span> <span className="font-medium text-gray-900 dark:text-gray-300">{b.id.substring(0,6).toUpperCase()}</span></span>
+                      <span className="flex items-center gap-1.5"><span className="text-gray-400">Crop:</span> <span className="font-medium text-gray-900 dark:text-gray-300">{b.commodities?.name}</span></span>
+                      <span className="flex items-center gap-1.5"><span className="text-gray-400">Phone:</span> {b.profiles?.phone}</span>
+                    </div>
+
+                    {(b.actual_weight_quintals || b.quality_grade) && (
+                      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-neutral-800/80 text-sm">
+                        {b.actual_weight_quintals && (
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-gray-400">Weight:</span> 
+                            <span className="font-semibold text-gray-900 dark:text-white">{b.actual_weight_quintals} q</span>
+                          </span>
+                        )}
+                        {b.quality_grade && (
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-gray-400">Grade:</span> 
+                            <span className="font-semibold text-gray-900 dark:text-white">{b.quality_grade}</span>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 w-full md:w-auto">
+                    {!['rejected', 'cancelled', 'paid', 'accepted'].includes(b.status) && activeId !== b.id && (
+                      <button
+                        onClick={async () => {
+                          const reason = prompt('Rejection reason:');
+                          if (!reason) return;
+                          try {
+                            const { data: { session } } = await supabase.auth.getSession();
+                            if (!session?.access_token) return;
+                            const res = await fetch(`/api/bookings/${b.id}/status`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+                              body: JSON.stringify({ status: 'rejected', quality_notes: `Rejected: ${reason}` }),
+                            });
+                            if (res.ok) { showToast('Booking rejected', 'info'); load(); }
+                          } catch (err) {}
+                        }}
+                        className="flex-1 md:flex-none px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                      >
+                        Reject
+                      </button>
+                    )}
+                    
+                    {NEXT_STATUS[b.status] && activeId !== b.id && (
+                      <button
+                        onClick={() => NEXT_STATUS[b.status] === 'checked_in' ? advance(b) : startAction(b)}
+                        disabled={actionLoading}
+                        className="flex-1 md:flex-none bg-gray-900 hover:bg-black text-white dark:bg-white dark:hover:bg-gray-100 dark:text-black px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                      >
+                        Proceed to {NEXT_STATUS[b.status].replace(/_/g, ' ')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Embedded Action Form */}
+                {activeId === b.id && (
+                  <div className="bg-gray-50/50 dark:bg-neutral-900/50 p-5 border-t border-gray-100 dark:border-neutral-800">
+                    
+                    {NEXT_STATUS[b.status] === 'weighed' && (
+                      <div className="max-w-sm">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1.5">Recorded Weight (Quintals)</label>
+                        <input
+                          type="number" step="0.1"
+                          className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-shadow outline-none"
+                          placeholder="e.g. 45.5"
+                          value={actionData.actual_weight_quintals || ''}
+                          onChange={e => setActionData({ ...actionData, actual_weight_quintals: e.target.value })}
+                        />
+                        <div className="flex gap-3 mt-4">
+                          <button onClick={() => advance(b)} disabled={!actionData.actual_weight_quintals || actionLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50">Confirm Weight</button>
+                          <button onClick={cancelAction} className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {NEXT_STATUS[b.status] === 'quality_checked' && (
+                      <div className="space-y-5">
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1.5">Moisture Content (%)</label>
+                            <input
+                              type="number" step="0.1"
+                              className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-shadow outline-none"
+                              placeholder="e.g. 12.5"
+                              value={actionData.moisture_percent || ''}
+                              onChange={e => setActionData({ ...actionData, moisture_percent: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1.5">Admixture (%)</label>
+                            <input
+                              type="number" step="0.1"
+                              className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-shadow outline-none"
+                              placeholder="e.g. 1.2"
+                              value={actionData.admixture_percent || ''}
+                              onChange={e => setActionData({ ...actionData, admixture_percent: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="max-w-xl">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1.5">Final Quality Grade</label>
+                          <select
+                            className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-shadow outline-none"
+                            value={actionData.quality_grade || ''}
+                            onChange={e => setActionData({ ...actionData, quality_grade: e.target.value })}
+                          >
+                            <option value="">Select a grade...</option>
+                            <option value="A">Grade A (Premium)</option>
+                            <option value="B">Grade B (Standard)</option>
+                            <option value="C">URS (Under Rejection Standard)</option>
+                            <option value="Rejected">Reject Lot</option>
+                          </select>
+                        </div>
+
+                        {(actionData.quality_grade === 'Rejected') && (
+                          <div className="max-w-xl p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
+                            <label className="block text-sm font-medium text-red-800 dark:text-red-400 mb-1.5">Rejection Reason</label>
+                            <input
+                              type="text"
+                              className="w-full bg-white dark:bg-neutral-800 border border-red-200 dark:border-red-800/50 rounded-lg px-4 py-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none"
+                              placeholder="Please provide details..."
+                              value={actionData.rejection_reason || ''}
+                              onChange={e => setActionData({ ...actionData, rejection_reason: e.target.value })}
+                            />
+                          </div>
+                        )}
+
+                        <div className="flex gap-3 pt-2">
+                          <button onClick={() => advance(b)} disabled={!actionData.quality_grade || actionLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50">Save Inspection Data</button>
+                          <button onClick={cancelAction} className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {NEXT_STATUS[b.status] === 'accepted' && (
+                      <div className="max-w-sm">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1.5">Accepted Quantity (Quintals)</label>
+                        <input
+                          type="number" step="0.1"
+                          className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-shadow outline-none"
+                          placeholder="Final cleared weight"
+                          value={actionData.accepted_quantity_quintals || ''}
+                          onChange={e => setActionData({ ...actionData, accepted_quantity_quintals: e.target.value })}
+                        />
+                        <div className="flex gap-3 mt-4">
+                          <button onClick={() => advance(b)} disabled={!actionData.accepted_quantity_quintals || actionLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50">Generate Weigh-Slip</button>
+                          <button onClick={cancelAction} className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                )}
+              </motion.div>
+            ))}
+
+            {!loading && bookings.length === 0 && (
+              <div className="text-center py-20 px-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-neutral-800 text-3xl mb-4">
+                  ☕
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">Queue Empty</h3>
+                <p className="text-sm text-gray-500 dark:text-neutral-400 max-w-sm mx-auto">There are no scheduled procurement slots remaining for the selected date.</p>
+              </div>
+            )}
+          </div>
+
+        </main>
       </div>
     </PullToRefresh>
   );

@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { supabase } from '../../lib/supabaseClient';
 import FarmerBottomNav from '../../components/FarmerBottomNav';
-import LanguageToggle from '../../components/LanguageToggle';
 import { useLanguage } from '../../lib/i18n';
 import { getCropConfig } from '../../lib/cropIcons';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
+import Link from 'next/link';
 
 export default function NetCalculator() {
   const [commodities, setCommodities] = useState([]);
@@ -46,139 +49,153 @@ export default function NetCalculator() {
   const netTakeHome = grossValue - totalDeductions;
   const realizationPct = grossValue > 0 ? (netTakeHome / grossValue) * 100 : 0;
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full" /></div>;
+  if (loading) return <div className="min-h-screen bg-[var(--chassis)] flex items-center justify-center text-slate-500 font-bold uppercase tracking-widest"><div className="animate-spin w-6 h-6 border-4 border-slate-500 border-t-transparent rounded-full mr-3" /> LOADING...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 dark:bg-neutral-900">
+    <div className="min-h-screen bg-[var(--chassis)] pb-24 font-sans selection:bg-emerald-500/30">
       <Head>
         <title>Net Realization Calculator | Kisan Setu</title>
       </Head>
 
-      <div className="bg-green-700 text-white px-4 py-6 rounded-b-3xl shadow-sm relative">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">{language === 'hi' ? 'शुद्ध आय कैलकुलेटर' : 'Net Realization Calculator'}</h1>
-            <p className="text-green-100 text-sm">{language === 'hi' ? 'मंडी शुल्क और परिवहन के बाद अपनी वास्तविक कमाई जानें' : 'Know your true take-home after transport & mandi fees'}</p>
-          </div>
-          <LanguageToggle />
-        </div>
-      </div>
-
-      <div className="px-4 mt-6 max-w-lg mx-auto space-y-4">
+      <div className="max-w-md mx-auto px-4 pt-8">
         
-        {/* Input Form */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-neutral-700">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-700 dark:text-neutral-300 mb-1">Select Crop</label>
+        {/* Navigation Breadcrumb */}
+        <div className="mb-6">
+          <Link href="/farmer/dashboard" className="text-emerald-700 text-xs font-bold uppercase tracking-wider hover:text-emerald-800 transition">
+            &larr; Dashboard
+          </Link>
+        </div>
+
+        {/* Physical Hardware Calculator Housing */}
+        <Card elevated={true} withScrews={true} withVents={true} className="bg-[#e0e5ec] p-4 border border-white/50 w-full shadow-floating">
+          
+          <div className="flex justify-between items-center mb-4 px-2">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">NET YIELD CALC V1.0</span>
+            <span className="text-[9px] font-bold text-slate-400 bg-white/50 px-2 py-0.5 rounded shadow-recessed inset-0">SOLAR PWR</span>
+          </div>
+
+          {/* LCD Display Screen */}
+          <div className="bg-[#9ea79a] shadow-[inset_0_4px_8px_rgba(0,0,0,0.3),0_1px_0_rgba(255,255,255,1)] rounded-lg p-4 mb-6 border-4 border-[#8b9588] relative">
+            {/* Screen Glass glare effect */}
+            <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent rounded-t-lg pointer-events-none" />
+            
+            <div className="flex justify-between items-end mb-2">
+              <span className="text-[10px] text-slate-800/60 font-black uppercase tracking-widest">GROSS MSP</span>
+              <span className="font-mono text-xl text-slate-800 font-black tracking-tight">{grossValue > 0 ? `₹${Math.round(grossValue).toLocaleString()}` : '0.00'}</span>
+            </div>
+            
+            <div className="flex justify-between items-end border-b-2 border-slate-800/20 pb-2 mb-2">
+              <span className="text-[10px] text-slate-800/60 font-black uppercase tracking-widest">- DEDUCTIONS</span>
+              <span className="font-mono text-lg text-slate-800/80 font-bold tracking-tight">{totalDeductions > 0 ? `₹${Math.round(totalDeductions).toLocaleString()}` : '0.00'}</span>
+            </div>
+            
+            <div className="flex justify-between items-end">
+              <span className="text-[12px] text-slate-900 font-black uppercase tracking-widest">NET REALIZATION</span>
+              <span className="font-mono text-3xl text-slate-900 font-black tracking-tighter drop-shadow-sm">{netTakeHome > 0 ? `₹${Math.round(netTakeHome).toLocaleString()}` : '0.00'}</span>
+            </div>
+            {grossValue > 0 && (
+              <div className="text-right mt-1">
+                <span className="text-[10px] font-mono font-bold text-slate-800/80 tracking-widest bg-slate-800/10 px-1.5 py-0.5 rounded">
+                  MARGIN: {realizationPct.toFixed(1)}%
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Input Controls */}
+          <div className="space-y-4 px-2">
+            
+            <div className="bg-[var(--chassis)] p-4 rounded-xl shadow-recessed border border-white/60">
+              <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">COMMODITY SELECTOR</label>
               <select 
                 value={selectedCrop} 
                 onChange={(e) => setSelectedCrop(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-green-500 focus:border-green-500 block p-3 dark:bg-neutral-900 dark:border-neutral-700 dark:text-white"
+                className="w-full bg-[#f8fafc] shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_1px_0_rgba(255,255,255,1)] border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700"
               >
                 {commodities.map(c => (
-                  <option key={c.id} value={c.id}>{getCropConfig(c.name).icon} {c.name} (MSP: ₹{c.msp_rate_per_quintal}/q)</option>
+                  <option key={c.id} value={c.id}>{getCropConfig(c.name).icon} {c.name.toUpperCase()} (₹{c.msp_rate_per_quintal}/Q)</option>
                 ))}
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-neutral-300 mb-1">Quantity (Quintals)</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[var(--chassis)] p-4 rounded-xl shadow-recessed border border-white/60">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">QTY (QTL)</label>
                 <input 
                   type="number" 
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
-                  placeholder="e.g. 25"
-                  className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-green-500 focus:border-green-500 block p-3 dark:bg-neutral-900 dark:border-neutral-700 dark:text-white"
+                  placeholder="0.0"
+                  className="w-full bg-[#f8fafc] shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_1px_0_rgba(255,255,255,1)] border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700 font-mono text-right"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-neutral-300 mb-1">Distance to Mandi (km)</label>
+              <div className="bg-[var(--chassis)] p-4 rounded-xl shadow-recessed border border-white/60">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">DIST (KM)</label>
                 <input 
                   type="number" 
                   value={distance}
                   onChange={(e) => setDistance(e.target.value)}
-                  placeholder="e.g. 40"
-                  className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-green-500 focus:border-green-500 block p-3 dark:bg-neutral-900 dark:border-neutral-700 dark:text-white"
+                  placeholder="0.0"
+                  className="w-full bg-[#f8fafc] shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),0_1px_0_rgba(255,255,255,1)] border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-700 font-mono text-right"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-700 dark:text-neutral-300 mb-1">Transport Mode</label>
-              <div className="flex gap-2">
-                <button 
+            <div className="bg-[var(--chassis)] p-4 rounded-xl shadow-recessed border border-white/60">
+              <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">TRANSPORT MODE TOGGLE</label>
+              <div className="flex gap-3">
+                <Button 
                   onClick={() => setTransportMode('solo')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${transportMode === 'solo' ? 'bg-orange-100 text-orange-800 border-2 border-orange-500' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}
+                  variant={transportMode === 'solo' ? 'primary' : 'secondary'}
+                  className={`flex-1 text-[10px] py-2 h-auto ${transportMode === 'solo' ? 'bg-amber-500 border-amber-600 shadow-[0_0_10px_#f59e0b,inset_0_1px_2px_rgba(255,255,255,0.4)]' : ''}`}
                 >
-                  🚜 Solo Tractor
-                </button>
-                <button 
+                  🚜 SOLO
+                </Button>
+                <Button 
                   onClick={() => setTransportMode('pooled')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${transportMode === 'pooled' ? 'bg-green-100 text-green-800 border-2 border-green-500' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}
+                  variant={transportMode === 'pooled' ? 'primary' : 'secondary'}
+                  className={`flex-1 text-[10px] py-2 h-auto ${transportMode === 'pooled' ? 'bg-emerald-500 border-emerald-600 shadow-[0_0_10px_#10b981,inset_0_1px_2px_rgba(255,255,255,0.4)]' : ''}`}
                 >
-                  🤝 Pooled Transport
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Results */}
-        {q > 0 && (
-          <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-700 overflow-hidden">
-            <div className="p-4 bg-gray-50 dark:bg-neutral-900 border-b border-gray-100 dark:border-neutral-700 flex justify-between items-center">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Gross Value (MSP)</p>
-                <p className="text-lg font-black text-gray-800 dark:text-white">₹{Math.round(grossValue).toLocaleString()}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-green-600 uppercase tracking-wider font-bold">Net Realization</p>
-                <p className="text-xl font-black text-green-600">₹{Math.round(netTakeHome).toLocaleString()}</p>
-                <p className="text-[10px] text-green-700 bg-green-100 px-2 py-0.5 rounded-full inline-block mt-0.5">{(realizationPct).toFixed(1)}% of Gross</p>
+                  🤝 POOLED
+                </Button>
               </div>
             </div>
 
-            <div className="p-4 space-y-3">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider border-b pb-1 dark:border-neutral-700">Estimated Deductions</p>
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-neutral-400">Freight ({distance}km @ ₹{PER_KM_RATE}/km)</span>
-                <span className="font-semibold text-red-500">-₹{Math.round(freight).toLocaleString()}</span>
-              </div>
-              
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-neutral-400">Loading/Unloading</span>
-                <span className="font-semibold text-red-500">-₹{Math.round(handling).toLocaleString()}</span>
-              </div>
+            {/* Print out slip for deductions */}
+            {q > 0 && (
+              <div className="mt-4 border-t-2 border-dashed border-slate-400/30 pt-4 px-2">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">DEDUCTIONS BREAKDOWN</p>
+                <div className="space-y-1 font-mono text-xs text-slate-600 font-bold">
+                  <div className="flex justify-between">
+                    <span>FREIGHT ({transportMode.toUpperCase()})</span>
+                    <span className="text-red-700/80">- {Math.round(freight)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>LABOR/HANDLING</span>
+                    <span className="text-red-700/80">- {Math.round(handling)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>APMC FEE (1%)</span>
+                    <span className="text-red-700/80">- {Math.round(apmcFee)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>GUNNY BAGS</span>
+                    <span className="text-red-700/80">- {Math.round(bags)}</span>
+                  </div>
+                </div>
 
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-neutral-400">APMC Commission (1%)</span>
-                <span className="font-semibold text-red-500">-₹{Math.round(apmcFee).toLocaleString()}</span>
-              </div>
-
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-neutral-400">Gunny Bags</span>
-                <span className="font-semibold text-red-500">-₹{Math.round(bags).toLocaleString()}</span>
-              </div>
-
-              <div className="pt-2 border-t border-gray-100 dark:border-neutral-700 flex justify-between font-bold">
-                <span className="text-gray-800 dark:text-neutral-200">Total Deductions</span>
-                <span className="text-red-600">-₹{Math.round(totalDeductions).toLocaleString()}</span>
-              </div>
-            </div>
-            
-            {transportMode === 'solo' && d > 15 && (
-              <div className="bg-orange-50 border-t border-orange-100 p-3">
-                <p className="text-xs text-orange-800 font-medium">
-                  💡 Tip: Using a pooled transport with other farmers could save you <strong className="font-bold">₹{Math.round(freight - (d * 18 * (q/20 > 1 ? q/20 : 1))).toLocaleString()}</strong> on freight!
-                </p>
+                {transportMode === 'solo' && d > 15 && (
+                  <div className="mt-4 bg-amber-200/50 rounded p-2 text-center shadow-recessed">
+                    <p className="text-[9px] font-black text-amber-900 uppercase tracking-widest leading-tight">
+                      ⚠️ TIP: POOLED TRANSPORT SAVES ₹{Math.round(freight - (d * 18 * (q/20 > 1 ? q/20 : 1)))} ON THIS TRIP.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
+            
           </div>
-        )}
-
+        </Card>
       </div>
       <FarmerBottomNav />
     </div>
