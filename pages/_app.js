@@ -17,6 +17,13 @@ export default function App({ Component, pageProps }) {
   const router = useRouter();
 
   useEffect(() => {
+    // Ensure Next.js dev FOUC blocker is cleared
+    const fouc = document.querySelector('style[data-next-hide-fouc]');
+    if (fouc) fouc.remove();
+    if (document.body.style.display === 'none') {
+      document.body.style.display = 'block';
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
         for (let registration of registrations) {

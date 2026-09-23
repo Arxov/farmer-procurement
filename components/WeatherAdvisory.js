@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../lib/i18n';
 
 /**
  * 3-Day Mandi Weather Forecast & Grain Quality Advisory Widget
@@ -6,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 export default function WeatherAdvisory({ district = 'Mandi Region' }) {
   const [expanded, setExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -21,57 +23,85 @@ export default function WeatherAdvisory({ district = 'Mandi Region' }) {
 
   const forecast = [
     {
-      day: 'Today',
+      day: language === 'mr' ? 'आज' : language === 'hi' ? 'आज' : 'Today',
       date: d1.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
       temp: '32°C',
-      condition: 'Clear & Sunny',
-      icon: '☀️',
-      moistureRisk: 'Low',
-      riskColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+      condition: language === 'mr' ? 'स्वच्छ व सूर्यप्रकाश' : language === 'hi' ? 'साफ व धूप' : 'Clear & Sunny',
+      iconType: 'sun',
+      moistureRisk: language === 'mr' ? 'कमी जोखीम' : language === 'hi' ? 'कम जोखिम' : 'Low Risk',
+      riskColor: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800',
     },
     {
-      day: 'Tomorrow',
+      day: language === 'mr' ? 'उद्या' : language === 'hi' ? 'कल' : 'Tomorrow',
       date: d2.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
       temp: '30°C',
-      condition: 'Partly Cloudy',
-      icon: '⛅',
-      moistureRisk: 'Low',
-      riskColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+      condition: language === 'mr' ? 'अंशतः ढगाळ' : language === 'hi' ? 'आंशिक बादल' : 'Partly Cloudy',
+      iconType: 'cloud-sun',
+      moistureRisk: language === 'mr' ? 'कमी जोखीम' : language === 'hi' ? 'कम जोखिम' : 'Low Risk',
+      riskColor: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800',
     },
     {
-      day: d3.toLocaleDateString('en-IN', { weekday: 'short' }),
+      day: d3.toLocaleDateString(language === 'mr' ? 'mr-IN' : language === 'hi' ? 'hi-IN' : 'en-IN', { weekday: 'short' }),
       date: d3.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
       temp: '26°C',
-      condition: 'Scattered Showers',
-      icon: '🌧️',
-      moistureRisk: 'Moderate Risk',
-      riskColor: 'text-amber-800 bg-amber-50 border-amber-200',
+      condition: language === 'mr' ? 'हलक्या सरी' : language === 'hi' ? 'हल्की बारिश' : 'Light Showers',
+      iconType: 'rain',
+      moistureRisk: language === 'mr' ? 'मध्यम जोखीम' : language === 'hi' ? 'मध्यम जोखिम' : 'Moderate',
+      riskColor: 'text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800',
     },
   ];
 
+  const renderWeatherIcon = (type) => {
+    switch (type) {
+      case 'sun':
+        return (
+          <svg className="w-6 h-6 text-amber-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        );
+      case 'cloud-sun':
+        return (
+          <svg className="w-6 h-6 text-sky-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" />
+          </svg>
+        );
+      case 'rain':
+      default:
+        return (
+          <svg className="w-6 h-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        );
+    }
+  };
+
   if (!mounted) {
-    return <div className="bg-gradient-to-br from-sky-50 to-blue-50/60 border border-sky-200/80 rounded-2xl p-4 mb-6 shadow-xs h-[160px] animate-pulse"></div>;
+    return <div className="bg-white dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 rounded-3xl p-5 mb-5 shadow-xs h-[160px] animate-pulse"></div>;
   }
 
   return (
-    <div className="bg-gradient-to-br from-sky-50 to-blue-50/60 border border-sky-200/80 rounded-2xl p-4 mb-6 shadow-xs">
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">🌤️</span>
+    <div className="bg-white dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 rounded-3xl p-5 shadow-xs">
+      <div className="flex justify-between items-center mb-3.5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" />
+            </svg>
+          </div>
           <div>
-            <h3 className="text-xs font-bold text-sky-950 uppercase tracking-wider">
-              Mandi Weather & Grain Moisture Advisory
+            <h3 className="text-xs font-black font-display text-slate-900 dark:text-white uppercase tracking-wider">
+              {t('weatherAdvisory')}
             </h3>
-            <p className="text-[11px] text-sky-700">Live agromet forecast for {district}</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Live agromet radar • {district}</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="text-[11px] font-semibold text-sky-800 hover:text-sky-900 bg-white dark:bg-neutral-800/80 border border-sky-200 px-2.5 py-1 rounded-lg transition"
+          className="text-[11px] font-bold font-display text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-3 py-1 rounded-xl transition"
         >
-          {expanded ? 'Hide Advisory' : 'Storage Guidelines ▾'}
+          {expanded ? t('hideGuide') : t('moistureRules')}
         </button>
       </div>
 
@@ -80,19 +110,19 @@ export default function WeatherAdvisory({ district = 'Mandi Region' }) {
         {forecast.map((item, idx) => (
           <div
             key={idx}
-            className="bg-white dark:bg-neutral-800/90 backdrop-blur-xs border border-sky-100 rounded-xl p-2.5 text-center shadow-2xs flex flex-col justify-between"
+            className="bg-slate-50 dark:bg-neutral-800/60 border border-slate-200/60 dark:border-neutral-700/60 rounded-2xl p-2.5 text-center shadow-2xs flex flex-col justify-between"
           >
             <div>
-              <p className="text-[11px] font-bold text-gray-800 dark:text-neutral-200">{item.day}</p>
-              <p className="text-[9px] text-gray-400">{item.date}</p>
-              <span className="text-xl my-1 block">{item.icon}</span>
-              <p className="text-xs font-black text-gray-900 dark:text-neutral-100">{item.temp}</p>
-              <p className="text-[10px] text-gray-500 dark:text-neutral-400 truncate leading-tight mt-0.5">{item.condition}</p>
+              <p className="text-[11px] font-bold font-display text-slate-800 dark:text-slate-200">{item.day}</p>
+              <p className="text-[9px] text-slate-400 font-medium">{item.date}</p>
+              <div className="my-1.5">{renderWeatherIcon(item.iconType)}</div>
+              <p className="text-sm font-black font-display text-slate-900 dark:text-white">{item.temp}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate leading-tight mt-0.5">{item.condition}</p>
             </div>
 
-            <div className="mt-2 pt-1.5 border-t border-gray-100 dark:border-neutral-700">
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 dark:border-neutral-700/50">
               <span
-                className={`text-[9px] font-bold px-1.5 py-0.5 rounded border inline-block ${item.riskColor}`}
+                className={`text-[9px] font-bold px-2 py-0.5 rounded-full border inline-block ${item.riskColor}`}
               >
                 {item.moistureRisk}
               </span>
@@ -102,27 +132,41 @@ export default function WeatherAdvisory({ district = 'Mandi Region' }) {
       </div>
 
       {/* Dynamic Moisture Precaution Banner */}
-      <div className="bg-amber-500/10 border border-amber-300/60 rounded-xl p-2.5 flex items-start gap-2">
-        <span className="text-sm mt-0.5">🌾</span>
-        <p className="text-[11px] text-amber-950 leading-snug">
-          <strong>Procurement Precaution:</strong> Official mandi moisture threshold is{' '}
-          <strong>max 12-14%</strong>. Ensure grains are covered during transit on{' '}
-          <strong>{forecast[2].day}</strong> to avoid grade downgrades at inspection.
+      <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-3 flex items-start gap-2.5">
+        <svg className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+          {language === 'mr' ? (
+            <>
+              <strong>अधिकृत दक्षता:</strong> सरकारी हमीभाव केंद्रावर धान्यातील ओलावा कमाल <strong>१२-१४%</strong> असावा. &apos;अ&apos; वर्ग (Grade A) हमीभाव मिळवण्यासाठी <strong>{forecast[2].day}</strong> रोजी वाहतुकीदरम्यान माल ताडपत्रीने झाकून ठेवा.
+            </>
+          ) : language === 'hi' ? (
+            <>
+              <strong>आधिकारिक सावधानी:</strong> सरकारी मंडी में अनाज की नमी अधिकतम <strong>१२-१४%</strong> होनी चाहिए। ग्रेड &apos;ए&apos; मूल्य सुनिश्चित करने हेतु <strong>{forecast[2].day}</strong> को परिवहन के दौरान फसल को तिरपाल से ढकें।
+            </>
+          ) : (
+            <>
+              <strong>Official Precaution:</strong> Government Mandi moisture threshold is{' '}
+              <strong>max 12-14%</strong>. Ensure grains are covered with tarpaulin during transit on{' '}
+              <strong>{forecast[2].day}</strong> to guarantee Grade A payout.
+            </>
+          )}
         </p>
       </div>
 
       {/* Expandable Moisture Guidelines */}
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-sky-200/60 text-xs text-sky-900 space-y-1.5 animate-fadeIn">
-          <p className="font-bold text-[11px] text-sky-950 uppercase tracking-wide">
-            Official FAQ / Mandi Quality Standards:
+        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-neutral-800 text-xs text-slate-700 dark:text-slate-300 space-y-2">
+          <p className="font-bold text-[11px] text-slate-900 dark:text-white uppercase tracking-wide">
+            {t('qualityGuidelines')}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-            <div className="bg-white dark:bg-neutral-800/80 p-2 rounded-lg border border-sky-100">
-              <span className="font-bold text-gray-800 dark:text-neutral-200">✅ Grade A Target:</span> Under 12% moisture content, &lt; 0.75% foreign matter.
+            <div className="bg-slate-50 dark:bg-neutral-800/60 p-2.5 rounded-xl border border-slate-200/60 dark:border-neutral-700">
+              {t('gradeACriteria')}
             </div>
-            <div className="bg-white dark:bg-neutral-800/80 p-2 rounded-lg border border-sky-100">
-              <span className="font-bold text-gray-800 dark:text-neutral-200">🚚 Transport Tip:</span> Use double-layer tarpaulins if transporting during evening dew.
+            <div className="bg-slate-50 dark:bg-neutral-800/60 p-2.5 rounded-xl border border-slate-200/60 dark:border-neutral-700">
+              {t('transitProtocol')}
             </div>
           </div>
         </div>
