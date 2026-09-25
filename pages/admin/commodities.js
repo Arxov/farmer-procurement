@@ -94,14 +94,14 @@ export default function AdminCommodities() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+      <div className="max-w-5xl mx-auto space-y-6 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-6">
 
         {/* Unified Administrative Executive Header & Segmented Tabs */}
         <AdminNav activeTab="/admin/commodities" />
 
         {/* Section Action Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div>
             <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
               {t('commodityManagement')}
@@ -130,9 +130,9 @@ export default function AdminCommodities() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5 space-y-4"
+              className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5 space-y-4"
             >
-              <div className="flex justify-between items-center border-b border-slate-100 dark:border-neutral-800 pb-3">
+              <div className="flex justify-between items-center border-b border-slate-200/80 dark:border-neutral-800 pb-3">
                 <h2 className="text-sm font-black font-display text-slate-900 dark:text-white">
                   {editing === 'new' ? 'Add New Registered Commodity' : 'Edit Statutory MSP Commodity'}
                 </h2>
@@ -148,7 +148,7 @@ export default function AdminCommodities() {
                   </label>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
                     placeholder="e.g. Wheat, Paddy, Soybean"
                     value={form.name}
                     onChange={e => setForm({ ...form, name: e.target.value })}
@@ -162,7 +162,7 @@ export default function AdminCommodities() {
                     type="number"
                     min="0"
                     step="0.01"
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
                     placeholder="e.g. 2275"
                     value={form.msp_rate_per_quintal}
                     onChange={e => setForm({ ...form, msp_rate_per_quintal: e.target.value })}
@@ -173,7 +173,7 @@ export default function AdminCommodities() {
                     Agricultural Season
                   </label>
                   <select
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-display font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all capitalize"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-display font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all capitalize"
                     value={form.season}
                     onChange={e => setForm({ ...form, season: e.target.value })}
                   >
@@ -191,7 +191,7 @@ export default function AdminCommodities() {
                 </p>
               )}
 
-              <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800">
+              <div className="flex gap-2 pt-2 border-t border-slate-200/80 dark:border-neutral-800">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={save}
@@ -223,18 +223,18 @@ export default function AdminCommodities() {
         </AnimatePresence>
 
         {/* Commodities Table */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/60 dark:bg-neutral-900/50">
+                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/80 dark:bg-neutral-900/50">
                   <th className="p-3.5">Commodity & Badge</th>
                   <th className="p-3.5">Statutory MSP (₹/q)</th>
                   <th className="p-3.5">Harvest Season</th>
                   <th className="p-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 font-sans">
+              <tbody className="divide-y divide-slate-200/70 dark:divide-neutral-800 font-sans">
                 {commodities.map(c => {
                   const seasonStyles = {
                     kharif: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',

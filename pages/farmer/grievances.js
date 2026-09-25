@@ -168,14 +168,14 @@ export default function GrievancesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
       <Head>
         <title>{t('fileGrievance')} | Kisan Setu</title>
       </Head>
 
-      <div className="max-w-2xl mx-auto px-4 pt-6 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 pt-6 space-y-5 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs">
         {/* Top Executive Navigation Bar */}
-        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center gap-3">
             <motion.div whileTap={{ scale: 0.92 }}>
               <Link
@@ -209,7 +209,7 @@ export default function GrievancesPage() {
         </div>
 
         {/* Sovereign Service Identity Header Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-slate-200/80 dark:border-neutral-800 shadow-2xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-neutral-800 pb-4">
             <div className="flex items-center gap-3.5">
               <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-rose-700 dark:text-rose-400 shrink-0 text-xl shadow-2xs">
@@ -237,21 +237,21 @@ export default function GrievancesPage() {
 
           {/* Statutory Trust Badges */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-bold pt-1">
-            <div className="bg-slate-50 dark:bg-neutral-800/50 border border-slate-200/70 dark:border-neutral-700/60 p-2.5 rounded-xl flex items-center gap-2">
+            <div className="bg-slate-50/90 dark:bg-neutral-800/50 border border-slate-200/80 dark:border-neutral-700/60 p-2.5 rounded-xl flex items-center gap-2">
               <span className="text-base">🛡️</span>
               <span className="text-[11px] text-slate-700 dark:text-neutral-300 font-display">
                 {language === 'mr' ? '४८ तास निवारण हमी' : language === 'hi' ? '४८ घंटे में निवारण गारंटी' : '48-Hour Legal SLA'}
               </span>
             </div>
 
-            <div className="bg-slate-50 dark:bg-neutral-800/50 border border-slate-200/70 dark:border-neutral-700/60 p-2.5 rounded-xl flex items-center gap-2">
+            <div className="bg-slate-50/90 dark:bg-neutral-800/50 border border-slate-200/80 dark:border-neutral-700/60 p-2.5 rounded-xl flex items-center gap-2">
               <span className="text-base">📋</span>
               <span className="text-[11px] text-slate-700 dark:text-neutral-300 font-display">
                 {language === 'mr' ? 'डिजिटल वजन पुरावा' : language === 'hi' ? 'डिजिटल तौल साक्ष्य' : 'Weighbridge Audit Log'}
               </span>
             </div>
 
-            <div className="bg-slate-50 dark:bg-neutral-800/50 border border-slate-200/70 dark:border-neutral-700/60 p-2.5 rounded-xl flex items-center gap-2">
+            <div className="bg-slate-50/90 dark:bg-neutral-800/50 border border-slate-200/80 dark:border-neutral-700/60 p-2.5 rounded-xl flex items-center gap-2">
               <span className="text-base">🏛️</span>
               <span className="text-[11px] text-slate-700 dark:text-neutral-300 font-display">
                 {language === 'mr' ? 'जिल्हा मध्यस्थता अधिकारी' : language === 'hi' ? 'जिला मध्यस्थता अधिकारी' : 'District Mandi Arbiter'}
@@ -261,7 +261,7 @@ export default function GrievancesPage() {
         </div>
 
         {/* Dispute Registration Form Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-slate-200/80 dark:border-neutral-800 shadow-2xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="border-b border-slate-100 dark:border-neutral-800 pb-3">
             <h2 className="text-xs font-black font-display text-slate-900 dark:text-white uppercase tracking-wider">
               {t('fileGrievance')}
@@ -388,7 +388,7 @@ export default function GrievancesPage() {
         </div>
 
         {/* Farmer's Past Grievances & Redressal History */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-slate-200/80 dark:border-neutral-800 shadow-2xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
             <h2 className="text-xs font-black font-display text-slate-900 dark:text-white uppercase tracking-wider">
               {t('myGrievances')}
@@ -417,7 +417,7 @@ export default function GrievancesPage() {
               {grievances.map((g) => (
                 <div
                   key={g.id}
-                  className="p-4 bg-slate-50 dark:bg-neutral-800/60 rounded-2xl border border-slate-200/60 dark:border-neutral-700/60 space-y-3"
+                  className="p-4 bg-slate-50/90 dark:bg-neutral-800/60 rounded-2xl border border-slate-200/80 dark:border-neutral-700/60 space-y-3"
                 >
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div>
@@ -431,7 +431,7 @@ export default function GrievancesPage() {
                     <div>{getStatusBadge(g.status)}</div>
                   </div>
 
-                  <div className="p-3 bg-white dark:bg-neutral-900 rounded-xl border border-slate-200/50 dark:border-neutral-800 text-xs text-slate-700 dark:text-slate-300 font-sans leading-relaxed">
+                  <div className="p-3 bg-white dark:bg-neutral-900 rounded-xl border border-slate-200/80 dark:border-neutral-800 text-xs text-slate-700 dark:text-slate-300 font-sans leading-relaxed">
                     {g.description}
                   </div>
 

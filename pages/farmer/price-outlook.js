@@ -89,14 +89,14 @@ export default function PriceOutlook() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
       <Head>
         <title>{t('priceOutlookTitle')} | Kisan Setu</title>
       </Head>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs">
         {/* Top Brand Bar & Trust Indicators */}
-        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center gap-2">
             <motion.div whileTap={{ scale: 0.94 }}>
               <Link
@@ -134,7 +134,7 @@ export default function PriceOutlook() {
         </div>
 
         {/* Executive Service Identity Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-neutral-800/80 pb-3.5">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-blue-600/10 dark:bg-blue-400/10 border border-blue-500/25 flex items-center justify-center text-blue-700 dark:text-blue-400 shrink-0 shadow-2xs">
@@ -188,7 +188,7 @@ export default function PriceOutlook() {
         </div>
 
         {/* Commodity Selector Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-3">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-3">
           <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300">
             {t('selectCommodityLabel')}
           </label>
@@ -218,7 +218,7 @@ export default function PriceOutlook() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-neutral-900 rounded-3xl border border-slate-200/80 dark:border-neutral-800 shadow-xs overflow-hidden space-y-4"
+            className="bg-white dark:bg-neutral-900 rounded-3xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 overflow-hidden space-y-4"
           >
             {/* Top Recommendation Strip */}
             <div
@@ -282,7 +282,7 @@ export default function PriceOutlook() {
 
             {/* Rate Metrics Comparison */}
             <div className="px-5 pt-1 grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 dark:bg-neutral-800/60 p-3.5 rounded-2xl border border-slate-200/60 dark:border-neutral-700/60">
+              <div className="bg-slate-50/90 dark:bg-neutral-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-neutral-700/60">
                 <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                   {t('currentMarketRate')}
                 </p>
@@ -292,7 +292,7 @@ export default function PriceOutlook() {
                 <p className="text-[10px] text-slate-500 font-medium mt-0.5">Govt Mandi Spot Base</p>
               </div>
 
-              <div className="bg-blue-50/70 dark:bg-blue-950/40 p-3.5 rounded-2xl border border-blue-200/60 dark:border-blue-800/60">
+              <div className="bg-blue-50/80 dark:bg-blue-950/40 p-3.5 rounded-2xl border border-blue-200/80 dark:border-blue-800/60">
                 <p className="text-[10px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-300">
                   {t('forecast7DayRate')}
                 </p>
@@ -311,7 +311,7 @@ export default function PriceOutlook() {
                 14-Day Mandi Price Projection
               </h2>
 
-              <div className="bg-slate-50/80 dark:bg-neutral-800/40 border border-slate-200/60 dark:border-neutral-700/60 rounded-2xl p-4">
+              <div className="bg-slate-50/90 dark:bg-neutral-800/40 border border-slate-200/80 dark:border-neutral-700/60 rounded-2xl p-4">
                 <div className="flex items-end justify-between h-36 gap-1 sm:gap-1.5">
                   {chartData.map((d, i) => {
                     const prices = chartData.map((c) => c.price);

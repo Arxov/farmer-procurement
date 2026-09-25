@@ -92,7 +92,7 @@ export default function AdminNav({ activeTab }) {
   return (
     <div className="space-y-4 mb-6">
       {/* Executive Government Brand Bar */}
-      <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+      <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white dark:from-emerald-600 dark:to-emerald-800 flex items-center justify-center shadow-xs shrink-0">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,7 +138,7 @@ export default function AdminNav({ activeTab }) {
       </div>
 
       {/* Apple HIG Segmented Control Navigation Bar */}
-      <div className="bg-slate-100/90 dark:bg-neutral-800/80 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 dark:border-neutral-700/80 shadow-2xs overflow-x-auto">
+      <div className="bg-slate-200/70 dark:bg-neutral-800/80 backdrop-blur-md p-1.5 rounded-2xl border border-slate-300/80 dark:border-neutral-700 shadow-xs overflow-x-auto">
         <div className="flex items-center gap-1 min-w-max">
           {NAV_ITEMS.map((item) => {
             const isActive = router.pathname === item.href || activeTab === item.href;
@@ -165,7 +165,7 @@ export default function AdminNav({ activeTab }) {
                   <motion.div
                     layoutId="adminNavPill"
                     transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-                    className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-xs border border-slate-200/80 dark:border-neutral-700"
+                    className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-neutral-700 ring-1 ring-slate-900/5"
                   />
                 )}
               </Link>

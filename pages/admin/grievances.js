@@ -68,14 +68,14 @@ export default function AdminGrievances() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+      <div className="max-w-5xl mx-auto space-y-6 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-6">
 
         {/* Unified Administrative Executive Header & Segmented Tabs */}
         <AdminNav activeTab="/admin/grievances" />
 
         {/* Section Action Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div>
             <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
               {t('grievanceManagement')}
@@ -86,14 +86,14 @@ export default function AdminGrievances() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 px-3 py-1 rounded-xl">
+            <span className="text-[11px] font-mono font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 px-3 py-1 rounded-xl shadow-2xs">
               Open Tickets: {counts.open}
             </span>
           </div>
         </div>
 
         {/* Apple HIG Segmented Control Filter Tabs */}
-        <div className="bg-slate-100/90 dark:bg-neutral-800/80 p-1.5 rounded-2xl border border-slate-200/80 dark:border-neutral-700/80 shadow-2xs overflow-x-auto">
+        <div className="bg-slate-200/70 dark:bg-neutral-800/80 p-1.5 rounded-2xl border border-slate-300/80 dark:border-neutral-700 shadow-xs overflow-x-auto">
           <div className="flex items-center gap-1 min-w-max">
             {['all', 'open', 'in_review', 'resolved'].map((f) => {
               const isActive = filter === f;
@@ -115,7 +115,7 @@ export default function AdminGrievances() {
                     <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full ${
                       isActive
                         ? 'bg-slate-900 text-white dark:bg-emerald-600'
-                        : 'bg-slate-200 dark:bg-neutral-700 text-slate-600 dark:text-slate-300'
+                        : 'bg-slate-300/80 dark:bg-neutral-700 text-slate-700 dark:text-slate-300'
                     }`}>
                       {counts[f]}
                     </span>
@@ -124,7 +124,7 @@ export default function AdminGrievances() {
                     <motion.div
                       layoutId="grievanceFilterPill"
                       transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-                      className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-xs border border-slate-200/80 dark:border-neutral-700"
+                      className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-neutral-700 ring-1 ring-slate-900/5"
                     />
                   )}
                 </button>
@@ -143,9 +143,9 @@ export default function AdminGrievances() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 key={g.id}
-                className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5 space-y-3.5 hover:shadow-xs transition-all relative overflow-hidden"
+                className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5 space-y-3.5 hover:shadow-md transition-all relative overflow-hidden"
               >
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 dark:border-neutral-800 pb-3">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-200/80 dark:border-neutral-800 pb-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-black font-display text-sm text-slate-900 dark:text-white">
                       {g.bookings?.profiles?.full_name || 'Farmer Client'}
@@ -173,7 +173,7 @@ export default function AdminGrievances() {
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-700 dark:text-neutral-300 font-sans leading-relaxed bg-slate-50/80 dark:bg-neutral-800/50 rounded-xl p-3 border border-slate-200/60 dark:border-neutral-700/60">
+                  <p className="text-xs text-slate-700 dark:text-neutral-300 font-sans leading-relaxed bg-slate-50/90 dark:bg-neutral-800/60 rounded-xl p-3 border border-slate-200/80 dark:border-neutral-700/80">
                     {g.description}
                   </p>
 
@@ -201,13 +201,13 @@ export default function AdminGrievances() {
                 </div>
 
                 {/* Dispute Redressal Action Controls */}
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800">
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/80 dark:border-neutral-800">
                   {g.status === 'open' && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => updateStatus(g.id, 'in_review')}
                       disabled={updating === g.id}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-display font-bold shadow-2xs disabled:opacity-50 transition-colors"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-display font-bold shadow-xs disabled:opacity-50 transition-colors"
                     >
                       {updating === g.id ? 'Processing...' : 'Initiate Review'}
                     </motion.button>
@@ -217,7 +217,7 @@ export default function AdminGrievances() {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => updateStatus(g.id, 'resolved')}
                       disabled={updating === g.id}
-                      className="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-display font-bold shadow-2xs disabled:opacity-50 transition-colors"
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-display font-bold shadow-xs disabled:opacity-50 transition-colors"
                     >
                       {updating === g.id ? 'Processing...' : 'Mark Resolved'}
                     </motion.button>
@@ -227,7 +227,7 @@ export default function AdminGrievances() {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => updateStatus(g.id, 'open')}
                       disabled={updating === g.id}
-                      className="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-display font-bold shadow-2xs disabled:opacity-50 transition-colors"
+                      className="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-display font-bold shadow-xs disabled:opacity-50 transition-colors"
                     >
                       {updating === g.id ? 'Processing...' : 'Reopen Ticket'}
                     </motion.button>
@@ -238,13 +238,13 @@ export default function AdminGrievances() {
           </AnimatePresence>
 
           {filtered.length === 0 && (
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-slate-200/80 dark:border-neutral-800 text-center space-y-2">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-8 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 text-center space-y-2">
               <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-400 flex items-center justify-center mx-auto">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-xs text-slate-400">No grievances found for this status filter.</p>
+              <p className="text-xs text-slate-400 font-sans">No grievances found for this status filter.</p>
             </div>
           )}
         </div>

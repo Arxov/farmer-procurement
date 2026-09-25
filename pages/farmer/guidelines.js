@@ -17,14 +17,14 @@ export default function Guidelines() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
       <Head>
         <title>{t('guidelinesTitle')} | Kisan Setu</title>
       </Head>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs">
         {/* Top Brand Bar & Trust Indicators */}
-        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center gap-2">
             <motion.div whileTap={{ scale: 0.94 }}>
               <Link
@@ -62,7 +62,7 @@ export default function Guidelines() {
         </div>
 
         {/* Executive Service Identity Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-neutral-800/80 pb-3.5">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-amber-600/10 dark:bg-amber-400/10 border border-amber-500/25 flex items-center justify-center text-amber-700 dark:text-amber-400 shrink-0 shadow-2xs">
@@ -116,7 +116,7 @@ export default function Guidelines() {
         </div>
 
         {/* Apple HIG Segmented Pill Controls */}
-        <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-neutral-800/90 p-1.5 rounded-2xl border border-slate-200/80 dark:border-neutral-700/80">
+        <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-neutral-800/90 p-1.5 rounded-2xl border border-slate-200/90 dark:border-neutral-700/80">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -154,7 +154,7 @@ export default function Guidelines() {
               className="space-y-4"
             >
               {/* Statutory Documents Required */}
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-3.5">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-3.5">
                 <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-neutral-800 pb-3">
                   <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,7 +200,7 @@ export default function Guidelines() {
               </div>
 
               {/* Legal Metrology Weighbridge Protocol */}
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-3.5">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-3.5">
                 <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-neutral-800 pb-3">
                   <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-400 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -255,7 +255,7 @@ export default function Guidelines() {
               className="space-y-4"
             >
               {/* Cereals (Wheat, Paddy) */}
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-3.5">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-3.5">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 dark:border-neutral-800 pb-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 flex items-center justify-center shrink-0">
@@ -294,7 +294,7 @@ export default function Guidelines() {
               </div>
 
               {/* Pulses & Oilseeds */}
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-3.5">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-3.5">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 dark:border-neutral-800 pb-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-400 flex items-center justify-center shrink-0">
@@ -344,7 +344,7 @@ export default function Guidelines() {
               transition={{ duration: 0.18 }}
               className="space-y-4"
             >
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-4">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
                 <div>
                   <h3 className="text-sm font-black font-display text-slate-900 dark:text-white">
                     {t('marketDemandTitle')}

@@ -59,11 +59,11 @@ export default function GatePassPage() {
   const totalVal = booking?.payments?.[0]?.amount || (acceptedQty * mspRate);
 
   return (
-    <div className="min-h-screen bg-slate-100/70 dark:bg-neutral-950 px-4 py-8 print:bg-white print:p-0 text-slate-900 dark:text-white transition-colors">
-      <div className="max-w-xl mx-auto space-y-4">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 print:bg-white print:p-0 text-slate-900 dark:text-white transition-colors">
+      <div className="max-w-xl mx-auto space-y-4 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-4">
 
         {/* Top Control Bar (Hidden during printing) */}
-        <div className="flex justify-between items-center print:hidden bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center print:hidden bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <motion.div whileTap={{ scale: 0.95 }}>
             <Link
               href="/farmer/dashboard"
@@ -89,7 +89,7 @@ export default function GatePassPage() {
         </div>
 
         {!gatePass ? (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xs p-8 text-center border border-slate-200/80 dark:border-neutral-800 space-y-3">
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-sm p-8 text-center border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 border border-amber-200 dark:border-amber-800 flex items-center justify-center mx-auto text-xl">
               ⏳
             </div>
@@ -103,7 +103,7 @@ export default function GatePassPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-lg border-2 border-emerald-900 dark:border-emerald-700 overflow-hidden print:shadow-none print:border-2 print:border-black print:rounded-none">
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-lg border border-slate-200/90 dark:border-emerald-700 ring-1 ring-slate-900/5 overflow-hidden print:shadow-none print:border-2 print:border-black print:rounded-none">
 
             {/* Sovereign National Tricolor Ribbon */}
             <div className="h-2 w-full bg-gradient-to-r from-orange-500 via-white to-green-600 print:h-1.5" />

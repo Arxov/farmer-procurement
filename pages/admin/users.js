@@ -67,14 +67,14 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+      <div className="max-w-5xl mx-auto space-y-6 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-6">
 
         {/* Unified Administrative Executive Header & Segmented Tabs */}
         <AdminNav activeTab="/admin/users" />
 
         {/* Section Action Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div>
             <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
               {t('userManagement')}
@@ -85,14 +85,14 @@ export default function AdminUsers() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono font-bold bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-700 px-3 py-1 rounded-xl">
+            <span className="text-[11px] font-mono font-bold bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-700 px-3 py-1 rounded-xl shadow-2xs">
               {users.length} Registered Identities
             </span>
           </div>
         </div>
 
         {/* Apple HIG Segmented Control Filter Tabs */}
-        <div className="bg-slate-100/90 dark:bg-neutral-800/80 p-1.5 rounded-2xl border border-slate-200/80 dark:border-neutral-700/80 shadow-2xs overflow-x-auto">
+        <div className="bg-slate-200/70 dark:bg-neutral-800/80 p-1.5 rounded-2xl border border-slate-300/80 dark:border-neutral-700 shadow-xs overflow-x-auto">
           <div className="flex items-center gap-1 min-w-max">
             {['all', 'farmer', 'officer', 'admin'].map((f) => {
               const isActive = filter === f;
@@ -114,7 +114,7 @@ export default function AdminUsers() {
                     <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full ${
                       isActive
                         ? 'bg-slate-900 text-white dark:bg-emerald-600'
-                        : 'bg-slate-200 dark:bg-neutral-700 text-slate-600 dark:text-slate-300'
+                        : 'bg-slate-300/80 dark:bg-neutral-700 text-slate-700 dark:text-slate-300'
                     }`}>
                       {counts[f] || 0}
                     </span>
@@ -123,7 +123,7 @@ export default function AdminUsers() {
                     <motion.div
                       layoutId="userFilterPill"
                       transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-                      className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-xs border border-slate-200/80 dark:border-neutral-700"
+                      className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-neutral-700 ring-1 ring-slate-900/5"
                     />
                   )}
                 </button>
@@ -133,11 +133,11 @@ export default function AdminUsers() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/60 dark:bg-neutral-900/50">
+                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/80 dark:bg-neutral-900/50">
                   <th className="p-3.5">Full Name</th>
                   <th className="p-3.5">Registered Phone</th>
                   <th className="p-3.5">Village / Tehsil</th>
@@ -146,7 +146,7 @@ export default function AdminUsers() {
                   <th className="p-3.5 text-right">Access Level</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 font-sans">
+              <tbody className="divide-y divide-slate-200/70 dark:divide-neutral-800 font-sans">
                 {filtered.map(u => (
                   <tr key={u.id} className="hover:bg-slate-50/80 dark:hover:bg-neutral-800/40 transition">
                     <td className="p-3.5">
@@ -176,7 +176,7 @@ export default function AdminUsers() {
                         value={u.role}
                         onChange={e => changeRole(u.id, e.target.value)}
                         disabled={updating === u.id}
-                        className="bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-2.5 py-1 text-xs font-display font-semibold text-slate-800 dark:text-neutral-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 cursor-pointer capitalize"
+                        className="bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-2.5 py-1 text-xs font-display font-semibold text-slate-800 dark:text-neutral-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 disabled:opacity-50 cursor-pointer capitalize"
                       >
                         <option value="farmer">Farmer</option>
                         <option value="officer">Officer</option>

@@ -245,19 +245,19 @@ export default function LoginPage() {
           {/* BEGIN: RightAuthSection */}
           {/* Right 48% Area: Government Emblems, Tactile Identity Passes, Smart Form, Trust Strip */}
           <section
-            className="lg:w-[50%] xl:w-[48%] w-full bg-gradient-to-br from-[#fbfdfc] via-[#f1f8f4] to-[#e7f4ed] flex flex-col justify-between p-4 sm:p-5 lg:p-6 xl:p-8 relative overflow-y-auto"
+            className="lg:w-[50%] xl:w-[48%] w-full bg-slate-100/90 dark:bg-neutral-950 flex flex-col justify-between p-4 sm:p-5 lg:p-6 xl:p-8 relative overflow-y-auto border-l border-slate-200/90 dark:border-neutral-800"
             data-purpose="auth-interaction-panel"
           >
             {/* Ambient Background Glows */}
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-200/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-200/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-100/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
             {/* Top Bar: Official Mandi Badge & Language Switcher */}
             <header className="flex items-center justify-between w-full pt-0 pb-1.5 z-20 gap-3" data-purpose="top-header">
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-900 bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-emerald-900/10 shadow-2xs select-none">
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-900 dark:text-emerald-400 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-200/90 dark:border-neutral-800 shadow-2xs select-none">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] text-emerald-800 font-bold tracking-tight notranslate" translate="no">
+                <span className="text-[11px] text-emerald-800 dark:text-emerald-300 font-bold tracking-tight notranslate" translate="no">
                   Digital Mandi Portal • अधिकृत पोर्टल
                 </span>
               </div>
@@ -338,7 +338,7 @@ export default function LoginPage() {
               </div>
 
               {/* Login Card */}
-              <div className="bg-white rounded-2xl custom-shadow overflow-hidden border border-slate-100">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl overflow-hidden border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5">
 
                 {/* Card Top Brand Bar: Impressive Kisan Setu Title */}
                 <div className="bg-gradient-to-r from-[#042817] via-[#08522d] to-[#042817] px-6 py-3.5 flex items-center justify-center text-white border-b border-emerald-500/20 shadow-xs select-none">
@@ -773,7 +773,7 @@ export default function LoginPage() {
 
             {/* Point 6: Apple HIG Unified Trust & Stats Dock with Radar Beacon & Vector SVGs */}
             <div
-              className="w-full max-w-[480px] mx-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-xl py-2.5 px-3 shadow-2xs mt-3 flex items-center justify-between text-center select-none notranslate relative z-10"
+              className="w-full max-w-[480px] mx-auto bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-slate-200/90 dark:border-neutral-800 rounded-2xl py-2.5 px-3 shadow-xs mt-3 flex items-center justify-between text-center select-none notranslate relative z-10"
               translate="no"
               data-purpose="mandi-trust-strip"
             >

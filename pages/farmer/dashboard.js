@@ -238,7 +238,7 @@ export default function FarmerDashboard() {
         className={`bg-white dark:bg-neutral-900 rounded-2xl p-5 border transition-all ${
           isLeaveNow
             ? 'border-amber-400 ring-4 ring-amber-100 dark:ring-amber-900/30 shadow-md'
-            : 'border-slate-200/80 dark:border-neutral-800 shadow-xs hover:shadow-md'
+            : 'border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 hover:shadow-md'
         }`}
       >
         {/* Rejection Alert Box */}
@@ -600,11 +600,11 @@ export default function FarmerDashboard() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
-        <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5">
+      <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+        <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs">
 
           {/* Top Brand Bar & Trust Indicators */}
-          <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+          <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-xs shrink-0">
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -645,7 +645,7 @@ export default function FarmerDashboard() {
           </div>
 
           {/* Official Government Farmer Registry Certificate & Mandi Hub Card */}
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
             {/* Certificate Header Banner */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-neutral-800/80 pb-3.5">
               <div className="flex items-center gap-3">
@@ -691,7 +691,7 @@ export default function FarmerDashboard() {
             </div>
 
             {/* Verified Farmer Credentials & Mandi Jurisdiction Bar (Streamlined) */}
-            <div className="bg-slate-50 dark:bg-neutral-800/60 rounded-2xl p-3 border border-slate-200/60 dark:border-neutral-700/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 text-xs">
+            <div className="bg-slate-50/90 dark:bg-neutral-800/60 rounded-2xl p-3 border border-slate-200/80 dark:border-neutral-700/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 text-xs">
               <div className="flex items-center gap-2 flex-wrap text-slate-700 dark:text-neutral-300">
                 <span className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-300">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -913,7 +913,7 @@ export default function FarmerDashboard() {
 
           {/* Live MSP Rate Board with CACP Statutory Notifications */}
           {commodities.length > 0 && (
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs">
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
               <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
@@ -940,7 +940,7 @@ export default function FarmerDashboard() {
                     key={c.id}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    className="bg-slate-50 dark:bg-neutral-800/60 border border-slate-200/60 dark:border-neutral-700/60 rounded-2xl p-3 flex flex-col justify-between"
+                    className="bg-slate-50/90 dark:bg-neutral-800/60 border border-slate-200/80 dark:border-neutral-700/60 rounded-2xl p-3 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex justify-between items-center mb-1">
@@ -995,7 +995,7 @@ export default function FarmerDashboard() {
               <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.96 }}>
                 <Link
                   href="/farmer/net-calculator"
-                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
+                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
                 >
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1009,7 +1009,7 @@ export default function FarmerDashboard() {
               <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.96 }}>
                 <Link
                   href="/farmer/price-outlook"
-                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
+                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
                 >
                   <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1023,7 +1023,7 @@ export default function FarmerDashboard() {
               <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.96 }}>
                 <Link
                   href="/farmer/guidelines"
-                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
+                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
                 >
                   <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1037,7 +1037,7 @@ export default function FarmerDashboard() {
               <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.96 }}>
                 <Link
                   href="/farmer/grievances"
-                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
+                  className="bg-white dark:bg-neutral-900 p-3.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 flex flex-col items-center justify-center text-center gap-1.5 hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-neutral-800/80 transition group h-full"
                 >
                   <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

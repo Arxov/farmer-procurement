@@ -412,11 +412,11 @@ export default function OfficerDashboard() {
 
   return (
     <PullToRefresh onRefresh={() => load(selectedDate)}>
-      <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+        <div className="max-w-4xl mx-auto space-y-6 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-6">
 
           {/* Executive Government Officer Brand Bar */}
-          <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+          <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-xs shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -462,7 +462,7 @@ export default function OfficerDashboard() {
           </div>
 
           {/* Action Header & Date Filter Bar */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
             <div>
               <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
                 {t('todaysQueue')}
@@ -496,7 +496,7 @@ export default function OfficerDashboard() {
 
           {/* Counter Board with Animated NumberTickers */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/80 dark:border-neutral-800 shadow-2xs relative overflow-hidden">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-1 bg-blue-500"></div>
               <p className="text-[11px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider font-display">
                 Total Scheduled
@@ -506,7 +506,7 @@ export default function OfficerDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/80 dark:border-neutral-800 shadow-2xs relative overflow-hidden">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-1 bg-amber-500"></div>
               <p className="text-[11px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider font-display">
                 Checked In
@@ -516,7 +516,7 @@ export default function OfficerDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/80 dark:border-neutral-800 shadow-2xs relative overflow-hidden">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-1 bg-purple-500"></div>
               <p className="text-[11px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider font-display">
                 In Inspection
@@ -526,7 +526,7 @@ export default function OfficerDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/80 dark:border-neutral-800 shadow-2xs relative overflow-hidden">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-1 bg-emerald-600"></div>
               <p className="text-[11px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider font-display">
                 Accepted
@@ -554,7 +554,7 @@ export default function OfficerDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
                 key={b.id}
-                className="bg-white dark:bg-neutral-900 rounded-2xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs hover:shadow-md transition-all relative overflow-hidden"
+                className="bg-white dark:bg-neutral-900 rounded-2xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 hover:shadow-md transition-all relative overflow-hidden"
               >
                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-600"></div>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pl-1">
@@ -646,7 +646,7 @@ export default function OfficerDashboard() {
             ))}
 
             {!loading && bookings.length === 0 && (
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-slate-200/80 dark:border-neutral-800 text-center space-y-3">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 text-center space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-neutral-800 text-slate-400 flex items-center justify-center mx-auto">
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

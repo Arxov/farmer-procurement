@@ -260,11 +260,11 @@ export default function BookSlot() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 pt-6 pb-28 sm:pb-12 text-slate-900 dark:text-white transition-colors">
-      <div className="max-w-2xl mx-auto space-y-5">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 pt-6 pb-28 sm:pb-12 text-slate-900 dark:text-white transition-colors">
+      <div className="max-w-2xl mx-auto space-y-5 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-4">
 
         {/* Top Executive Navigation Bar */}
-        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center gap-3">
             <motion.div whileTap={{ scale: 0.92 }}>
               <Link
@@ -383,7 +383,7 @@ export default function BookSlot() {
         </div>
 
         {/* Main Wizard Card */}
-        <div className="bg-white dark:bg-neutral-900 shadow-2xs rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-neutral-800 transition-all space-y-6">
+        <div className="bg-white dark:bg-neutral-900 shadow-sm rounded-3xl p-6 sm:p-7 border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 transition-all space-y-6">
 
           {/* Wizard Header & Stepper */}
           <div className="space-y-4 border-b border-slate-100 dark:border-neutral-800 pb-5">

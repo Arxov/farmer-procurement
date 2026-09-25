@@ -114,7 +114,7 @@ export default function Register() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 flex flex-col justify-center items-center text-slate-900 dark:text-white transition-colors relative overflow-hidden">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 flex flex-col justify-center items-center text-slate-900 dark:text-white transition-colors relative overflow-hidden">
       <Head>
         <title>{t('completeProfile')} | Kisan Setu</title>
       </Head>
@@ -126,7 +126,7 @@ export default function Register() {
       <div className="w-full max-w-md space-y-4 relative z-10">
 
         {/* Top Sovereign Banner & Language Switcher */}
-        <div className="flex justify-between items-center bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-base">
               🌾
@@ -144,7 +144,7 @@ export default function Register() {
         </div>
 
         {/* KYC Onboarding Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-slate-200/80 dark:border-neutral-800 overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 overflow-hidden">
 
           {/* National Tricolor Apex Ribbon */}
           <div className="h-2 w-full bg-gradient-to-r from-orange-500 via-white to-green-600" />

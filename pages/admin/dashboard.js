@@ -175,14 +175,14 @@ export default function AdminDashboard() {
   const maxCentre = Math.max(...byCentre.map(([, v]) => v), 1);
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+      <div className="max-w-5xl mx-auto space-y-6 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-6">
 
         {/* Unified Administrative Executive Header & Segmented Tabs */}
         <AdminNav activeTab="/admin/dashboard" />
 
         {/* Dashboard Title & Actions Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div>
             <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
               {t('adminOverview')}
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
               <select
                 value={stateFilter}
                 onChange={e => setStateFilter(e.target.value)}
-                className="bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3 py-2 text-xs font-display font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20"
+                className="bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3 py-2 text-xs font-display font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20"
               >
                 <option value="all">All States / UTs</option>
                 {states.map(s => <option key={s} value={s}>{s}</option>)}
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
         {/* Visual Charts Row: Donut & 7-Day Trend */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Status Breakdown Donut Chart */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h2 className="text-sm font-black font-display text-slate-900 dark:text-white">
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* 7-Day Trend Area Chart */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h2 className="text-sm font-black font-display text-slate-900 dark:text-white">
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Revenue & Payout Visual Metric */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5">
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-sm font-black font-display text-slate-900 dark:text-white">
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
 
           {revenue.total > 0 ? (
             <div className="space-y-3">
-              <div className="w-full bg-slate-100 dark:bg-neutral-800 rounded-full h-3 flex overflow-hidden">
+              <div className="w-full bg-slate-200/80 dark:bg-neutral-800 rounded-full h-3 flex overflow-hidden">
                 <div
                   className="bg-emerald-600 h-3 transition-all duration-700"
                   style={{ width: `${Math.round((revenue.paid / revenue.total) * 100)}%` }}
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/70 dark:border-emerald-800/50">
+                <div className="p-3.5 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/80 dark:border-emerald-800/50">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 font-display">
                       ✅ Disbursed (Paid)
@@ -298,7 +298,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
 
-                <div className="p-3.5 bg-amber-50/60 dark:bg-amber-950/30 rounded-xl border border-amber-200/70 dark:border-amber-800/50">
+                <div className="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 rounded-xl border border-amber-200/80 dark:border-amber-800/50">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-bold text-amber-800 dark:text-amber-300 font-display">
                       ⏳ Pending Verification
@@ -312,7 +312,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
 
-                <div className="p-3.5 bg-slate-50 dark:bg-neutral-800/70 rounded-xl border border-slate-200/80 dark:border-neutral-700">
+                <div className="p-3.5 bg-slate-50/90 dark:bg-neutral-800/70 rounded-xl border border-slate-200/80 dark:border-neutral-700">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-bold text-slate-700 dark:text-neutral-300 font-display">
                       🏛️ Total Committed
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Centre Quality Control & Rejection Ratios */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5">
           <h2 className="text-sm font-black font-display text-slate-900 dark:text-white mb-0.5">
             Centre Quality Control (QC) & Rejection Ratios
           </h2>
@@ -368,7 +368,7 @@ export default function AdminDashboard() {
               const acceptedPct = Math.round((qc.accepted / qc.total) * 100);
 
               return (
-                <div key={name} className="border border-slate-200/70 dark:border-neutral-800 rounded-xl p-3.5 bg-slate-50/50 dark:bg-neutral-900/50">
+                <div key={name} className="border border-slate-200/80 dark:border-neutral-800 rounded-xl p-3.5 bg-slate-50/80 dark:bg-neutral-900/50">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="font-bold text-xs font-display text-slate-900 dark:text-white">{name}</h3>
@@ -397,7 +397,7 @@ export default function AdminDashboard() {
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {Object.entries(qc.reasons).sort((a,b)=>b[1]-a[1]).map(([reason, count]) => (
-                          <span key={reason} className="text-[10px] bg-white dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-neutral-700 font-mono">
+                          <span key={reason} className="text-[10px] bg-white dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-neutral-700 font-mono shadow-2xs">
                             {reason}: <strong className="font-bold text-slate-900 dark:text-white">{count}</strong>
                           </span>
                         ))}
@@ -415,7 +415,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Bookings by Centre Distribution */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5">
           <h2 className="text-sm font-black font-display text-slate-900 dark:text-white mb-0.5">
             {t('bookingsByCentre')}
           </h2>
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
                   <span className="font-bold text-slate-800 dark:text-neutral-200 font-display">{name}</span>
                   <span className="font-bold text-slate-900 dark:text-white">{count} bookings</span>
                 </div>
-                <div className="w-full bg-slate-100 dark:bg-neutral-800 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-slate-200/70 dark:bg-neutral-800 rounded-full h-2.5 overflow-hidden">
                   <div
                     className="bg-emerald-600 h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${(count / maxCentre) * 100}%` }}
@@ -439,8 +439,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Cryptographic Audit Ledger Stream (Trust Optics) */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 sm:p-5 border-b border-slate-100 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900/50">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 sm:p-5 border-b border-slate-200/80 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-900/50">
             <div>
               <h2 className="text-sm font-black font-display text-slate-900 dark:text-white flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -455,14 +455,14 @@ export default function AdminDashboard() {
             </span>
           </div>
 
-          <div className="divide-y divide-slate-100 dark:divide-neutral-800">
+          <div className="divide-y divide-slate-200/70 dark:divide-neutral-800">
             {[
               { type: 'UPDATE_PERMISSIONS', user: 'National Admin', role: '(Admin)', desc: 'Modified RBAC security permissions for farmer role', hash: 'b89b7bd4e7772e18...', entity: 'ROLE_PERMISSIONS:farmer', time: '5m ago' },
               { type: 'LOT_VERIFIED', user: 'Baramati FPO Manager', role: '(Fpo)', desc: 'Grade A confirmed. Verified weight 450 kg at Baramati Hub.', hash: '3b7c89f2a4d9821e...', entity: 'CROP_LOT:LOT-TOM-8491', time: '30m ago' },
               { type: 'PAYMENT_AUTHORIZED_NODAL', user: 'FreshMart Foods Pvt. Ltd.', role: '(Buyer)', desc: 'Nodal guarantee of ₹16,400 authorized for 800 kg lot.', hash: 'c98df71a6e29810f...', entity: 'POOL:POOL-SOLAPUR-0907', time: '2h ago' },
               { type: 'WEIGH_SLIP_GENERATED', user: 'Pune APMC Officer', role: '(Officer)', desc: 'Final digital weigh-slip synced for Booking KS-9281.', hash: 'a12fc338d1bb4829...', entity: 'WEIGH_SLIP:WS-9281', time: '2h 25m ago' }
             ].map((log, i) => (
-              <div key={i} className="p-4 hover:bg-slate-50/70 dark:hover:bg-neutral-800/40 transition">
+              <div key={i} className="p-4 hover:bg-slate-50/90 dark:hover:bg-neutral-800/40 transition">
                 <div className="flex justify-between items-start mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-mono font-bold bg-slate-100 dark:bg-neutral-800 text-slate-800 dark:text-neutral-200 px-2 py-0.5 rounded-md uppercase tracking-wider border border-slate-200 dark:border-neutral-700">
@@ -485,7 +485,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Bookings Table */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs p-5 border border-slate-200/80 dark:border-neutral-800">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm p-5 border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
               <h2 className="text-sm font-black font-display text-slate-900 dark:text-white">
@@ -501,12 +501,12 @@ export default function AdminDashboard() {
                 placeholder="Search farmer, centre, crop..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3 py-1.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 w-full sm:w-56"
+                className="bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3 py-1.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 w-full sm:w-56"
               />
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
-                className="bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-2.5 py-1.5 text-xs font-display font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 capitalize"
+                className="bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-2.5 py-1.5 text-xs font-display font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 capitalize"
               >
                 <option value="all">All Statuses</option>
                 {['booked', 'checked_in', 'weighed', 'quality_checked', 'accepted', 'paid', 'rejected', 'cancelled'].map(st => (

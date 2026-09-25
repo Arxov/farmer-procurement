@@ -59,14 +59,14 @@ export default function NetCalculator() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 pb-28 sm:pb-12 text-slate-900 dark:text-slate-100 transition-colors">
       <Head>
         <title>{t('netCalculatorTitle')} | Kisan Setu</title>
       </Head>
 
-      <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 pt-4 space-y-5 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs">
         {/* Top Brand Bar & Trust Indicators */}
-        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div className="flex items-center gap-2">
             <motion.div whileTap={{ scale: 0.94 }}>
               <Link
@@ -104,7 +104,7 @@ export default function NetCalculator() {
         </div>
 
         {/* Executive Service Identity Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-neutral-800/80 pb-3.5">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-emerald-600/10 dark:bg-emerald-400/10 border border-emerald-500/25 flex items-center justify-center text-emerald-700 dark:text-emerald-400 shrink-0 shadow-2xs">
@@ -158,7 +158,7 @@ export default function NetCalculator() {
         </div>
 
         {/* Input Form Card */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 space-y-4">
           <div className="space-y-4">
             {/* Commodity Selector */}
             <div>
@@ -233,7 +233,7 @@ export default function NetCalculator() {
               <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300 mb-1.5">
                 {t('transportModeLabel')}
               </label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100/90 dark:bg-neutral-800 rounded-2xl border border-slate-200/70 dark:border-neutral-700">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-neutral-800 rounded-2xl border border-slate-200/90 dark:border-neutral-700">
                 <button
                   type="button"
                   onClick={() => setTransportMode('solo')}
@@ -274,7 +274,7 @@ export default function NetCalculator() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-neutral-900 rounded-3xl border border-slate-200/80 dark:border-neutral-800 shadow-xs overflow-hidden space-y-4"
+            className="bg-white dark:bg-neutral-900 rounded-3xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5 overflow-hidden space-y-4"
           >
             {/* Header Realization Banner */}
             <div className="p-5 bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white dark:from-emerald-950/40 dark:via-neutral-900 dark:to-neutral-900 border-b border-emerald-100/80 dark:border-neutral-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

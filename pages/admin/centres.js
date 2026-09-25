@@ -93,14 +93,14 @@ export default function AdminCentres() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100/90 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+      <div className="max-w-5xl mx-auto space-y-6 sm:border-x sm:border-slate-200/80 dark:sm:border-neutral-800/60 sm:min-h-screen sm:bg-slate-50/50 dark:sm:bg-neutral-950 sm:shadow-xs sm:px-6">
 
         {/* Unified Administrative Executive Header & Segmented Tabs */}
         <AdminNav activeTab="/admin/centres" />
 
         {/* Section Action Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 dark:border-neutral-800 shadow-sm ring-1 ring-slate-900/5">
           <div>
             <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
               {t('centreManagement')}
@@ -129,9 +129,9 @@ export default function AdminCentres() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 p-5 space-y-4"
+              className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 p-5 space-y-4"
             >
-              <div className="flex justify-between items-center border-b border-slate-100 dark:border-neutral-800 pb-3">
+              <div className="flex justify-between items-center border-b border-slate-200/80 dark:border-neutral-800 pb-3">
                 <h2 className="text-sm font-black font-display text-slate-900 dark:text-white">
                   {editing === 'new' ? 'Add New Procurement Centre' : 'Edit Procurement Centre'}
                 </h2>
@@ -147,7 +147,7 @@ export default function AdminCentres() {
                   </label>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
                     placeholder="e.g. Baramati Main APMC Mandi"
                     value={form.name}
                     onChange={e => setForm({ ...form, name: e.target.value })}
@@ -159,7 +159,7 @@ export default function AdminCentres() {
                   </label>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
                     placeholder="e.g. Pune"
                     value={form.district}
                     onChange={e => setForm({ ...form, district: e.target.value })}
@@ -171,7 +171,7 @@ export default function AdminCentres() {
                   </label>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-sans text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
                     placeholder="e.g. Maharashtra"
                     value={form.state}
                     onChange={e => setForm({ ...form, state: e.target.value })}
@@ -184,7 +184,7 @@ export default function AdminCentres() {
                   <input
                     type="number"
                     min="1"
-                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    className="w-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
                     placeholder="100"
                     value={form.daily_capacity}
                     onChange={e => setForm({ ...form, daily_capacity: e.target.value })}
@@ -198,7 +198,7 @@ export default function AdminCentres() {
                 </p>
               )}
 
-              <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800">
+              <div className="flex gap-2 pt-2 border-t border-slate-200/80 dark:border-neutral-800">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={save}
@@ -230,11 +230,11 @@ export default function AdminCentres() {
         </AnimatePresence>
 
         {/* Centres Table */}
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-neutral-800 ring-1 ring-slate-900/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/60 dark:bg-neutral-900/50">
+                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/80 dark:bg-neutral-900/50">
                   <th className="p-3.5">Centre Name</th>
                   <th className="p-3.5">District</th>
                   <th className="p-3.5">State</th>
@@ -242,7 +242,7 @@ export default function AdminCentres() {
                   <th className="p-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 font-sans">
+              <tbody className="divide-y divide-slate-200/70 dark:divide-neutral-800 font-sans">
                 {centres.map(c => (
                   <tr key={c.id} className="hover:bg-slate-50/80 dark:hover:bg-neutral-800/40 transition">
                     <td className="p-3.5 font-bold font-display text-slate-900 dark:text-white">

@@ -196,8 +196,8 @@ export function StatusDonutChart({ byStatus = {}, total = 0 }) {
                 onMouseLeave={() => setHoveredStatus(null)}
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-left border transition-all ${
                   isHovered
-                    ? 'bg-slate-50 dark:bg-neutral-950 border-gray-400 dark:border-neutral-500 shadow-xs ring-2 ring-gray-200 dark:ring-neutral-700'
-                    : 'bg-white dark:bg-neutral-800 border-gray-100 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                    ? 'bg-slate-50 dark:bg-neutral-950 border-slate-400 dark:border-neutral-500 shadow-xs ring-2 ring-slate-200 dark:ring-neutral-700'
+                    : 'bg-white dark:bg-neutral-800 border-slate-200/80 dark:border-neutral-700 hover:border-slate-300 dark:hover:border-neutral-600'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -217,7 +217,7 @@ export function StatusDonutChart({ byStatus = {}, total = 0 }) {
       </div>
 
       {/* Stage Meaning / Explanatory Tooltip Banner */}
-      <div className="pt-3 border-t border-gray-100 dark:border-neutral-700">
+      <div className="pt-3 border-t border-slate-200/80 dark:border-neutral-700">
         {activeItem ? (
           <div
             className={`p-3 rounded-xl border text-xs flex items-start gap-2.5 transition-all ${activeItem.config.lightBg} ${activeItem.config.border}`}
@@ -363,7 +363,7 @@ export function CapacityRadialCard({ name, booked, capacity, pct }) {
     pct >= 85 ? '#ef4444' : pct >= 50 ? '#f59e0b' : '#10b981';
 
   return (
-    <div className="bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4">
+    <div className="bg-white dark:bg-neutral-800 border border-slate-200/90 dark:border-neutral-700 rounded-2xl p-4 shadow-sm hover:shadow-md ring-1 ring-slate-900/5 transition flex items-center justify-between gap-4">
       <div className="min-w-0">
         <h4 className="font-bold text-gray-900 dark:text-neutral-100 text-sm truncate">{name}</h4>
         <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">
