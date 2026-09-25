@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
+import AdminNav from '../../components/AdminNav';
 
-const ROLE_COLORS = {
-  farmer: 'bg-green-100 text-green-800',
-  officer: 'bg-blue-100 text-blue-800',
-  admin: 'bg-purple-100 text-purple-800',
+const ROLE_BADGES = {
+  farmer: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+  officer: 'bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+  admin: 'bg-purple-50 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300 border-purple-200 dark:border-purple-800',
 };
 
 export default function AdminUsers() {
@@ -51,77 +52,151 @@ export default function AdminUsers() {
   const counts = { all: users.length, farmer: 0, officer: 0, admin: 0 };
   users.forEach(u => { if (counts[u.role] !== undefined) counts[u.role]++; });
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><p>{t('loading')}</p></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 flex items-center justify-center p-4">
+        <div className="flex items-center gap-2 text-slate-500 font-display text-sm">
+          <svg className="animate-spin h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{t('loading')}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-4 py-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
+    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 py-8 animate-fadeIn">
+      <div className="max-w-5xl mx-auto space-y-6">
+
+        {/* Unified Administrative Executive Header & Segmented Tabs */}
+        <AdminNav activeTab="/admin/users" />
+
+        {/* Section Action Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
           <div>
-            <Link href="/admin/dashboard" className="text-green-700 text-sm">&larr; Dashboard</Link>
-            <h1 className="text-xl font-bold mt-1">User & Role Management</h1>
+            <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
+              {t('userManagement')}
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Role-Based Access Control (RBAC) security governance, farmer KYC verification, and officer authorizations.
+            </p>
           </div>
-          <p className="text-sm text-gray-500 dark:text-neutral-400">{users.length} registered users</p>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono font-bold bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-700 px-3 py-1 rounded-xl">
+              {users.length} Registered Identities
+            </span>
+          </div>
         </div>
 
-        {/* Filter */}
-        <div className="flex gap-2 mb-6">
-          {['all', 'farmer', 'officer', 'admin'].map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${filter === f ? 'bg-green-700 text-white' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 border'}`}
-            >
-              {f} ({counts[f] || 0})
-            </button>
-          ))}
-        </div>
-
-        {/* Table */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-gray-500 dark:text-neutral-400">
-                <th className="p-3">Name</th>
-                <th className="p-3">Phone</th>
-                <th className="p-3">Village</th>
-                <th className="p-3">Land (acres)</th>
-                <th className="p-3">Role</th>
-                <th className="p-3">Change Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(u => (
-                <tr key={u.id} className="border-b last:border-0 hover:bg-gray-50 dark:bg-neutral-900">
-                  <td className="p-3 font-medium">{u.full_name || '-'}</td>
-                  <td className="p-3">{u.phone || '-'}</td>
-                  <td className="p-3">{u.village || '-'}</td>
-                  <td className="p-3">{u.land_holding_acres ?? '-'}</td>
-                  <td className="p-3">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize ${ROLE_COLORS[u.role] || 'bg-gray-100 dark:bg-neutral-800'}`}>
-                      {u.role}
+        {/* Apple HIG Segmented Control Filter Tabs */}
+        <div className="bg-slate-100/90 dark:bg-neutral-800/80 p-1.5 rounded-2xl border border-slate-200/80 dark:border-neutral-700/80 shadow-2xs overflow-x-auto">
+          <div className="flex items-center gap-1 min-w-max">
+            {['all', 'farmer', 'officer', 'admin'].map((f) => {
+              const isActive = filter === f;
+              return (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className="relative focus:outline-hidden"
+                >
+                  <motion.div
+                    whileTap={{ scale: 0.95 }}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-display font-semibold transition-all select-none relative z-10 capitalize ${
+                      isActive
+                        ? 'text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-neutral-200'
+                    }`}
+                  >
+                    <span>{f}s</span>
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full ${
+                      isActive
+                        ? 'bg-slate-900 text-white dark:bg-emerald-600'
+                        : 'bg-slate-200 dark:bg-neutral-700 text-slate-600 dark:text-slate-300'
+                    }`}>
+                      {counts[f] || 0}
                     </span>
-                  </td>
-                  <td className="p-3">
-                    <select
-                      value={u.role}
-                      onChange={e => changeRole(u.id, e.target.value)}
-                      disabled={updating === u.id}
-                      className="border rounded-lg px-2 py-1 text-sm disabled:opacity-50"
-                    >
-                      <option value="farmer">Farmer</option>
-                      <option value="officer">Officer</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={6} className="p-6 text-center text-gray-500 dark:text-neutral-400">No users found.</td></tr>
-              )}
-            </tbody>
-          </table>
+                  </motion.div>
+                  {isActive && (
+                    <motion.div
+                      layoutId="userFilterPill"
+                      transition={{ type: 'spring', damping: 25, stiffness: 240 }}
+                      className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-xl shadow-xs border border-slate-200/80 dark:border-neutral-700"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Users Table */}
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xs border border-slate-200/80 dark:border-neutral-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-neutral-800 text-left font-bold text-slate-400 uppercase tracking-wider font-display bg-slate-50/60 dark:bg-neutral-900/50">
+                  <th className="p-3.5">Full Name</th>
+                  <th className="p-3.5">Registered Phone</th>
+                  <th className="p-3.5">Village / Tehsil</th>
+                  <th className="p-3.5">Land Holding</th>
+                  <th className="p-3.5">System Role</th>
+                  <th className="p-3.5 text-right">Access Level</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 font-sans">
+                {filtered.map(u => (
+                  <tr key={u.id} className="hover:bg-slate-50/80 dark:hover:bg-neutral-800/40 transition">
+                    <td className="p-3.5">
+                      <p className="font-bold font-display text-slate-900 dark:text-white">
+                        {u.full_name || '—'}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-mono">UID: {u.id?.slice(0, 8)}</p>
+                    </td>
+                    <td className="p-3.5 font-mono text-slate-600 dark:text-slate-400">
+                      {u.phone || '—'}
+                    </td>
+                    <td className="p-3.5 text-slate-600 dark:text-slate-400">
+                      {u.village || '—'}
+                    </td>
+                    <td className="p-3.5">
+                      <span className="font-mono font-bold text-slate-800 dark:text-neutral-200">
+                        {u.land_holding_acres != null ? `${u.land_holding_acres} acres` : '—'}
+                      </span>
+                    </td>
+                    <td className="p-3.5">
+                      <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border capitalize ${ROLE_BADGES[u.role] || 'bg-slate-100 dark:bg-neutral-800'}`}>
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <select
+                        value={u.role}
+                        onChange={e => changeRole(u.id, e.target.value)}
+                        disabled={updating === u.id}
+                        className="bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-2.5 py-1 text-xs font-display font-semibold text-slate-800 dark:text-neutral-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 cursor-pointer capitalize"
+                      >
+                        <option value="farmer">Farmer</option>
+                        <option value="officer">Officer</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-xs text-slate-400">
+                      No users found matching this role filter.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   );
