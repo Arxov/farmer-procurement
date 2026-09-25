@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/i18n';
 import { addToOfflineQueue } from '../../lib/offlineQueue';
@@ -11,9 +12,9 @@ import { useCentres } from '../../hooks/useCentres';
 import { useCommodities } from '../../hooks/useCommodities';
 import confetti from 'canvas-confetti';
 import LanguageToggle from '../../components/LanguageToggle';
+import NumberTicker from '../../components/NumberTicker';
 
 const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
-
 const EMPTY_ARRAY = [];
 
 export default function BookSlot() {
@@ -35,7 +36,7 @@ export default function BookSlot() {
   const [centreCommodities, setCentreCommodities] = useState([]);
 
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     if (router.query.commodityId) {
@@ -85,7 +86,7 @@ export default function BookSlot() {
         }
       } catch (e) { /* ignore */ }
     };
-    
+
     const tId = setTimeout(fetchSuggestion, 400);
     return () => clearTimeout(tId);
   }, [commodityId, quantity, location]);
@@ -97,7 +98,6 @@ export default function BookSlot() {
     setSlotWindow(suggestion.slotWindow);
   };
 
-  
   // Fetch which commodities this centre procures
   useEffect(() => {
     if (!centreId) { setCentreCommodities([]); return; }
@@ -111,9 +111,8 @@ export default function BookSlot() {
     fetchCC();
   }, [centreId]);
 
-
   const [centreStats, setCentreStats] = useState(null);
-  
+
   // Fetch Centre Stats when centreId changes
   useEffect(() => {
     if (!centreId) {
@@ -129,19 +128,18 @@ export default function BookSlot() {
         });
         if (res.ok) {
           const stats = await res.json();
-          
-          // If we have location, let's calculate distance on frontend
+
           const selectedCentre = centres.find(c => c.id === centreId);
           if (location && selectedCentre?.latitude) {
             const R = 6371;
             const dLat = (selectedCentre.latitude - location.lat) * Math.PI/180;
             const dLon = (selectedCentre.longitude - location.lng) * Math.PI/180;
-            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + 
-                      Math.cos(location.lat*Math.PI/180)*Math.cos(selectedCentre.latitude*Math.PI/180) * 
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+                      Math.cos(location.lat*Math.PI/180)*Math.cos(selectedCentre.latitude*Math.PI/180) *
                       Math.sin(dLon/2)*Math.sin(dLon/2);
             stats.distanceKm = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 10) / 10;
           }
-          
+
           setCentreStats(stats);
         }
       } catch (e) {
@@ -202,11 +200,11 @@ export default function BookSlot() {
     setError('');
 
     const rescheduleId = router.query.reschedule;
-    const bookingPayload = { 
-      centreId, 
-      commodityId, 
-      date, 
-      slotWindow, 
+    const bookingPayload = {
+      centreId,
+      commodityId,
+      date,
+      slotWindow,
       quantity: quantity.trim() === '' ? null : quantity,
       rescheduleId: rescheduleId || undefined
     };
@@ -234,12 +232,12 @@ export default function BookSlot() {
         setError(result.error || 'Something went wrong on the server.');
         return;
       }
-      // Success celebrations
+
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#059669', '#10b981', '#34d399', '#fbbf24'] // Green & Gold
+        colors: ['#059669', '#10b981', '#34d399', '#fbbf24']
       });
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
         navigator.vibrate([30, 50, 30]);
@@ -262,271 +260,325 @@ export default function BookSlot() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 px-4 pt-8 pb-28 sm:pb-10">
-      <div className="max-w-lg mx-auto">
-        {/* Navigation Breadcrumb */}
-        <div className="mb-4">
-          <Link href="/farmer/dashboard" className="text-green-800 text-sm font-medium hover:underline inline-flex items-center gap-1">
-            &larr; {t('back')} 
-          </Link>
-        </div>
+    <div className="min-h-screen bg-slate-50/70 dark:bg-neutral-950 px-4 pt-6 pb-28 sm:pb-12 text-slate-900 dark:text-white transition-colors">
+      <div className="max-w-2xl mx-auto space-y-5">
 
-        {/* Location & Auto-suggestion banner */}
-        <div className="mb-5 flex flex-col gap-3">
-          <button
-            onClick={requestLocation}
-            disabled={locating}
-            className="self-start text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1 transition-colors bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 hover:bg-gray-50 text-gray-700 dark:text-neutral-300 shadow-sm"
-          >
-            {locating ? '📍 Locating...' : (location ? '📍 Location Active (Calculates Transport)' : '📍 Use My Location (Find Closest/Best Deals)')}
-          </button>
-
-          {suggestion && (
-            <div className={`border rounded-2xl p-4 shadow-xs ${suggestion.netBenefit > 0 ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20' : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20'}`}>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-base">💡</span>
-                <p className={`text-sm font-bold ${suggestion.netBenefit > 0 ? 'text-amber-900 dark:text-amber-300' : 'text-emerald-900 dark:text-emerald-300'}`}>
-                  {suggestion.netBenefit > 0 ? 'Smart Financial Suggestion' : 'Least Crowded Recommendation'}
-                </p>
-              </div>
-              
-              <p className={`text-xs ${suggestion.netBenefit > 0 && suggestion.distanceKm !== null ? 'text-amber-800 dark:text-amber-400' : 'text-emerald-800 dark:text-emerald-400'}`}>
-                {suggestion.netBenefit > 0 && suggestion.distanceKm !== null
-                  ? <>Drive {suggestion.distanceKm}km to <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus per quintal.</>
-                  : suggestion.netBenefit > 0 
-                  ? <>Slot at <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}). They are offering a ₹{suggestion.localBonus} local bonus!</>
-                  : <>Slot at <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> at <strong>{suggestion.slotWindow}</strong>.</>}
-              </p>
-
-              {suggestion.netBenefit > 0 && (
-                <div className="mt-2 bg-white/60 dark:bg-black/20 rounded-lg p-2 text-[11px] text-amber-900 dark:text-amber-200 font-medium">
-                  Estimated Net Profit Increase: <strong className="text-emerald-600 dark:text-emerald-400">₹{suggestion.netBenefit.toLocaleString()}</strong> 
-                  {suggestion.distanceKm !== null && <span className="text-amber-700/70 block mt-0.5 text-[9px]">(Includes -₹{suggestion.transportCost.toLocaleString()} est. transport cost)</span>}
-                </div>
-              )}
-
-              {!suggestion.netBenefit && suggestion.distanceKm && (
-                <p className="text-[11px] text-emerald-600 mt-1 font-medium">
-                  📍 {suggestion.distanceKm} km away • ⚡ {suggestion.remainingCapacity} slots remaining
-                </p>
-              )}
-
-              <button
-                onClick={applySuggestion}
-                className={`mt-2.5 text-xs text-white px-3.5 py-1.5 rounded-lg font-semibold shadow-xs transition ${suggestion.netBenefit > 0 ? 'bg-amber-600 hover:bg-amber-700' : 'bg-emerald-700 hover:bg-emerald-800'}`}
+        {/* Top Executive Navigation Bar */}
+        <div className="flex justify-between items-center bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <motion.div whileTap={{ scale: 0.92 }}>
+              <Link
+                href="/farmer/dashboard"
+                className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 flex items-center justify-center transition shadow-2xs"
+                title={t('back', 'Back')}
               >
-                Apply Recommended Slot
-              </button>
-            </div>
-          )}
-        </div>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </Link>
+            </motion.div>
 
-        {/* Main Booking Wizard Card */}
-        <div className="bg-white dark:bg-neutral-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-neutral-700 transition-all">
-          <div className="border-b border-gray-100 dark:border-neutral-700 pb-3 mb-5 flex justify-between items-start">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-neutral-100">Book a Procurement Slot</h1>
-              <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">Government MSP Slot Allotment • Transparent 3-Step Booking</p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black tracking-tight text-emerald-900 dark:text-emerald-400 font-display">KISAN SETU</span>
+                <span className="text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-2 py-0.2 rounded-md">
+                  MSP ALLOTMENT
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Central Mandi Procurement & Digital Weighbridge Registry
+              </p>
             </div>
-            <LanguageToggle />
           </div>
 
-          {/* Stepper Header Pills */}
-          <div className="flex items-center justify-between mb-6 px-1">
-            {[
-              { num: 1, title: 'Mandi & Crop', icon: '🌾' },
-              { num: 2, title: 'Date & Slot', icon: '📅' },
-              { num: 3, title: 'Review & Book', icon: '📋' },
-            ].map((s, idx) => (
-              <div key={s.num} className="flex items-center flex-1 last:flex-none">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (s.num < step) setStep(s.num);
-                  }}
-                  disabled={s.num > step}
-                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition ${
-                    step === s.num
-                      ? 'bg-green-700 text-white shadow-sm ring-2 ring-green-100'
-                      : step > s.num
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
-                      : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <span>{step > s.num ? '✓' : s.icon}</span>
-                  <span className="hidden sm:inline">{s.title}</span>
-                  <span className="sm:hidden">{s.num}</span>
-                </button>
-                {idx < 2 && (
-                  <div
-                    className={`flex-1 h-0.5 mx-2 transition-colors ${
-                      step > s.num ? 'bg-green-600' : 'bg-gray-200'
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+          </div>
+        </div>
+
+        {/* Location & Smart Suggestion Recommendation Box */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={requestLocation}
+              disabled={locating}
+              className={`text-xs font-display font-bold px-3.5 py-2 rounded-xl border flex items-center gap-1.5 transition-all shadow-2xs ${
+                location
+                  ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                  : 'bg-white dark:bg-neutral-900 border-slate-200/80 dark:border-neutral-800 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-300'
+              }`}
+            >
+              <span className="text-sm">📍</span>
+              <span>
+                {locating
+                  ? 'Calculating Mandi Proximity...'
+                  : location
+                  ? 'Location Synchronized (Optimizing Transport)'
+                  : 'Detect My Location (Find Closest Mandis)'}
+              </span>
+            </motion.button>
+          </div>
+
+          <AnimatePresence>
+            {suggestion && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className={`border rounded-2xl p-4 shadow-2xs relative overflow-hidden ${
+                  suggestion.netBenefit > 0
+                    ? 'bg-gradient-to-br from-amber-50/80 to-white dark:from-amber-950/20 dark:to-neutral-900 border-amber-200/80 dark:border-amber-800/60'
+                    : 'bg-gradient-to-br from-emerald-50/80 to-white dark:from-emerald-950/20 dark:to-neutral-900 border-emerald-200/80 dark:border-emerald-800/60'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">💡</span>
+                    <div>
+                      <p className={`text-xs font-black font-display uppercase tracking-wider ${
+                        suggestion.netBenefit > 0 ? 'text-amber-900 dark:text-amber-300' : 'text-emerald-900 dark:text-emerald-300'
+                      }`}>
+                        {suggestion.netBenefit > 0 ? 'Optimal Net Profit Recommendation' : 'Recommended Least-Crowded Mandi'}
+                      </p>
+                      <p className="text-xs text-slate-700 dark:text-neutral-300 font-sans mt-0.5 leading-relaxed">
+                        {suggestion.netBenefit > 0 && suggestion.distanceKm !== null ? (
+                          <>
+                            Direct routing to <strong>{suggestion.centreName}</strong> on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}).
+                            Offering a <strong className="text-emerald-700 dark:text-emerald-400 font-mono">₹{suggestion.localBonus}</strong> local bonus per quintal.
+                          </>
+                        ) : (
+                          <>
+                            Recommended slot at <strong>{suggestion.centreName}</strong> ({suggestion.district}) on <strong>{suggestion.date}</strong> ({suggestion.slotWindow}).
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={applySuggestion}
+                    className={`shrink-0 text-xs text-white px-3.5 py-1.5 rounded-xl font-display font-bold shadow-2xs transition-colors ${
+                      suggestion.netBenefit > 0
+                        ? 'bg-amber-700 hover:bg-amber-800'
+                        : 'bg-emerald-700 hover:bg-emerald-800'
                     }`}
-                  />
+                  >
+                    Apply Optimal Slot
+                  </motion.button>
+                </div>
 
-
+                {suggestion.netBenefit > 0 && (
+                  <div className="mt-3 bg-white/80 dark:bg-neutral-800/70 rounded-xl p-2.5 border border-amber-200/60 dark:border-amber-900/40 text-[11px] font-sans flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">Estimated Net Gain:</span>
+                    <span className="font-mono font-black text-emerald-700 dark:text-emerald-400 text-sm">
+                      +₹{suggestion.netBenefit.toLocaleString('en-IN')}
+                    </span>
+                  </div>
                 )}
-              </div>
-            ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Main Wizard Card */}
+        <div className="bg-white dark:bg-neutral-900 shadow-2xs rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-neutral-800 transition-all space-y-6">
+
+          {/* Wizard Header & Stepper */}
+          <div className="space-y-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900 dark:text-white">
+                Book a Procurement Slot
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Statutory MSP Slot Allotment • Transparent 3-Step Booking Protocol
+              </p>
+            </div>
+
+            {/* Apple HIG Stepper Pills */}
+            <div className="flex items-center justify-between gap-2 pt-1">
+              {[
+                { num: 1, title: 'Mandi & Crop', icon: '🌾' },
+                { num: 2, title: 'Date & Slot', icon: '📅' },
+                { num: 3, title: 'Volume & Confirm', icon: '📋' },
+              ].map((s, idx) => {
+                const isCurrent = step === s.num;
+                const isDone = step > s.num;
+
+                return (
+                  <div key={s.num} className="flex items-center flex-1 last:flex-none">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      type="button"
+                      onClick={() => { if (s.num < step) setStep(s.num); }}
+                      disabled={s.num > step}
+                      className={`flex items-center gap-2 text-xs font-display font-bold px-3 py-1.5 rounded-xl transition-all ${
+                        isCurrent
+                          ? 'bg-emerald-700 text-white shadow-2xs'
+                          : isDone
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 hover:bg-emerald-200 cursor-pointer'
+                          : 'bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 cursor-not-allowed'
+                      }`}
+                    >
+                      <span className="text-xs">{isDone ? '✓' : s.icon}</span>
+                      <span className="hidden sm:inline">{s.title}</span>
+                      <span className="sm:hidden">{s.num}</span>
+                    </motion.button>
+                    {idx < 2 && (
+                      <div className={`flex-1 h-0.5 mx-2 transition-colors ${
+                        step > s.num ? 'bg-emerald-600' : 'bg-slate-200 dark:bg-neutral-800'
+                      }`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Error Message Box */}
           {error && (
-            <div className="mb-4 text-red-600 text-xs bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
-              <span>⚠️</span>
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4 shrink-0 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <span>{error}</span>
-            </div>
+            </motion.div>
           )}
 
           {/* STEP 1: Mandi & Commodity */}
           {step === 1 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="space-y-1.5">
+                <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300">
                   1. {t('procurementCentre')} *
                 </label>
-                <select
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={centreId}
-                  onChange={e => { setCentreId(e.target.value); setError(''); }}
-                >
-                  <option value="">Select centre</option>
-                  {centres.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
-                    </option>
-                  ))}
-                </select>
-                
+                <div className="relative">
+                  <select
+                    className="w-full min-h-[46px] bg-slate-50 dark:bg-neutral-800/80 border border-slate-200/80 dark:border-neutral-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold appearance-none cursor-pointer"
+                    value={centreId}
+                    onChange={e => { setCentreId(e.target.value); setError(''); }}
+                  >
+                    <option value="">Select Mandi Centre</option>
+                    {centres.map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} — {c.district || 'Mandi'} ({c.state || 'Maharashtra'})
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
                 {centreStats && (
-                  <div className="mt-3 bg-slate-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-xl p-3 animate-fadeIn">
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Mandi Insights</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span className="text-gray-400">👨‍🌾</span>
-                          <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">Trusted By</span>
-                        </div>
-                        <p className="text-sm font-bold text-gray-900 dark:text-neutral-100">{centreStats.farmersServed}+ Farmers</p>
-                      </div>
-                      
-                      <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span className="text-gray-400">⚖️</span>
-                          <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">QC Strictness</span>
-                        </div>
-                        <p className={`text-sm font-bold ${centreStats.rejectionRate > 15 ? 'text-red-600' : 'text-emerald-600'}`}>
-                          {centreStats.rejectionRate}% Rejection
+                  <div className="mt-3 bg-slate-50/80 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-neutral-800 rounded-2xl p-3.5 space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-display">
+                      Mandi Operational Ledger
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                      <div className="bg-white dark:bg-neutral-800 rounded-xl p-2.5 border border-slate-200/60 dark:border-neutral-700">
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 block font-display">Farmers Served</span>
+                        <p className="text-sm font-black font-mono text-slate-900 dark:text-white mt-0.5">
+                          {centreStats.farmersServed}+
                         </p>
                       </div>
-                      
+
+                      <div className="bg-white dark:bg-neutral-800 rounded-xl p-2.5 border border-slate-200/60 dark:border-neutral-700">
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 block font-display">QC Rejection</span>
+                        <p className={`text-sm font-black font-mono mt-0.5 ${centreStats.rejectionRate > 15 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          {centreStats.rejectionRate}%
+                        </p>
+                      </div>
+
                       {centreStats.distanceKm && (
-                        <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 border border-gray-100 dark:border-neutral-700 col-span-2">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-gray-400">📍</span>
-                            <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400">Distance from you</span>
-                          </div>
-                          <p className="text-sm font-bold text-gray-900 dark:text-neutral-100">{centreStats.distanceKm} km away</p>
+                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-2.5 border border-slate-200/60 dark:border-neutral-700 col-span-2 sm:col-span-1">
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 block font-display">Radial Distance</span>
+                          <p className="text-sm font-black font-mono text-slate-900 dark:text-white mt-0.5">
+                            {centreStats.distanceKm} km
+                          </p>
                         </div>
                       )}
                     </div>
                   </div>
                 )}
-                {selectedComm && (
-                  <div className="mt-3 space-y-2 animate-fadeIn">
-                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
-                      <div className="flex gap-2">
-                        <span className="text-amber-600 dark:text-amber-400 mt-0.5">⚠️</span>
-                        <div>
-                          <p className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5">
-                            Mandi QC Precaution
-                          </p>
-                          <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                            {selectedComm.harvest_guidelines || (
-                              selectedComm.name.toLowerCase().includes('wheat') || selectedComm.name.toLowerCase().includes('paddy') 
-                              ? 'Sun-dry for at least 48 hours. Max allowed moisture is 14%. Higher moisture will result in rejection or MSP deductions.' 
-                              : selectedComm.name.toLowerCase().includes('soya') || selectedComm.name.toLowerCase().includes('cotton')
-                              ? 'Ensure pods/bolls are completely dry and free from foreign matter. Max allowed moisture is 12%.'
-                              : 'Ensure your crop is clean, sorted, and free from excessive moisture or foreign matter to avoid rejection.'
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {selectedComm.market_advisory && (
-                      <div className={`border rounded-xl p-3 ${selectedComm.demand_status === 'oversupply' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
-                        <div className="flex gap-2">
-                          <span className="mt-0.5">{selectedComm.demand_status === 'oversupply' ? '📉' : '💡'}</span>
-                          <div>
-                            <p className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${selectedComm.demand_status === 'oversupply' ? 'text-red-800' : 'text-blue-800'}`}>
-                              Market Advisory: {selectedComm.demand_status === 'oversupply' ? 'Oversupply' : 'Information'}
-                            </p>
-                            <p className={`text-xs leading-relaxed ${selectedComm.demand_status === 'oversupply' ? 'text-red-700' : 'text-blue-700'}`}>
-                              {selectedComm.market_advisory}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <p className="text-[11px] text-gray-400 mt-1">Select the APMC yard closest to your farmland.</p>
-                {centreId && centreCommodities.length > 0 && commodities.filter(c => {
-                  const cc = centreCommodities.find(cc => cc.commodity_id === c.id);
-                  if (!cc) return false;
-                  return true; // Bypass strict season check for demo
-                }).length === 0 && (
-                  <div className="mt-2 bg-orange-50 border border-orange-200 rounded-xl p-3">
-                    <p className="text-xs text-orange-700 font-semibold">⚠️ No crops are currently being procured at this mandi for the current season.</p>
-                  </div>
-                )}
-
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
+              {/* Commodity Selection */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300">
                   2. {t('commodity')} *
                 </label>
-                <select
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={commodityId}
-                  onChange={e => { setcommodityId(e.target.value); setError(''); }}
-                >
-                  <option value="">Select commodity</option>
-                  {commodities
-                    .filter(c => {
-                      if (!centreId || centreCommodities.length === 0) return true;
-                      const cc = centreCommodities.find(cc => cc.commodity_id === c.id);
-                      if (!cc) return false;
-                      // Check if current month is within procurement window
-                      return true; // Bypass strict season check for demo
-                    })
-                    .map(c => {
-                    const crop = getCropConfig(c.name);
-                    return (
-                      <option key={c.id} value={c.id}>
-                        {crop.icon} {c.name} — MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString()}/q
-                      </option>
-                    );
-                  })}
-                </select>
+                <div className="relative">
+                  <select
+                    className="w-full min-h-[46px] bg-slate-50 dark:bg-neutral-800/80 border border-slate-200/80 dark:border-neutral-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-semibold appearance-none cursor-pointer"
+                    value={commodityId}
+                    onChange={e => { setcommodityId(e.target.value); setError(''); }}
+                  >
+                    <option value="">Select Registered Commodity</option>
+                    {commodities.map(c => {
+                      const crop = getCropConfig(c.name);
+                      return (
+                        <option key={c.id} value={c.id}>
+                          {crop.icon} {c.name} — Statutory MSP: ₹{Number(c.msp_rate_per_quintal).toLocaleString('en-IN')}/q
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
                 {selectedComm && (
-                  <div className="mt-2.5 p-3 rounded-xl bg-slate-50 dark:bg-neutral-950 border border-slate-200 flex items-center justify-between">
+                  <div className="mt-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 dark:text-neutral-400">Selected Crop:</span>
+                      <span className="text-xs text-slate-500 dark:text-neutral-400 font-display">Target Crop:</span>
                       <CropBadge name={selectedComm.name} size="sm" />
                     </div>
                     <div className="text-right">
-                      <span className="text-[11px] text-gray-500 dark:text-neutral-400 block">MSP Rate</span>
-                      <span className="text-xs font-bold text-green-800">₹{Number(selectedComm.msp_rate_per_quintal).toLocaleString()}/q</span>
+                      <span className="text-[10px] text-slate-400 font-display block uppercase tracking-wider">Official MSP</span>
+                      <span className="text-xs font-black font-mono text-emerald-800 dark:text-emerald-400">
+                        ₹{Number(selectedComm.msp_rate_per_quintal).toLocaleString('en-IN')}/quintal
+                      </span>
                     </div>
                   </div>
                 )}
               </div>
 
-              <button
+              {/* Quality & Moisture Advisory */}
+              {selectedComm && (
+                <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 rounded-2xl p-3.5 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">⚖️</span>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 font-display">
+                      Mandi Quality & Moisture Specification
+                    </p>
+                  </div>
+                  <p className="text-xs text-amber-800 dark:text-amber-400 font-sans leading-relaxed">
+                    {selectedComm.harvest_guidelines || (
+                      selectedComm.name.toLowerCase().includes('wheat') || selectedComm.name.toLowerCase().includes('paddy')
+                      ? 'Sun-dry produce for at least 48 hours. Max permissible moisture is 12-14%. Excessive moisture causes automatic rejection at the AI vision gate.'
+                      : 'Ensure produce is sorted, free of stones, foreign plant matter, and moisture within statutory CACP guidelines.'
+                    )}
+                  </p>
+                </div>
+              )}
+
+              <motion.button
+                whileTap={{ scale: 0.96 }}
                 type="button"
                 onClick={() => {
                   if (!centreId || !commodityId) {
@@ -536,28 +588,33 @@ export default function BookSlot() {
                   setError('');
                   setStep(2);
                 }}
-                className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl py-3 font-display font-black text-sm shadow-2xs hover:shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                Next: Choose date & Time Slot &rarr;
-              </button>
-            </div>
+                <span>Continue: Select Date & Time Slot</span>
+                <span>&rarr;</span>
+              </motion.button>
+            </motion.div>
           )}
 
-          {/* STEP 2: date & Time Window */}
+          {/* STEP 2: Date & Slot Window */}
           {step === 2 && (
-            <div className="space-y-4 animate-fadeIn">
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
               <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 uppercase tracking-wider">
-                    Date & Mandi Capacity *
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300">
+                    Mandi Daily Capacity & Date Selection *
                   </label>
                   {availability.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setshowCustomDate(!showCustomDate)}
-                      className="text-[11px] text-green-700 hover:text-green-800 font-semibold"
+                      className="text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline font-display font-bold cursor-pointer"
                     >
-                      {showCustomDate ? '⚡ Show Capacity Cards' : '📅 Or pick specific calendar date'}
+                      {showCustomDate ? '⚡ Show Live Capacity' : '📅 Custom Calendar Date'}
                     </button>
                   )}
                 </div>
@@ -581,93 +638,95 @@ export default function BookSlot() {
                       const isMed = item.percent >= 50 && item.percent < 85;
 
                       return (
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
                           type="button"
                           key={item.date}
                           onClick={() => { setDate(item.date); setError(''); }}
-                          className={`p-2.5 rounded-xl border text-left transition relative flex flex-col justify-between ${
+                          className={`p-3 rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${
                             isSelected
-                              ? 'border-green-600 bg-green-50/70 ring-2 ring-green-600/20 shadow-xs'
-                              : 'border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-gray-300 dark:border-neutral-600'
+                              ? 'border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/40 ring-2 ring-emerald-600/30 shadow-xs'
+                              : 'border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-slate-300 dark:hover:border-neutral-700'
                           }`}
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <span className="text-[11px] font-bold text-gray-900 dark:text-neutral-100 block leading-tight">{dayName}</span>
-                              <span className="text-[10px] text-gray-500 dark:text-neutral-400">{dayMonth}</span>
+                              <span className="text-xs font-bold font-display text-slate-900 dark:text-white block leading-tight">
+                                {dayName}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {dayMonth}
+                              </span>
                             </div>
                             <span
                               className={`w-2 h-2 rounded-full mt-1 ${
-                                isLow ? 'bg-emerald-500' : isMed ? 'bg-amber-500' : 'bg-red-500 animate-pulse'
+                                isLow ? 'bg-emerald-500' : isMed ? 'bg-amber-500' : 'bg-rose-500 animate-pulse'
                               }`}
                             />
                           </div>
 
-                          <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-neutral-700">
-                            <p className="text-[10px] font-semibold text-gray-700 dark:text-neutral-300">
-                              {item.available} <span className="text-[9px] font-normal text-gray-500 dark:text-neutral-400">left</span>
+                          <div className="mt-3 pt-2 border-t border-slate-100 dark:border-neutral-800">
+                            <p className="text-[10px] font-mono font-bold text-slate-700 dark:text-neutral-300">
+                              {item.available} slots left
                             </p>
-                            <div className="w-full bg-gray-100 dark:bg-neutral-800 rounded-full h-1 mt-1 overflow-hidden">
+                            <div className="w-full bg-slate-100 dark:bg-neutral-800 rounded-full h-1.5 mt-1 overflow-hidden">
                               <div
-                                className={`h-full rounded-full ${
-                                  isLow ? 'bg-emerald-500' : isMed ? 'bg-amber-500' : 'bg-red-500'
+                                className={`h-full rounded-full transition-all ${
+                                  isLow ? 'bg-emerald-500' : isMed ? 'bg-amber-500' : 'bg-rose-500'
                                 }`}
                                 style={{ width: `${item.percent}%` }}
                               />
                             </div>
                           </div>
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </div>
                 ) : (
-                  <>
                   <input
                     type="date"
-                    className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none mb-2"
+                    className="w-full min-h-[46px] bg-slate-50 dark:bg-neutral-800/80 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none mb-2"
                     value={date}
-                    onChange={e =>
- { setDate(e.target.value); setError(''); }}
+                    onChange={e => { setDate(e.target.value); setError(''); }}
                   />
-
-                {/* Weather Aware Warning */}
-                {date && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex gap-3 mt-4">
-                    <span className="text-2xl mt-0.5">🌦️</span>
-                    <div>
-                      <p className="text-xs font-bold text-blue-800 dark:text-blue-300">Weather Forecast for {date}</p>
-                      <p className="text-[11px] text-blue-700 dark:text-blue-400 mt-1">Light rain is expected near your selected mandi. High moisture can lead to crop rejection. Please ensure your produce is properly covered.</p>
-                    </div>
-                  </div>
-                )}
-                  </>
-
                 )}
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
+              {/* Time Window Selection */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300">
                   {t('timeWindow')} *
                 </label>
-                <select
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={slotWindow}
-                  onChange={e => setSlotWindow(e.target.value)}
-                >
-                  {SLOT_WINDOWS.map(w => <option key={w} value={w}>{w}</option>)}
-                </select>
-                <p className="text-[11px] text-gray-400 mt-1">Arrival within this window guarantees priority weighbridge access.</p>
+                <div className="relative">
+                  <select
+                    className="w-full min-h-[46px] bg-slate-50 dark:bg-neutral-800/80 border border-slate-200/80 dark:border-neutral-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none font-mono font-bold appearance-none cursor-pointer"
+                    value={slotWindow}
+                    onChange={e => setSlotWindow(e.target.value)}
+                  >
+                    {SLOT_WINDOWS.map(w => <option key={w} value={w}>{w}</option>)}
+                  </select>
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400 font-sans">
+                  Arrival within this 2-hour window guarantees priority weighbridge passage.
+                </p>
               </div>
 
-              <div className="flex gap-3 mt-4">
-                <button
+              <div className="flex gap-2.5 pt-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => { setError(''); setStep(1); }}
-                  className="flex-1 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 text-gray-700 dark:text-neutral-300 rounded-xl py-3 font-semibold text-sm transition"
+                  className="w-1/3 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 rounded-2xl py-3 font-display font-bold text-xs sm:text-sm transition-colors cursor-pointer"
                 >
                   &larr; Back
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => {
                     if (!date || !slotWindow) {
@@ -677,89 +736,103 @@ export default function BookSlot() {
                     setError('');
                     setStep(3);
                   }}
-                  className="flex-1 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition"
+                  className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl py-3 font-display font-black text-xs sm:text-sm shadow-2xs hover:shadow-xs transition-all cursor-pointer"
                 >
-                  Next: Quantity & Review &rarr;
-                </button>
+                  Continue: Volume & Confirmation &rarr;
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* STEP 3: Quantity & Review Confirmation */}
           {step === 3 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-neutral-300 mb-1.5 uppercase tracking-wider">
-                  {t('expectedQuantity')} (Quintals)
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="space-y-1.5">
+                <label className="block text-xs font-black font-display uppercase tracking-wider text-slate-700 dark:text-neutral-300">
+                  {t('expectedQuantity')} (Quintals) *
                 </label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="0.1"
-                  placeholder="e.g. 25"
-                  className="w-full border border-gray-300 dark:border-neutral-600 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={quantity}
-                  onChange={e => setQuantity(e.target.value)}
-                />
-                <p className="text-[11px] text-gray-400 mt-1">Approximate harvest weight. Actual weight will be recorded at the digital weighbridge.</p>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    placeholder="e.g. 25"
+                    className="w-full min-h-[46px] bg-slate-50 dark:bg-neutral-800/80 border border-slate-200/80 dark:border-neutral-700 rounded-xl px-3.5 py-2.5 text-base font-mono font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none"
+                    value={quantity}
+                    onChange={e => setQuantity(e.target.value)}
+                  />
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-slate-400">
+                    QUINTALS (q)
+                  </div>
+                </div>
               </div>
 
-              {/* Live MSP Calculation Box */}
+              {/* Live MSP Calculation Card */}
               {estPayout > 0 && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs flex justify-between items-center">
+                <div className="bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-4 flex justify-between items-center">
                   <div>
-                    <p className="text-emerald-800 font-semibold">💰 Estimated Direct Benefit (DBT)</p>
-                    <p className="text-emerald-600 text-[11px]">
-                      {quantity} quintals × ₹{Number(selectedComm?.msp_rate_per_quintal || 0).toLocaleString()}/q
+                    <p className="text-emerald-900 dark:text-emerald-300 font-display font-bold text-xs">
+                      💰 Projected Direct Benefit Transfer (DBT)
+                    </p>
+                    <p className="text-emerald-700 dark:text-emerald-400 text-[11px] font-mono mt-0.5">
+                      {quantity} q × ₹{Number(selectedComm?.msp_rate_per_quintal || 0).toLocaleString('en-IN')}/q
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-base font-bold text-emerald-900">₹{Number(estPayout).toLocaleString()}</p>
-                    <p className="text-[10px] text-emerald-700">Directly deposited to bank account</p>
+                    <p className="text-lg font-black font-mono text-emerald-900 dark:text-emerald-200">
+                      ₹<NumberTicker value={estPayout} />
+                    </p>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-display">Aadhaar PFMS Escrow</p>
                   </div>
                 </div>
               )}
 
-              {/* Booking Summary Card */}
-              <div className="bg-slate-50 dark:bg-neutral-950 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
-                <p className="font-bold text-gray-800 dark:text-neutral-200 text-sm border-b border-slate-200 pb-1.5">
-                  📋 Appointment Summary
+              {/* Statutory Appointment Summary Card */}
+              <div className="bg-slate-50/80 dark:bg-neutral-950 border border-slate-200/80 dark:border-neutral-800 rounded-2xl p-4 text-xs space-y-2.5">
+                <p className="font-bold text-slate-900 dark:text-white text-xs border-b border-slate-200/60 dark:border-neutral-800 pb-2 font-display uppercase tracking-wider">
+                  📋 Mandi Appointment Docket
                 </p>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400">Mandi Centre:</span>
-                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{selectedCentre?.name || '-'} ({selectedCentre?.district})</span>
+                  <span className="text-slate-500 dark:text-neutral-400">Mandi Node:</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{selectedCentre?.name || '-'} ({selectedCentre?.district})</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 dark:text-neutral-400">Commodity:</span>
+                  <span className="text-slate-500 dark:text-neutral-400">Crop Consignment:</span>
                   <CropBadge name={selectedComm?.name} size="xs" />
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400">Inspection date:</span>
-                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{date}</span>
+                  <span className="text-slate-500 dark:text-neutral-400">Procurement Date:</span>
+                  <span className="font-bold font-mono text-slate-900 dark:text-white">{date}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-neutral-400">Time Window:</span>
-                  <span className="font-semibold text-gray-800 dark:text-neutral-200">{slotWindow}</span>
+                  <span className="text-slate-500 dark:text-neutral-400">Time Window:</span>
+                  <span className="font-bold font-mono text-slate-900 dark:text-white">{slotWindow}</span>
                 </div>
-                <div className="flex justify-between border-t border-slate-200 pt-1.5">
-                  <span className="text-gray-500 dark:text-neutral-400">Moisture Standard:</span>
-                  <span className="font-semibold text-emerald-700">&le; 12-14% Required</span>
+                <div className="flex justify-between border-t border-slate-200/60 dark:border-neutral-800 pt-2">
+                  <span className="text-slate-500 dark:text-neutral-400">Moisture Threshold:</span>
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400">&le; 12-14% Permissible</span>
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-4">
-                <button
+              <div className="flex gap-2.5 pt-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => { setError(''); setStep(2); }}
-                  className="flex-1 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 text-gray-700 dark:text-neutral-300 rounded-xl py-3 font-semibold text-sm transition"
+                  className="w-1/3 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 rounded-2xl py-3 font-display font-bold text-xs sm:text-sm transition-colors cursor-pointer"
                 >
                   &larr; Back
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={submit}
                   disabled={loading}
-                  className="flex-1 bg-green-700 hover:bg-green-800 text-white rounded-xl py-3 font-semibold text-sm shadow-sm transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl py-3 font-display font-black text-xs sm:text-sm shadow-2xs hover:shadow-xs transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -767,12 +840,13 @@ export default function BookSlot() {
                       <span>{t('bookingInProgress')}</span>
                     </>
                   ) : (
-                    <span>Confirm Booking →</span>
+                    <span>Confirm Procurement Booking &rarr;</span>
                   )}
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           )}
+
         </div>
       </div>
 
@@ -780,5 +854,3 @@ export default function BookSlot() {
     </div>
   );
 }
-
-
