@@ -155,6 +155,14 @@ export default function FarmerDashboard() {
     return upcoming.find(b => b.slot_date === today && ['booked', 'checked_in', 'weighed', 'quality_checked'].includes(b.status));
   }, [upcoming, today]);
 
+  // Whether the farmer should leave now (queue position <= 2)
+  const leaveNow = useMemo(() => {
+    return upcoming.some(b => {
+      const q = b.queue_entries?.[0];
+      return b.slot_date === today && q && ['booked', 'checked_in'].includes(b.status) && q.queue_position != null && q.queue_position <= 2;
+    });
+  }, [upcoming, today]);
+
   // Audio and Haptic queue turn alarm
   useEffect(() => {
     const hasLeaveNow = upcoming.some(b => {

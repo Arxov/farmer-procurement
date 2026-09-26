@@ -102,7 +102,7 @@ export default function AdminDashboard() {
         const { data: payments } = await supabase.from('payments').select('amount, status').limit(5000);
         let pending = 0, paid = 0;
         (payments || []).forEach(p => {
-          if (p.status === 'paid') paid += (p.amount || 0);
+          if (p.status === 'completed' || p.status === 'paid') paid += (p.amount || 0);
           else pending += (p.amount || 0);
         });
         setRevenue({ pending, paid, total: pending + paid });

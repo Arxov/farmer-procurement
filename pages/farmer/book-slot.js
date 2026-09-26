@@ -13,6 +13,7 @@ import { useCommodities } from '../../hooks/useCommodities';
 import confetti from 'canvas-confetti';
 import LanguageToggle from '../../components/LanguageToggle';
 import NumberTicker from '../../components/NumberTicker';
+import { useToast } from '../../components/Toast';
 
 const SLOT_WINDOWS = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];
 const EMPTY_ARRAY = [];
@@ -37,6 +38,7 @@ export default function BookSlot() {
 
   const router = useRouter();
   const { t, language } = useLanguage();
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (router.query.commodityId) {
@@ -50,7 +52,7 @@ export default function BookSlot() {
   const requestLocation = () => {
     setLocating(true);
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      showToast('Geolocation is not supported by your browser.', 'error');
       setLocating(false);
       return;
     }
@@ -59,7 +61,7 @@ export default function BookSlot() {
       setLocating(false);
     }, (err) => {
       console.error(err);
-      alert('Could not get location. Ensure permissions are granted.');
+      showToast('Could not get location. Ensure permissions are granted.', 'error');
       setLocating(false);
     });
   };

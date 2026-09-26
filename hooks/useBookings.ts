@@ -33,7 +33,7 @@ export async function fetchOfficerBookings(date: string) {
   if (!date) return [];
   const { data, error } = await supabase
     .from('bookings')
-    .select('*, profiles(full_name, phone), commodities(name)')
+    .select('*, profiles(full_name, phone), commodities(name, max_moisture, max_broken_percent, max_damaged_percent), queue_entries(queue_position, estimated_wait_minutes)')
     .eq('slot_date', date)
     .order('created_at', { ascending: true });
 

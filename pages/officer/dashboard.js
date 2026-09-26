@@ -35,21 +35,25 @@ export default function OfficerDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/'); return; }
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/'); return; }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
 
-      if (!profile || !['officer', 'admin'].includes(profile.role)) {
-        router.push('/');
-        return;
+        if (!profile || !['officer', 'admin'].includes(profile.role)) {
+          router.push('/');
+          return;
+        }
+
+        setAuthorized(true);
+      } catch (err) {
+        showToast('Failed to verify authorization. Please check your connection.', 'error');
       }
-
-      setAuthorized(true);
     };
     checkAuth();
   }, []);
